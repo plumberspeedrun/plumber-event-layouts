@@ -69,6 +69,30 @@
 				"width": 1920,
 				"height": 1080,
 				"singleInstance": false
+			},
+			{
+				"file": "SmwRace.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			}
+		],
+		"assetCategories": [
+			{
+				"name": "logo",
+				"title": "ロゴ画像",
+				"allowedTypes": [
+					"svg",
+					"png"
+				]
+			},
+			{
+				"name": "background",
+				"title": "レイアウト画像",
+				"allowedTypes": [
+					"svg",
+					"png"
+				]
 			}
 		]
 	}
