@@ -16,12 +16,13 @@ const App = () => {
 
 	return (
 		<>
-			<Logo
-				width={500}
-				x={0}
-				y={0}
-			/>
-			<BaseLayout backgroundUrl={bgAsset[0]?.url} />
+			<BaseLayout backgroundUrl={bgAsset[0]?.url}>
+				<Logo
+					width={500}
+					x={0}
+					y={0}
+				/>
+			</BaseLayout>
 		</>
 	);
 };

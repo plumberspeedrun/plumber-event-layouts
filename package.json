@@ -19,6 +19,7 @@
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
+		"@fontsource/m-plus-1p": "^5.2.9",
 		"@nodecg/react-hooks": "^1.0.3",
 		"nodecg": "^2.6.4",
 		"react": "^19.2.4",

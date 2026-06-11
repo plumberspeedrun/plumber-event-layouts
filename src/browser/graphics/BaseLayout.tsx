@@ -1,3 +1,4 @@
+import "@fontsource/m-plus-1p/900.css";
 import {CSSProperties, ReactNode} from "react";
 
 const containerStyle: CSSProperties = {
@@ -22,6 +23,12 @@ const Footer = () => {
 				width: "1920px",
 				height: "50px",
 				backgroundColor: "#202020",
+				display: "flex",
+				alignItems: "center",
+				fontSize: 32,
+				fontFamily: '"M PLUS 1p"',
+				fontWeight: 900,
+				color: "white",
 			}}
 		>
 			<div>hi</div>
@@ -33,7 +40,6 @@ export const BaseLayout = ({children, backgroundUrl}: IProps) => {
 	return (
 		<>
 			<div style={containerStyle}>
-				{children}
 				<img
 					src={backgroundUrl}
 					style={{
@@ -44,6 +50,7 @@ export const BaseLayout = ({children, backgroundUrl}: IProps) => {
 						height: "1080px",
 					}}
 				/>
+				{children}
 				<Footer />
 			</div>
 		</>
