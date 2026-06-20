@@ -24,6 +24,7 @@
 	"include": [
 		"src/**/*.ts",
 		"src/**/*.tsx",
+		"playwright.config.ts",
 		"node_modules/@nodecg/types/augment-window.d.ts"
 	]
 }

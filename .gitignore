@@ -13,4 +13,10 @@ types/schemas
 # tsbuildinfo
 *.tsbuildinfo
 
+# Playwright
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
+
 *.local.*
