@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+        "Bash(ls:*)",
+        "Bash(cat:*)",
+        "Bash(pnpm:*)"
+    ],
+    "deny": [
+        "Bash(sudo:*)",
+        "Bash(wget:*)",
+        "Bash(rm -rf:*)"
+    ]
+  }
+}
+
