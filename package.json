@@ -74,6 +74,22 @@
 				"file": "example.html",
 				"workspace": "Example",
 				"headerColor": "#525F78"
+			},
+			{
+				"name": "schedule",
+				"title": "スケジュール管理",
+				"width": 4,
+				"file": "schedule.html",
+				"workspace": "Schedule",
+				"headerColor": "#525F78"
+			},
+			{
+				"name": "timerControl",
+				"title": "タイマー操作",
+				"width": 3,
+				"file": "timerControl.html",
+				"workspace": "Schedule",
+				"headerColor": "#525F78"
 			}
 		],
 		"graphics": [

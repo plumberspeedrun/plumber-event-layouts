@@ -17,7 +17,7 @@ export const ScheduleList = () => {
 					</span>
 					<span>
 						{runData.teams
-							.flatMap((t) => t.players.map((p) => p.social.twitch))
+							.flatMap((t) => t.players.map((p) => p.social?.twitch))
 							.join(", ")}
 					</span>
 				</div>

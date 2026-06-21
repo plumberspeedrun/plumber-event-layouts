@@ -6,9 +6,12 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface ExtendedPlayerData {
-	[k: string]: {
+export type SheetRunners = {
+	name: string;
+	social?: {
+		twitch?: string;
+		youtube?: string;
 		twitter?: string;
 		niconico?: string;
 	};
-}
+}[];

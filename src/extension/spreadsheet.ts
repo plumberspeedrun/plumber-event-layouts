@@ -1,14 +1,13 @@
 import {auth as googleAuth, sheets as googleSheets} from "@googleapis/sheets";
 import NodeCG from "nodecg/types";
-import {Commentators} from "../nodecg/generated/commentators";
-import {Configschema} from "../nodecg/generated/configschema";
-import {ExtendedPlayerData} from "../nodecg/generated/extendedPlayerData";
-import {SpreadsheetStatus} from "../nodecg/generated/spreadsheetStatus";
-import {RunDataArray} from "../types/speedcontrol";
+import type {Configschema} from "../nodecg/generated/configschema.js";
+import type {SheetCommentators} from "../nodecg/generated/sheetCommentators.js";
+import type {SheetRunners} from "../nodecg/generated/sheetRunners.js";
+import type {SpreadsheetStatus} from "../nodecg/generated/spreadsheetStatus.js";
 
 const RUNNER_COLUMNS = ["name", "twitch", "youtube", "twitter", "niconico"];
 const COMMENTATOR_COLUMNS = [
-	"runId",
+	"game",
 	"name",
 	"twitter",
 	"twitch",
@@ -17,8 +16,18 @@ const COMMENTATOR_COLUMNS = [
 	"pronouns",
 ];
 
+const SOCIAL_KEYS = ["twitch", "youtube", "twitter", "niconico"] as const;
+
 type SheetRow = {
 	[column: string]: string;
+};
+
+const buildSocial = (record: SheetRow) => {
+	const social: Record<string, string> = {};
+	for (const key of SOCIAL_KEYS) {
+		if (record[key] != null) social[key] = record[key];
+	}
+	return Object.keys(social).length > 0 ? {social} : {};
 };
 
 const rowsToRecords = (rows: string[][], columns: string[]): SheetRow[] => {
@@ -41,9 +50,9 @@ const rowsToRecords = (rows: string[][], columns: string[]): SheetRow[] => {
 };
 
 export const spreadsheet = (nodecg: NodeCG.ServerAPI<Configschema>) => {
-	const commentatorsReplicant = nodecg.Replicant<Commentators>("commentators");
-	const extendedPlayerDataReplicant =
-		nodecg.Replicant<ExtendedPlayerData>("extendedPlayerData");
+	const sheetRunnersReplicant = nodecg.Replicant<SheetRunners>("sheetRunners");
+	const sheetCommentatorsReplicant =
+		nodecg.Replicant<SheetCommentators>("sheetCommentators");
 	const spreadsheetStatusReplicant =
 		nodecg.Replicant<SpreadsheetStatus>("spreadsheetStatus");
 
@@ -86,69 +95,22 @@ export const spreadsheet = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				COMMENTATOR_COLUMNS,
 			);
 
-			const runDataArray = nodecg.readReplicant<RunDataArray>(
-				"runDataArray",
-				"nodecg-speedcontrol",
-			);
+			sheetRunnersReplicant.value = runnerRecords
+				.filter((r) => r["name"] != null)
+				.map((r) => ({
+					name: r["name"]!,
+					...buildSocial(r),
+				}));
 
-			const newExtendedPlayerData: ExtendedPlayerData = {};
-			if (runDataArray != null) {
-				for (const runData of runDataArray) {
-					for (const team of runData.teams) {
-						for (const player of team.players) {
-							const record = runnerRecords.find(
-								(runner) => runner["name"] === player.name,
-							);
-							if (record == null) continue;
+			sheetCommentatorsReplicant.value = commentatorRecords
+				.filter((r) => r["game"] != null && r["name"] != null)
+				.map((r) => ({
+					game: r["game"]!,
+					name: r["name"]!,
+					...(r["pronouns"] != null && {pronouns: r["pronouns"]}),
+					...buildSocial(r),
+				}));
 
-							const twitter = record["twitter"];
-							const niconico = record["niconico"];
-							if (twitter == null && niconico == null) continue;
-
-							newExtendedPlayerData[player.id] = {
-								...(twitter != null && {twitter}),
-								...(niconico != null && {niconico}),
-							};
-						}
-					}
-				}
-			}
-
-			const newCommentators: Commentators = {};
-			for (const record of commentatorRecords) {
-				const runId = record["runId"];
-				const name = record["name"];
-				if (runId == null || name == null) continue;
-
-				const twitter = record["twitter"];
-				const twitch = record["twitch"];
-				const youtube = record["youtube"];
-				const niconico = record["niconico"];
-				const pronouns = record["pronouns"];
-				const hasSocial =
-					twitter != null ||
-					twitch != null ||
-					youtube != null ||
-					niconico != null;
-
-				const entry = newCommentators[runId] ?? [];
-				entry.push({
-					name,
-					...(pronouns != null && {pronouns}),
-					...(hasSocial && {
-						social: {
-							...(twitter != null && {twitter}),
-							...(twitch != null && {twitch}),
-							...(youtube != null && {youtube}),
-							...(niconico != null && {niconico}),
-						},
-					}),
-				});
-				newCommentators[runId] = entry;
-			}
-
-			commentatorsReplicant.value = newCommentators;
-			extendedPlayerDataReplicant.value = newExtendedPlayerData;
 			spreadsheetStatusReplicant.value = {
 				enabled: true,
 				lastSynced: new Date().toISOString(),

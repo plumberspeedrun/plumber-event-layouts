@@ -1,0 +1,127 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "array",
+	"items": {
+		"type": "object",
+		"additionalProperties": false,
+		"properties": {
+			"id": {
+				"type": "string"
+			},
+			"game": {
+				"type": "string"
+			},
+			"category": {
+				"type": "string"
+			},
+			"system": {
+				"type": "string"
+			},
+			"estimate": {
+				"type": "string"
+			},
+			"setupTime": {
+				"type": "string"
+			},
+			"teams": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"players": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"additionalProperties": false,
+								"properties": {
+									"id": {
+										"type": "string"
+									},
+									"teamId": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"pronouns": {
+										"type": "string"
+									},
+									"social": {
+										"type": "object",
+										"additionalProperties": false,
+										"properties": {
+											"twitch": {"type": "string"},
+											"youtube": {"type": "string"},
+											"twitter": {"type": "string"},
+											"niconico": {"type": "string"}
+										}
+									}
+								},
+								"required": ["id", "teamId", "name"]
+							}
+						}
+					},
+					"required": ["id", "players"]
+				}
+			},
+			"commentators": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"pronouns": {
+							"type": "string"
+						},
+						"social": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"twitch": {"type": "string"},
+								"youtube": {"type": "string"},
+								"twitter": {"type": "string"},
+								"niconico": {"type": "string"}
+							}
+						}
+					},
+					"required": ["name"]
+				}
+			},
+			"result": {
+				"type": "object",
+				"additionalProperties": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"time": {
+							"type": "string"
+						},
+						"milliseconds": {
+							"type": "number"
+						},
+						"placement": {
+							"type": "number"
+						},
+						"state": {
+							"type": "string",
+							"enum": ["completed", "forfeit"]
+						}
+					},
+					"required": ["time", "milliseconds", "state"]
+				}
+			}
+		},
+		"required": ["id", "teams"]
+	},
+	"default": []
+}

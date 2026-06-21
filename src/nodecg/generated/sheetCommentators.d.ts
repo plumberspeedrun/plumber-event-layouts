@@ -6,15 +6,14 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface Commentators {
-	[k: string]: {
-		name: string;
-		pronouns?: string;
-		social?: {
-			twitter?: string;
-			twitch?: string;
-			youtube?: string;
-			niconico?: string;
-		};
-	}[];
-}
+export type SheetCommentators = {
+	game: string;
+	name: string;
+	pronouns?: string;
+	social?: {
+		twitch?: string;
+		youtube?: string;
+		twitter?: string;
+		niconico?: string;
+	};
+}[];

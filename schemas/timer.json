@@ -1,0 +1,27 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"time": {
+			"type": "string"
+		},
+		"state": {
+			"type": "string",
+			"enum": ["stopped", "running", "paused", "finished"]
+		},
+		"milliseconds": {
+			"type": "number"
+		},
+		"timestamp": {
+			"type": "number"
+		}
+	},
+	"required": ["time", "state", "milliseconds", "timestamp"],
+	"default": {
+		"time": "00:00:00",
+		"state": "stopped",
+		"milliseconds": 0,
+		"timestamp": 0
+	}
+}

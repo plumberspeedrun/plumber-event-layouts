@@ -1,0 +1,25 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "array",
+	"items": {
+		"type": "object",
+		"additionalProperties": false,
+		"properties": {
+			"name": {
+				"type": "string"
+			},
+			"social": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"twitch": {"type": "string"},
+					"youtube": {"type": "string"},
+					"twitter": {"type": "string"},
+					"niconico": {"type": "string"}
+				}
+			}
+		},
+		"required": ["name"]
+	},
+	"default": []
+}
