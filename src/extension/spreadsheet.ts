@@ -1,4 +1,4 @@
-import {google} from "googleapis";
+import {auth as googleAuth, sheets as googleSheets} from "@googleapis/sheets";
 import NodeCG from "nodecg/types";
 import {Commentators} from "../nodecg/generated/commentators";
 import {Configschema} from "../nodecg/generated/configschema";
@@ -59,11 +59,11 @@ export const spreadsheet = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	const runnerSheetName = config.runnerSheetName ?? "Runners";
 	const commentatorSheetName = config.commentatorSheetName ?? "Commentators";
 
-	const auth = new google.auth.GoogleAuth({
+	const auth = new googleAuth.GoogleAuth({
 		keyFile: config.credentialsPath,
 		scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
 	});
-	const sheets = google.sheets({version: "v4", auth});
+	const sheets = googleSheets({version: "v4", auth});
 
 	const fetchSheetRows = async (sheetName: string): Promise<string[][]> => {
 		const res = await sheets.spreadsheets.values.get({
