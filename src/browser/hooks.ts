@@ -1,4 +1,6 @@
 import {useReplicant} from "@nodecg/react-hooks";
+import {Commentators} from "../nodecg/generated/commentators";
+import {ExtendedPlayerData} from "../nodecg/generated/extendedPlayerData";
 import {RunDataActiveRun, RunDataArray, Timer} from "../types/speedcontrol";
 
 export const useRunDataArray = () => {
@@ -34,4 +36,25 @@ export const useUpcomingRunData = () => {
 		(runData) => runData.id == runDataActiveRun?.id + 1,
 	)[0];
 	return upcomingRunData;
+};
+
+export const useCommentators = () => {
+	const [commentators] = useReplicant<Commentators>("commentators");
+	if (commentators == null) return;
+	return commentators;
+};
+
+export const useExtendedPlayerData = () => {
+	const [extendedPlayerData] =
+		useReplicant<ExtendedPlayerData>("extendedPlayerData");
+	if (extendedPlayerData == null) return;
+	return extendedPlayerData;
+};
+
+export const useCurrentRunCommentators = () => {
+	const runDataActiveRun = useRunDataActiveRun();
+	const commentators = useCommentators();
+
+	if (runDataActiveRun == null || commentators == null) return;
+	return commentators[runDataActiveRun.id];
 };
