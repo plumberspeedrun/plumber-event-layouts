@@ -60,6 +60,7 @@ export const sampleRunDataArray: RunDataArray = [
 		system: "SNES",
 		category: "Any%",
 		estimate: "01:30:00",
+		scheduledStartTime: "2026-06-22T10:00:00.000Z",
 		teams: [
 			{
 				id: "team-1",
@@ -90,6 +91,7 @@ export const sampleRunDataArray: RunDataArray = [
 		system: "SNES",
 		category: "100%",
 		estimate: "01:45:00",
+		scheduledStartTime: "2026-06-22T12:00:00.000Z",
 		teams: [
 			{
 				id: "team-2",
