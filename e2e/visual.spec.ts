@@ -1,4 +1,9 @@
-import {sampleBackgroundAsset, sampleLogoAsset} from "./data";
+import {
+	sampleActiveRunId,
+	sampleBackgroundAsset,
+	sampleLogoAsset,
+	sampleRunDataArray,
+} from "./data";
 import {expect, test} from "./fixtures";
 
 /**
@@ -38,5 +43,19 @@ test.describe("visual regression", () => {
 		await waitForImages(page);
 
 		await expect(page).toHaveScreenshot("smw-race.png");
+	});
+
+	test("ScheduleList レイアウト", async ({page, nodecg}) => {
+		await nodecg.gotoGraphics("ScheduleList.html");
+
+		// run データとアクティブ run を注入してスケジュールを描画させる。
+		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
+
+		// scheduledStartTime の表示はロケール依存のため、ゲーム名のみ検証する。
+		await expect(page.getByText("Super Mario World")).toBeVisible();
+		await waitForImages(page);
+
+		await expect(page).toHaveScreenshot("schedule-list.png");
 	});
 });

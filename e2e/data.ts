@@ -1,16 +1,16 @@
+import type {ActiveRunId} from "../src/nodecg/generated/activeRunId";
+import type {RunDataArray} from "../src/nodecg/generated/runDataArray";
+import type {SheetCommentators} from "../src/nodecg/generated/sheetCommentators";
+import type {SheetRunners} from "../src/nodecg/generated/sheetRunners";
+import type {SpreadsheetStatus} from "../src/nodecg/generated/spreadsheetStatus";
+import type {Timer} from "../src/nodecg/generated/timer";
 import type {Assets} from "../src/types/assets";
-import type {
-	RunDataActiveRun,
-	RunDataArray,
-	Timer,
-} from "../src/types/speedcontrol";
 
 /**
  * テスト用のサンプルデータ。
  *
  * VRT を決定論的にするため、固定値・data URL を用いる。
- * speedcontrol の Replicant（`runDataArray` 等）はバンドル名
- * `nodecg-speedcontrol` を指定して注入する。
+ * `runDataArray` 等は本バンドル独自の Replicant として注入する。
  */
 
 /**
@@ -51,7 +51,6 @@ export const sampleTimer: Timer = {
 	state: "running",
 	milliseconds: 754000,
 	timestamp: 0,
-	teamFinishTimes: {},
 };
 
 export const sampleRunDataArray: RunDataArray = [
@@ -61,21 +60,30 @@ export const sampleRunDataArray: RunDataArray = [
 		system: "SNES",
 		category: "Any%",
 		estimate: "01:30:00",
+		scheduledStartTime: "2026-06-22T10:00:00.000Z",
 		teams: [
 			{
 				id: "team-1",
 				players: [
 					{
 						id: "player-1",
-						teamID: "team-1",
+						teamId: "team-1",
 						name: "Runner One",
-						social: {twitch: "runner_one"},
-						customData: {},
+						social: {twitch: "runner_one", twitter: "runner_one_x"},
 					},
 				],
 			},
 		],
-		customData: {},
+		commentators: [
+			{
+				name: "Commentator One",
+				social: {twitter: "comm_one", twitch: "comm_one_twitch"},
+			},
+			{
+				name: "Commentator Two",
+				pronouns: "they/them",
+			},
+		],
 	},
 	{
 		id: "run-2",
@@ -83,22 +91,43 @@ export const sampleRunDataArray: RunDataArray = [
 		system: "SNES",
 		category: "100%",
 		estimate: "01:45:00",
+		scheduledStartTime: "2026-06-22T12:00:00.000Z",
 		teams: [
 			{
 				id: "team-2",
 				players: [
 					{
 						id: "player-2",
-						teamID: "team-2",
+						teamId: "team-2",
 						name: "Runner Two",
 						social: {twitch: "runner_two"},
-						customData: {},
 					},
 				],
 			},
 		],
-		customData: {},
 	},
 ];
 
-export const sampleActiveRun: RunDataActiveRun = sampleRunDataArray[0];
+export const sampleActiveRunId: ActiveRunId = "run-1";
+
+export const sampleSheetRunners: SheetRunners = [
+	{
+		name: "Runner One",
+		social: {twitch: "runner_one", twitter: "runner_one_x"},
+	},
+	{name: "Runner Two", social: {twitch: "runner_two"}},
+];
+
+export const sampleSheetCommentators: SheetCommentators = [
+	{
+		game: "Super Mario World",
+		name: "Commentator One",
+		social: {twitter: "comm_one", twitch: "comm_one_twitch"},
+	},
+	{game: "Super Mario World", name: "Commentator Two", pronouns: "they/them"},
+];
+
+export const sampleSpreadsheetStatus: SpreadsheetStatus = {
+	enabled: true,
+	lastSynced: "2026-06-21T00:00:00.000Z",
+};

@@ -4,6 +4,3 @@
 [submodule "bundles/nodecg-obs-browser"]
 	path = bundles/nodecg-obs-browser
 	url = git@github.com:yewdofu/nodecg-obs-browser.git
-[submodule "bundles/nodecg-speedcontrol"]
-	path = bundles/nodecg-speedcontrol
-	url = git@github.com:yewdofu/nodecg-speedcontrol.git

@@ -26,6 +26,7 @@
 	"dependencies": {
 		"@fontsource/m-plus-1p": "^5.2.9",
 		"@nodecg/react-hooks": "^1.0.3",
+		"googleapis": "^173.0.0",
 		"nodecg": "^2.6.4",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
@@ -73,6 +74,30 @@
 				"file": "example.html",
 				"workspace": "Example",
 				"headerColor": "#525F78"
+			},
+			{
+				"name": "schedule",
+				"title": "スケジュール管理",
+				"width": 4,
+				"file": "schedule.html",
+				"workspace": "Schedule",
+				"headerColor": "#525F78"
+			},
+			{
+				"name": "timerControl",
+				"title": "タイマー操作",
+				"width": 3,
+				"file": "timerControl.html",
+				"workspace": "Schedule",
+				"headerColor": "#525F78"
+			},
+			{
+				"name": "spreadsheetView",
+				"title": "スプレッドシート",
+				"width": 4,
+				"file": "spreadsheetView.html",
+				"workspace": "Schedule",
+				"headerColor": "#525F78"
 			}
 		],
 		"graphics": [
@@ -84,6 +109,12 @@
 			},
 			{
 				"file": "SmwRace.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
+				"file": "ScheduleList.html",
 				"width": 1920,
 				"height": 1080,
 				"singleInstance": false
