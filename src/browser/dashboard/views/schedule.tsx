@@ -158,20 +158,19 @@ const RunEditModal = ({
 		if (editingRun == null) return;
 		const allPlayers = editingRun.teams.flatMap((t) => t.players);
 		if (allPlayers.some((p) => p.name === name)) return;
-		const team = editingRun.teams[0];
-		if (team == null) return;
 		const sheetRunner = sheetRunners?.find((r) => r.name === name);
+		const newTeamId = crypto.randomUUID();
 		nodecg.sendMessage("scheduleUpdateRun", {
 			id: editingRun.id,
 			run: {
 				teams: [
+					...editingRun.teams,
 					{
-						...team,
+						id: newTeamId,
 						players: [
-							...team.players,
 							{
 								id: crypto.randomUUID(),
-								teamId: team.id,
+								teamId: newTeamId,
 								name,
 								...(sheetRunner?.social != null && {
 									social: sheetRunner.social,
@@ -179,7 +178,6 @@ const RunEditModal = ({
 							},
 						],
 					},
-					...editingRun.teams.slice(1),
 				],
 			},
 		});
@@ -190,10 +188,9 @@ const RunEditModal = ({
 		nodecg.sendMessage("scheduleUpdateRun", {
 			id: editingRun.id,
 			run: {
-				teams: editingRun.teams.map((team) => ({
-					...team,
-					players: team.players.filter((p) => p.id !== playerId),
-				})),
+				teams: editingRun.teams.filter(
+					(team) => !team.players.some((p) => p.id === playerId),
+				),
 			},
 		});
 	};
