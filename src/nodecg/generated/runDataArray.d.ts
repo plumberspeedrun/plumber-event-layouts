@@ -14,6 +14,7 @@ export type RunDataArray = {
 	estimate?: string;
 	setupTime?: string;
 	scheduledStartTime?: string;
+	runType?: 'individual' | 'team';
 	teams: {
 		id: string;
 		name?: string;

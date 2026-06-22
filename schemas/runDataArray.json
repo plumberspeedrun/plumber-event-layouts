@@ -27,6 +27,10 @@
 				"type": "string",
 				"format": "date-time"
 			},
+			"runType": {
+				"type": "string",
+				"enum": ["individual", "team"]
+			},
 			"teams": {
 				"type": "array",
 				"items": {

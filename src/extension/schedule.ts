@@ -21,6 +21,7 @@ type AddRunInput = {
 	estimate?: string;
 	setupTime?: string;
 	scheduledStartTime?: string;
+	runType?: "individual" | "team";
 	teams: {
 		name?: string;
 		players: {
@@ -39,7 +40,7 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 		const sheetRunner = sheetRunnersRep.value?.find(
 			(r) => r.name === playerName,
 		);
-		return sheetRunner?.social ? {social: sheetRunner.social} : {};
+		return sheetRunner?.social ? {social: {...sheetRunner.social}} : {};
 	};
 
 	nodecg.listenFor("scheduleAddRun", (data: AddRunInput, ack) => {
@@ -54,6 +55,7 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				...(data.scheduledStartTime != null && {
 					scheduledStartTime: data.scheduledStartTime,
 				}),
+				...(data.runType != null && {runType: data.runType}),
 				teams: data.teams.map((team) => {
 					const teamId = crypto.randomUUID();
 					return {

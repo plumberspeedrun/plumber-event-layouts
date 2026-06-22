@@ -115,10 +115,17 @@ const RunEditModal = ({
 	const [estimate, setEstimate] = useState("");
 	const [setupTime, setSetupTime] = useState("");
 	const [scheduledStartTime, setScheduledStartTime] = useState("");
+	const [runType, setRunType] = useState<"individual" | "team">("individual");
 	const [pickedRunner, setPickedRunner] = useState("");
 	const [newRunnerName, setNewRunnerName] = useState("");
 	const [newCommentatorName, setNewCommentatorName] = useState("");
 	const [pickedCommentator, setPickedCommentator] = useState("");
+	const [pickedTeamRunner, setPickedTeamRunner] = useState<
+		Record<string, string>
+	>({});
+	const [newTeamRunnerName, setNewTeamRunnerName] = useState<
+		Record<string, string>
+	>({});
 
 	useEffect(() => {
 		setGame(editingRun?.game ?? "");
@@ -131,6 +138,7 @@ const RunEditModal = ({
 				? editingRun.scheduledStartTime.slice(0, 16)
 				: "",
 		);
+		setRunType(editingRun?.runType ?? "individual");
 	}, [editingRun?.id]);
 
 	const candidateCommentators = (sheetCommentators ?? []).filter(
@@ -150,6 +158,7 @@ const RunEditModal = ({
 				scheduledStartTime: scheduledStartTime
 					? new Date(scheduledStartTime).toISOString()
 					: null,
+				runType,
 			},
 		});
 	};
@@ -190,6 +199,99 @@ const RunEditModal = ({
 			run: {
 				teams: editingRun.teams.filter(
 					(team) => !team.players.some((p) => p.id === playerId),
+				),
+			},
+		});
+	};
+
+	const handleAddTeam = () => {
+		if (editingRun == null) return;
+		nodecg.sendMessage("scheduleUpdateRun", {
+			id: editingRun.id,
+			run: {
+				teams: [
+					...editingRun.teams,
+					{
+						id: crypto.randomUUID(),
+						name: "新しいチーム",
+						players: [],
+					},
+				],
+			},
+		});
+	};
+
+	const handleRemoveTeam = (teamId: string) => {
+		if (editingRun == null) return;
+		nodecg.sendMessage("scheduleUpdateRun", {
+			id: editingRun.id,
+			run: {
+				teams: editingRun.teams.filter((team) => team.id !== teamId),
+			},
+		});
+	};
+
+	const handleUpdateTeamName = (teamId: string, name: string) => {
+		if (editingRun == null) return;
+		nodecg.sendMessage("scheduleUpdateRun", {
+			id: editingRun.id,
+			run: {
+				teams: editingRun.teams.map((team) =>
+					team.id === teamId ? {...team, name} : team,
+				),
+			},
+		});
+	};
+
+	const handleAddPlayerToTeam = (teamId: string, name: string) => {
+		if (editingRun == null) return;
+		const allPlayers = editingRun.teams.flatMap((t) => t.players);
+		if (allPlayers.some((p) => p.name === name)) return;
+		const sheetRunner = sheetRunners?.find((r) => r.name === name);
+		nodecg.sendMessage("scheduleUpdateRun", {
+			id: editingRun.id,
+			run: {
+				teams: editingRun.teams.map((team) =>
+					team.id === teamId
+						? {
+								...team,
+								players: [
+									...team.players,
+									{
+										id: crypto.randomUUID(),
+										teamId,
+										name,
+										...(sheetRunner?.social != null && {
+											social: sheetRunner.social,
+										}),
+									},
+								],
+							}
+						: team,
+				),
+			},
+		});
+	};
+
+	const handleRemovePlayerFromTeam = (teamId: string, playerId: string) => {
+		if (editingRun == null) return;
+		const team = editingRun.teams.find((t) => t.id === teamId);
+		if (team == null) return;
+		const remainingPlayers = team.players.filter((p) => p.id !== playerId);
+		if (remainingPlayers.length === 0) {
+			nodecg.sendMessage("scheduleUpdateRun", {
+				id: editingRun.id,
+				run: {
+					teams: editingRun.teams.filter((t) => t.id !== teamId),
+				},
+			});
+			return;
+		}
+		nodecg.sendMessage("scheduleUpdateRun", {
+			id: editingRun.id,
+			run: {
+				teams: editingRun.teams.map((t) =>
+					t.id === teamId ? {...t, players: remainingPlayers} : t,
 				),
 			},
 		});
@@ -279,73 +381,222 @@ const RunEditModal = ({
 							value={scheduledStartTime}
 							onChange={(e) => setScheduledStartTime(e.target.value)}
 						/>
+						<label style={{fontSize: 11, color: "#aab"}}>走行種別</label>
+						<div style={{display: "flex", gap: 12}}>
+							<label style={{display: "flex", gap: 4, alignItems: "center"}}>
+								<input
+									type='radio'
+									name='runType'
+									checked={runType === "individual"}
+									onChange={() => setRunType("individual")}
+								/>
+								個人
+							</label>
+							<label style={{display: "flex", gap: 4, alignItems: "center"}}>
+								<input
+									type='radio'
+									name='runType'
+									checked={runType === "team"}
+									onChange={() => setRunType("team")}
+								/>
+								チーム
+							</label>
+						</div>
 					</div>
 
 					<div style={sectionStyle}>
 						<strong>走者</strong>
-						{editingRun.teams.flatMap((team) =>
-							team.players.map((player) => (
-								<div
-									key={player.id}
-									style={rowStyle}
-								>
-									<div style={{flex: 1}}>{player.name}</div>
+						{runType === "individual" ? (
+							<>
+								{editingRun.teams.flatMap((team) =>
+									team.players.map((player) => (
+										<div
+											key={player.id}
+											style={rowStyle}
+										>
+											<div style={{flex: 1}}>{player.name}</div>
+											<button
+												style={buttonStyle}
+												onClick={() => handleRemoveRunner(player.id)}
+											>
+												削除
+											</button>
+										</div>
+									)),
+								)}
+
+								<div style={{display: "flex", gap: 8}}>
+									<select
+										style={inputStyle}
+										value={pickedRunner}
+										onChange={(e) => setPickedRunner(e.target.value)}
+									>
+										<option value=''>シートから選択</option>
+										{sheetRunners?.map((r) => (
+											<option
+												key={r.name}
+												value={r.name}
+											>
+												{r.name}
+											</option>
+										))}
+									</select>
 									<button
 										style={buttonStyle}
-										onClick={() => handleRemoveRunner(player.id)}
+										disabled={pickedRunner === ""}
+										onClick={() => {
+											handleAddRunner(pickedRunner);
+											setPickedRunner("");
+										}}
 									>
-										削除
+										追加
 									</button>
 								</div>
-							)),
-						)}
 
-						<div style={{display: "flex", gap: 8}}>
-							<select
-								style={inputStyle}
-								value={pickedRunner}
-								onChange={(e) => setPickedRunner(e.target.value)}
-							>
-								<option value=''>シートから選択</option>
-								{sheetRunners?.map((r) => (
-									<option
-										key={r.name}
-										value={r.name}
+								<div style={{display: "flex", gap: 8}}>
+									<input
+										style={inputStyle}
+										placeholder='走者名を直接入力'
+										value={newRunnerName}
+										onChange={(e) => setNewRunnerName(e.target.value)}
+									/>
+									<button
+										style={buttonStyle}
+										disabled={newRunnerName.trim() === ""}
+										onClick={() => {
+											handleAddRunner(newRunnerName.trim());
+											setNewRunnerName("");
+										}}
 									>
-										{r.name}
-									</option>
+										追加
+									</button>
+								</div>
+							</>
+						) : (
+							<>
+								{editingRun.teams.map((team) => (
+									<div
+										key={team.id}
+										style={{
+											display: "flex",
+											flexDirection: "column",
+											gap: 4,
+											background: "#3a4760",
+											borderRadius: 4,
+											padding: 6,
+										}}
+									>
+										<div style={{display: "flex", gap: 8}}>
+											<input
+												style={{...inputStyle, flex: 1}}
+												placeholder='チーム名'
+												value={team.name ?? ""}
+												onChange={(e) =>
+													handleUpdateTeamName(team.id, e.target.value)
+												}
+											/>
+											<button
+												style={buttonStyle}
+												onClick={() => handleRemoveTeam(team.id)}
+											>
+												チーム削除
+											</button>
+										</div>
+										{team.players.map((player) => (
+											<div
+												key={player.id}
+												style={rowStyle}
+											>
+												<div style={{flex: 1}}>{player.name}</div>
+												<button
+													style={buttonStyle}
+													onClick={() =>
+														handleRemovePlayerFromTeam(team.id, player.id)
+													}
+												>
+													削除
+												</button>
+											</div>
+										))}
+										<div style={{display: "flex", gap: 8}}>
+											<select
+												style={inputStyle}
+												value={pickedTeamRunner[team.id] ?? ""}
+												onChange={(e) =>
+													setPickedTeamRunner({
+														...pickedTeamRunner,
+														[team.id]: e.target.value,
+													})
+												}
+											>
+												<option value=''>シートから選択</option>
+												{sheetRunners?.map((r) => (
+													<option
+														key={r.name}
+														value={r.name}
+													>
+														{r.name}
+													</option>
+												))}
+											</select>
+											<button
+												style={buttonStyle}
+												disabled={(pickedTeamRunner[team.id] ?? "") === ""}
+												onClick={() => {
+													handleAddPlayerToTeam(
+														team.id,
+														pickedTeamRunner[team.id] ?? "",
+													);
+													setPickedTeamRunner({
+														...pickedTeamRunner,
+														[team.id]: "",
+													});
+												}}
+											>
+												追加
+											</button>
+										</div>
+										<div style={{display: "flex", gap: 8}}>
+											<input
+												style={inputStyle}
+												placeholder='走者名を直接入力'
+												value={newTeamRunnerName[team.id] ?? ""}
+												onChange={(e) =>
+													setNewTeamRunnerName({
+														...newTeamRunnerName,
+														[team.id]: e.target.value,
+													})
+												}
+											/>
+											<button
+												style={buttonStyle}
+												disabled={
+													(newTeamRunnerName[team.id] ?? "").trim() === ""
+												}
+												onClick={() => {
+													handleAddPlayerToTeam(
+														team.id,
+														(newTeamRunnerName[team.id] ?? "").trim(),
+													);
+													setNewTeamRunnerName({
+														...newTeamRunnerName,
+														[team.id]: "",
+													});
+												}}
+											>
+												追加
+											</button>
+										</div>
+									</div>
 								))}
-							</select>
-							<button
-								style={buttonStyle}
-								disabled={pickedRunner === ""}
-								onClick={() => {
-									handleAddRunner(pickedRunner);
-									setPickedRunner("");
-								}}
-							>
-								追加
-							</button>
-						</div>
-
-						<div style={{display: "flex", gap: 8}}>
-							<input
-								style={inputStyle}
-								placeholder='走者名を直接入力'
-								value={newRunnerName}
-								onChange={(e) => setNewRunnerName(e.target.value)}
-							/>
-							<button
-								style={buttonStyle}
-								disabled={newRunnerName.trim() === ""}
-								onClick={() => {
-									handleAddRunner(newRunnerName.trim());
-									setNewRunnerName("");
-								}}
-							>
-								追加
-							</button>
-						</div>
+								<button
+									style={buttonStyle}
+									onClick={handleAddTeam}
+								>
+									チーム追加
+								</button>
+							</>
+						)}
 					</div>
 
 					<div style={sectionStyle}>
@@ -453,6 +704,11 @@ const RunEditModal = ({
 	);
 };
 
+type NewTeam = {
+	name: string;
+	players: {name: string}[];
+};
+
 const Schedule = () => {
 	const runDataArray = useRunDataArray();
 	const activeRunId = useActiveRunId();
@@ -469,6 +725,14 @@ const Schedule = () => {
 	const [addPickedCommentator, setAddPickedCommentator] = useState("");
 	const [addNewCommentatorName, setAddNewCommentatorName] = useState("");
 	const [addCommentators, setAddCommentators] = useState<Commentator[]>([]);
+	const [runType, setRunType] = useState<"individual" | "team">("individual");
+	const [newTeams, setNewTeams] = useState<NewTeam[]>([]);
+	const [pickedNewTeamRunner, setPickedNewTeamRunner] = useState<
+		Record<number, string>
+	>({});
+	const [newTeamRunnerInput, setNewTeamRunnerInput] = useState<
+		Record<number, string>
+	>({});
 
 	const addCandidateCommentators = (sheetCommentators ?? []).filter(
 		(c) => c.game === game,
@@ -483,7 +747,56 @@ const Schedule = () => {
 		setAddCommentators(addCommentators.filter((c) => c.name !== name));
 	};
 
+	const handleAddTeamToNew = () => {
+		setNewTeams([...newTeams, {name: "", players: []}]);
+	};
+
+	const handleRemoveTeamFromNew = (index: number) => {
+		setNewTeams(newTeams.filter((_, i) => i !== index));
+	};
+
+	const handleUpdateNewTeamName = (index: number, name: string) => {
+		setNewTeams(
+			newTeams.map((team, i) => (i === index ? {...team, name} : team)),
+		);
+	};
+
+	const handleAddPlayerToNewTeam = (index: number, name: string) => {
+		if (name === "") return;
+		setNewTeams(
+			newTeams.map((team, i) =>
+				i === index ? {...team, players: [...team.players, {name}]} : team,
+			),
+		);
+	};
+
+	const handleRemovePlayerFromNewTeam = (
+		index: number,
+		playerIndex: number,
+	) => {
+		setNewTeams(
+			newTeams.map((team, i) =>
+				i === index
+					? {
+							...team,
+							players: team.players.filter((_, pi) => pi !== playerIndex),
+						}
+					: team,
+			),
+		);
+	};
+
 	const handleAddRun = () => {
+		const teams =
+			runType === "individual"
+				? [{players: [{name: runnerName || "Unknown"}]}]
+				: newTeams
+						.filter((team) => team.players.length > 0)
+						.map((team) => ({
+							...(team.name && {name: team.name}),
+							players: team.players,
+						}));
+
 		nodecg.sendMessage("scheduleAddRun", {
 			...(game && {game}),
 			...(category && {category}),
@@ -493,11 +806,8 @@ const Schedule = () => {
 				scheduledStartTime: new Date(scheduledStartTime).toISOString(),
 			}),
 			...(addCommentators.length > 0 && {commentators: addCommentators}),
-			teams: [
-				{
-					players: [{name: runnerName || "Unknown"}],
-				},
-			],
+			runType,
+			teams,
 		});
 		setGame("");
 		setCategory("");
@@ -508,6 +818,10 @@ const Schedule = () => {
 		setAddCommentators([]);
 		setAddPickedCommentator("");
 		setAddNewCommentatorName("");
+		setRunType("individual");
+		setNewTeams([]);
+		setPickedNewTeamRunner({});
+		setNewTeamRunnerInput({});
 	};
 
 	return (
@@ -635,30 +949,176 @@ const Schedule = () => {
 					value={scheduledStartTime}
 					onChange={(e) => setScheduledStartTime(e.target.value)}
 				/>
-				<label style={{fontSize: 11, color: "#aab"}}>走者</label>
-				<div style={{display: "flex", gap: 8}}>
-					<select
-						style={inputStyle}
-						value={runnerName}
-						onChange={(e) => setRunnerName(e.target.value)}
-					>
-						<option value=''>シートから選択</option>
-						{sheetRunners?.map((r) => (
-							<option
-								key={r.name}
-								value={r.name}
-							>
-								{r.name}
-							</option>
-						))}
-					</select>
-					<input
-						style={inputStyle}
-						placeholder='または直接入力'
-						value={runnerName}
-						onChange={(e) => setRunnerName(e.target.value)}
-					/>
+				<label style={{fontSize: 11, color: "#aab"}}>走行種別</label>
+				<div style={{display: "flex", gap: 12}}>
+					<label style={{display: "flex", gap: 4, alignItems: "center"}}>
+						<input
+							type='radio'
+							name='addRunType'
+							checked={runType === "individual"}
+							onChange={() => setRunType("individual")}
+						/>
+						個人
+					</label>
+					<label style={{display: "flex", gap: 4, alignItems: "center"}}>
+						<input
+							type='radio'
+							name='addRunType'
+							checked={runType === "team"}
+							onChange={() => setRunType("team")}
+						/>
+						チーム
+					</label>
 				</div>
+
+				<label style={{fontSize: 11, color: "#aab"}}>走者</label>
+				{runType === "individual" ? (
+					<div style={{display: "flex", gap: 8}}>
+						<select
+							style={inputStyle}
+							value={runnerName}
+							onChange={(e) => setRunnerName(e.target.value)}
+						>
+							<option value=''>シートから選択</option>
+							{sheetRunners?.map((r) => (
+								<option
+									key={r.name}
+									value={r.name}
+								>
+									{r.name}
+								</option>
+							))}
+						</select>
+						<input
+							style={inputStyle}
+							placeholder='または直接入力'
+							value={runnerName}
+							onChange={(e) => setRunnerName(e.target.value)}
+						/>
+					</div>
+				) : (
+					<>
+						{newTeams.map((team, index) => (
+							<div
+								key={index}
+								style={{
+									display: "flex",
+									flexDirection: "column",
+									gap: 4,
+									background: "#3a4760",
+									borderRadius: 4,
+									padding: 6,
+								}}
+							>
+								<div style={{display: "flex", gap: 8}}>
+									<input
+										style={{...inputStyle, flex: 1}}
+										placeholder='チーム名'
+										value={team.name}
+										onChange={(e) =>
+											handleUpdateNewTeamName(index, e.target.value)
+										}
+									/>
+									<button
+										style={buttonStyle}
+										onClick={() => handleRemoveTeamFromNew(index)}
+									>
+										チーム削除
+									</button>
+								</div>
+								{team.players.map((player, playerIndex) => (
+									<div
+										key={playerIndex}
+										style={rowStyle}
+									>
+										<div style={{flex: 1}}>{player.name}</div>
+										<button
+											style={buttonStyle}
+											onClick={() =>
+												handleRemovePlayerFromNewTeam(index, playerIndex)
+											}
+										>
+											削除
+										</button>
+									</div>
+								))}
+								<div style={{display: "flex", gap: 8}}>
+									<select
+										style={inputStyle}
+										value={pickedNewTeamRunner[index] ?? ""}
+										onChange={(e) =>
+											setPickedNewTeamRunner({
+												...pickedNewTeamRunner,
+												[index]: e.target.value,
+											})
+										}
+									>
+										<option value=''>シートから選択</option>
+										{sheetRunners?.map((r) => (
+											<option
+												key={r.name}
+												value={r.name}
+											>
+												{r.name}
+											</option>
+										))}
+									</select>
+									<button
+										style={buttonStyle}
+										disabled={(pickedNewTeamRunner[index] ?? "") === ""}
+										onClick={() => {
+											handleAddPlayerToNewTeam(
+												index,
+												pickedNewTeamRunner[index] ?? "",
+											);
+											setPickedNewTeamRunner({
+												...pickedNewTeamRunner,
+												[index]: "",
+											});
+										}}
+									>
+										追加
+									</button>
+								</div>
+								<div style={{display: "flex", gap: 8}}>
+									<input
+										style={inputStyle}
+										placeholder='走者名を直接入力'
+										value={newTeamRunnerInput[index] ?? ""}
+										onChange={(e) =>
+											setNewTeamRunnerInput({
+												...newTeamRunnerInput,
+												[index]: e.target.value,
+											})
+										}
+									/>
+									<button
+										style={buttonStyle}
+										disabled={(newTeamRunnerInput[index] ?? "").trim() === ""}
+										onClick={() => {
+											handleAddPlayerToNewTeam(
+												index,
+												(newTeamRunnerInput[index] ?? "").trim(),
+											);
+											setNewTeamRunnerInput({
+												...newTeamRunnerInput,
+												[index]: "",
+											});
+										}}
+									>
+										追加
+									</button>
+								</div>
+							</div>
+						))}
+						<button
+							style={buttonStyle}
+							onClick={handleAddTeamToNew}
+						>
+							チーム追加
+						</button>
+					</>
+				)}
 
 				<label style={{fontSize: 11, color: "#aab"}}>解説者</label>
 				{addCommentators.map((c) => (
