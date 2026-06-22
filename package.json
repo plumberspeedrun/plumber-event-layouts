@@ -90,6 +90,14 @@
 				"file": "timerControl.html",
 				"workspace": "Schedule",
 				"headerColor": "#525F78"
+			},
+			{
+				"name": "spreadsheetView",
+				"title": "スプレッドシート",
+				"width": 4,
+				"file": "spreadsheetView.html",
+				"workspace": "Schedule",
+				"headerColor": "#525F78"
 			}
 		],
 		"graphics": [
@@ -101,6 +109,12 @@
 			},
 			{
 				"file": "SmwRace.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
+				"file": "ScheduleList.html",
 				"width": 1920,
 				"height": 1080,
 				"singleInstance": false
