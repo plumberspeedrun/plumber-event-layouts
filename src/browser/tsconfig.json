@@ -9,7 +9,8 @@
 			"express",
 			"react",
 			"react-dom",
-			"nodecg/types/augment-window"
+			"nodecg/types/augment-window",
+			"vite/client"
 		]
 	},
 	"include": ["**/*.ts", "**/*.tsx", "../nodecg/**/*.ts"]
