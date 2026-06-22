@@ -13,6 +13,7 @@ export type RunDataArray = {
 	system?: string;
 	estimate?: string;
 	setupTime?: string;
+	scheduledStartTime?: string;
 	teams: {
 		id: string;
 		name?: string;

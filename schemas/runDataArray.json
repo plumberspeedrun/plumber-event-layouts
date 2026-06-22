@@ -23,6 +23,10 @@
 			"setupTime": {
 				"type": "string"
 			},
+			"scheduledStartTime": {
+				"type": "string",
+				"format": "date-time"
+			},
 			"teams": {
 				"type": "array",
 				"items": {

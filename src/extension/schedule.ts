@@ -7,12 +7,20 @@ import type {SheetRunners} from "../nodecg/generated/sheetRunners.js";
 
 type RunData = RunDataArray[number];
 
+const sortByScheduledStartTime = (a: RunData, b: RunData): number => {
+	if (a.scheduledStartTime == null && b.scheduledStartTime == null) return 0;
+	if (a.scheduledStartTime == null) return 1;
+	if (b.scheduledStartTime == null) return -1;
+	return a.scheduledStartTime.localeCompare(b.scheduledStartTime);
+};
+
 type AddRunInput = {
 	game?: string;
 	category?: string;
 	system?: string;
 	estimate?: string;
 	setupTime?: string;
+	scheduledStartTime?: string;
 	teams: {
 		name?: string;
 		players: {
@@ -43,6 +51,9 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				...(data.system != null && {system: data.system}),
 				...(data.estimate != null && {estimate: data.estimate}),
 				...(data.setupTime != null && {setupTime: data.setupTime}),
+				...(data.scheduledStartTime != null && {
+					scheduledStartTime: data.scheduledStartTime,
+				}),
 				teams: data.teams.map((team) => {
 					const teamId = crypto.randomUUID();
 					return {
@@ -59,7 +70,9 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				}),
 			};
 
-			runDataArrayRep.value = [...(runDataArrayRep.value ?? []), newRun];
+			const newArray = [...(runDataArrayRep.value ?? []), newRun];
+			newArray.sort(sortByScheduledStartTime);
+			runDataArrayRep.value = newArray;
 			if (ack && !ack.handled) ack(null);
 		} catch (err) {
 			if (ack && !ack.handled) ack(err as Error);
@@ -74,13 +87,16 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				const index = runs.findIndex((run) => run.id === data.id);
 				if (index >= 0) {
 					const existingRun = runs[index]!;
+					const {scheduledStartTime, ...restRun} = data.run;
 					const updatedRun: RunData = {
 						...existingRun,
-						...data.run,
+						...restRun,
+						...(scheduledStartTime != null && {scheduledStartTime}),
 						id: existingRun.id,
 					};
 					const newRuns = [...runs];
 					newRuns[index] = updatedRun;
+					newRuns.sort(sortByScheduledStartTime);
 					runDataArrayRep.value = newRuns;
 				}
 				if (ack && !ack.handled) ack(null);
@@ -102,29 +118,6 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 			if (ack && !ack.handled) ack(err as Error);
 		}
 	});
-
-	nodecg.listenFor(
-		"scheduleMoveRun",
-		(data: {id: string; direction: "up" | "down"}, ack) => {
-			try {
-				const runs = runDataArrayRep.value ?? [];
-				const index = runs.findIndex((run) => run.id === data.id);
-				if (index >= 0) {
-					const targetIndex = data.direction === "up" ? index - 1 : index + 1;
-					if (targetIndex >= 0 && targetIndex < runs.length) {
-						const newRuns = [...runs];
-						const temp = newRuns[index]!;
-						newRuns[index] = newRuns[targetIndex]!;
-						newRuns[targetIndex] = temp;
-						runDataArrayRep.value = newRuns;
-					}
-				}
-				if (ack && !ack.handled) ack(null);
-			} catch (err) {
-				if (ack && !ack.handled) ack(err as Error);
-			}
-		},
-	);
 
 	nodecg.listenFor("scheduleSetActiveRun", (data: {id: string}, ack) => {
 		try {
