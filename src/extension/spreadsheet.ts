@@ -7,7 +7,7 @@ import type {SpreadsheetStatus} from "../nodecg/generated/spreadsheetStatus.js";
 
 const RUNNER_COLUMNS = ["name", "twitch", "youtube", "twitter", "niconico"];
 const COMMENTATOR_COLUMNS = [
-	"game",
+	"game_name",
 	"name",
 	"twitter",
 	"twitch",
@@ -103,9 +103,9 @@ export const spreadsheet = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				}));
 
 			sheetCommentatorsReplicant.value = commentatorRecords
-				.filter((r) => r["game"] != null && r["name"] != null)
+				.filter((r) => r["game_name"] != null && r["name"] != null)
 				.map((r) => ({
-					game: r["game"]!,
+					game: r["game_name"]!,
 					name: r["name"]!,
 					...(r["pronouns"] != null && {pronouns: r["pronouns"]}),
 					...buildSocial(r),
