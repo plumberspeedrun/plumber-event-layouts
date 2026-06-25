@@ -45,25 +45,19 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 		stopTick();
 		tickInterval = setInterval(() => {
 			const ms = getCurrentMs();
-			timerReplicant.value = {
-				...timerReplicant.value,
-				time: formatTime(ms),
-				milliseconds: ms,
-				timestamp: Date.now(),
-			};
+			timerReplicant.value.time = formatTime(ms);
+			timerReplicant.value.milliseconds = ms;
+			timerReplicant.value.timestamp = Date.now();
 		}, 100);
 	};
 
 	const finishTimer = () => {
 		stopTick();
 		const ms = getCurrentMs();
-		timerReplicant.value = {
-			...timerReplicant.value,
-			time: formatTime(ms),
-			milliseconds: ms,
-			timestamp: Date.now(),
-			state: "finished",
-		};
+		timerReplicant.value.time = formatTime(ms);
+		timerReplicant.value.milliseconds = ms;
+		timerReplicant.value.timestamp = Date.now();
+		timerReplicant.value.state = "finished";
 	};
 
 	const getActiveRun = () => {
@@ -79,11 +73,11 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				accumulatedMs = 0;
 				startedAt = Date.now();
 				startTick();
-				timerReplicant.value = {...timerReplicant.value, state: "running"};
+				timerReplicant.value.state = "running";
 			} else if (state === "paused") {
 				startedAt = Date.now();
 				startTick();
-				timerReplicant.value = {...timerReplicant.value, state: "running"};
+				timerReplicant.value.state = "running";
 			}
 			if (ack && !ack.handled) ack(null);
 		} catch (err) {
@@ -97,13 +91,10 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				accumulatedMs += Date.now() - startedAt!;
 				startedAt = null;
 				stopTick();
-				timerReplicant.value = {
-					...timerReplicant.value,
-					time: formatTime(accumulatedMs),
-					milliseconds: accumulatedMs,
-					timestamp: Date.now(),
-					state: "paused",
-				};
+				timerReplicant.value.time = formatTime(accumulatedMs);
+				timerReplicant.value.milliseconds = accumulatedMs;
+				timerReplicant.value.timestamp = Date.now();
+				timerReplicant.value.state = "paused";
 			}
 			if (ack && !ack.handled) ack(null);
 		} catch (err) {
