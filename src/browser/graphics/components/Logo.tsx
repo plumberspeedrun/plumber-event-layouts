@@ -1,5 +1,5 @@
 import {useReplicant} from "@nodecg/react-hooks";
-import {Assets} from "../../../types/assets";
+import type {Assets} from "../../../types/assets";
 
 interface LogoProps {
 	width?: number;

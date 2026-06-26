@@ -34,9 +34,9 @@ export default defineConfig({
 		},
 	},
 	fullyParallel: true,
-	forbidOnly: !!process.env["CI"],
-	retries: process.env["CI"] ? 2 : 0,
-	workers: process.env["CI"] ? 1 : undefined,
+	forbidOnly: !!process.env.CI,
+	retries: process.env.CI ? 2 : 0,
+	workers: process.env.CI ? 1 : undefined,
 	reporter: "html",
 	projects: [
 		{
@@ -49,7 +49,7 @@ export default defineConfig({
 	webServer: {
 		command: "pnpm build && pnpm start",
 		url: baseURL,
-		reuseExistingServer: !process.env["CI"],
+		reuseExistingServer: !process.env.CI,
 		timeout: 180_000,
 		stdout: "pipe",
 		stderr: "pipe",

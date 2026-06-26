@@ -1,5 +1,5 @@
 import "@fontsource/m-plus-1p/900.css";
-import {CSSProperties, ReactNode} from "react";
+import type {CSSProperties, ReactNode} from "react";
 
 const containerStyle: CSSProperties = {
 	position: "absolute",
@@ -38,21 +38,19 @@ const Footer = () => {
 
 export const BaseLayout = ({children, backgroundUrl}: IProps) => {
 	return (
-		<>
-			<div style={containerStyle}>
-				<img
-					src={backgroundUrl}
-					style={{
-						position: "absolute",
-						top: 0,
-						left: 0,
-						width: "1920px",
-						height: "1080px",
-					}}
-				/>
-				{children}
-				<Footer />
-			</div>
-		</>
+		<div style={containerStyle}>
+			<img
+				src={backgroundUrl}
+				style={{
+					position: "absolute",
+					top: 0,
+					left: 0,
+					width: "1920px",
+					height: "1080px",
+				}}
+			/>
+			{children}
+			<Footer />
+		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import NodeCG from "nodecg/types";
+import type NodeCG from "nodecg/types";
 import {assets} from "./assets.js";
 import {schedule} from "./schedule.js";
 import {spreadsheet} from "./spreadsheet.js";

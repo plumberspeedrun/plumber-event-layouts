@@ -1,4 +1,4 @@
-import {ReactNode} from "react";
+import type {ReactNode} from "react";
 import {createRoot} from "react-dom/client";
 
 export const render = (app: ReactNode) => {

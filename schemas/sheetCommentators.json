@@ -18,10 +18,10 @@
 				"type": "object",
 				"additionalProperties": false,
 				"properties": {
-					"twitch": {"type": "string"},
-					"youtube": {"type": "string"},
-					"twitter": {"type": "string"},
-					"niconico": {"type": "string"}
+					"twitch": { "type": "string" },
+					"youtube": { "type": "string" },
+					"twitter": { "type": "string" },
+					"niconico": { "type": "string" }
 				}
 			}
 		},

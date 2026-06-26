@@ -15,5 +15,5 @@
 		}
 	},
 	"required": ["enabled"],
-	"default": {"enabled": false}
+	"default": { "enabled": false }
 }

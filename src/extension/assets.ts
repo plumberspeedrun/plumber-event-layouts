@@ -1,5 +1,5 @@
-import NodeCG from "nodecg/types";
-import {Assets} from "../types/assets";
+import type NodeCG from "nodecg/types";
+import type {Assets} from "../types/assets";
 
 export const assets = (nodecg: NodeCG.ServerAPI) => {
 	const logoAssets = nodecg.Replicant<Assets[]>("assets:logo");

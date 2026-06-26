@@ -4,9 +4,7 @@ import {BaseLayout} from "../BaseLayout";
 const App = () => {
 	// const upcomingRunData = useUpcomingRunData();
 	return (
-		<>
-			<BaseLayout />
-		</>
+		<BaseLayout />
 		// <div id='container' style={{ left: 0, top: 0, position: "absolute", width: "1920px", height: "1080px", color: 'black' }}>
 		//     <div>This is example.</div>
 		//     <Timer />
