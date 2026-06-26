@@ -20,6 +20,14 @@
 				"commentatorSheetName": {
 					"type": "string",
 					"default": "Commentators"
+				},
+				"scheduleSheetName": {
+					"type": "string",
+					"default": "Commentators"
+				},
+				"nsmbSheetName": {
+					"type": "string",
+					"default": "NSMB"
 				}
 			},
 			"required": ["credentialsPath", "spreadsheetId"]

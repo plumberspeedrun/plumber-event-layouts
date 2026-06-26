@@ -1,0 +1,42 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"relayData": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"game": {
+						"type": "string"
+					},
+					"platform": {
+						"type": "string"
+					},
+					"year": {
+						"type": "integer"
+					},
+					"runner": {
+						"type": "string"
+					},
+					"commentators": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"default": []
+					}
+				},
+				"required": ["game", "platform", "year", "runner"]
+			},
+			"default": []
+		},
+		"activeIndex": {
+			"type": "integer",
+			"default": 0
+		}
+	},
+	"default": { "relayData": [], "activeIndex": 0 }
+}

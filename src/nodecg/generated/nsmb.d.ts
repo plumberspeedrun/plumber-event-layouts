@@ -6,13 +6,13 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface Configschema {
-	googleSpreadsheet?: {
-		credentialsPath: string;
-		spreadsheetId: string;
-		runnerSheetName?: string;
-		commentatorSheetName?: string;
-		scheduleSheetName?: string;
-		nsmbSheetName?: string;
-	};
+export interface Nsmb {
+	relayData?: {
+		game: string;
+		platform: string;
+		year: number;
+		runner: string;
+		commentators?: string[];
+	}[];
+	activeIndex?: number;
 }

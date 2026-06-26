@@ -1,12 +1,19 @@
 import {auth as googleAuth, sheets as googleSheets} from "@googleapis/sheets";
 import NodeCG from "nodecg/types";
 import type {Configschema} from "../nodecg/generated/configschema.js";
+import type {Nsmb} from "../nodecg/generated/nsmb.js";
 import type {SheetCommentators} from "../nodecg/generated/sheetCommentators.js";
 import type {SheetRunners} from "../nodecg/generated/sheetRunners.js";
 import type {SpreadsheetStatus} from "../nodecg/generated/spreadsheetStatus.js";
 
-const RUNNER_COLUMNS = ["name", "twitch", "youtube", "twitter", "niconico"];
-const COMMENTATOR_COLUMNS = [
+const RUNNER_COLUMNS: SheetRowKey[] = [
+	"name",
+	"twitch",
+	"youtube",
+	"twitter",
+	"niconico",
+];
+const COMMENTATOR_COLUMNS: SheetRowKey[] = [
 	"game_name",
 	"name",
 	"twitter",
@@ -15,12 +22,31 @@ const COMMENTATOR_COLUMNS = [
 	"niconico",
 	"pronouns",
 ];
+const NSMB_COLUMNS: SheetRowKey[] = [
+	"game",
+	"platform",
+	"year",
+	"runner",
+	"commentators",
+];
 
 const SOCIAL_KEYS = ["twitch", "youtube", "twitter", "niconico"] as const;
 
-type SheetRow = {
-	[column: string]: string;
-};
+type SheetRowKey =
+	| "name"
+	| "twitch"
+	| "youtube"
+	| "twitter"
+	| "niconico"
+	| "game_name"
+	| "pronouns"
+	| "game"
+	| "platform"
+	| "year"
+	| "runner"
+	| "commentators";
+
+type SheetRow = Partial<Record<SheetRowKey, string>>;
 
 const buildSocial = (record: SheetRow) => {
 	const social: Record<string, string> = {};
@@ -30,7 +56,10 @@ const buildSocial = (record: SheetRow) => {
 	return Object.keys(social).length > 0 ? {social} : {};
 };
 
-const rowsToRecords = (rows: string[][], columns: string[]): SheetRow[] => {
+const rowsToRecords = (
+	rows: string[][],
+	columns: SheetRowKey[],
+): SheetRow[] => {
 	const [header, ...body] = rows;
 	if (header == null) return [];
 
@@ -55,6 +84,7 @@ export const spreadsheet = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 		nodecg.Replicant<SheetCommentators>("sheetCommentators");
 	const spreadsheetStatusReplicant =
 		nodecg.Replicant<SpreadsheetStatus>("spreadsheetStatus");
+	const nsmbReplicant = nodecg.Replicant<Nsmb>("nsmb");
 
 	const config = nodecg.bundleConfig.googleSpreadsheet;
 
@@ -67,6 +97,7 @@ export const spreadsheet = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 
 	const runnerSheetName = config.runnerSheetName ?? "Runners";
 	const commentatorSheetName = config.commentatorSheetName ?? "Commentators";
+	const nsmbSheetName = config.nsmbSheetName ?? "NSMB";
 
 	const auth = new googleAuth.GoogleAuth({
 		keyFile: config.credentialsPath,
@@ -84,9 +115,10 @@ export const spreadsheet = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 
 	const syncSpreadsheet = async () => {
 		try {
-			const [runnerRows, commentatorRows] = await Promise.all([
+			const [runnerRows, commentatorRows, nsmbRows] = await Promise.all([
 				fetchSheetRows(runnerSheetName),
 				fetchSheetRows(commentatorSheetName),
+				fetchSheetRows(nsmbSheetName),
 			]);
 
 			const runnerRecords = rowsToRecords(runnerRows, RUNNER_COLUMNS);
@@ -94,22 +126,49 @@ export const spreadsheet = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				commentatorRows,
 				COMMENTATOR_COLUMNS,
 			);
+			const nsmbRecords = rowsToRecords(nsmbRows, NSMB_COLUMNS);
 
 			sheetRunnersReplicant.value = runnerRecords
-				.filter((r) => r["name"] != null)
+				.filter((r) => r.name != null)
 				.map((r) => ({
-					name: r["name"]!,
+					name: r.name!,
 					...buildSocial(r),
 				}));
 
 			sheetCommentatorsReplicant.value = commentatorRecords
-				.filter((r) => r["game_name"] != null && r["name"] != null)
+				.filter((r) => r.game_name != null && r.name != null)
 				.map((r) => ({
-					game: r["game_name"]!,
-					name: r["name"]!,
-					...(r["pronouns"] != null && {pronouns: r["pronouns"]}),
+					game: r.game_name!,
+					name: r.name!,
+					...(r.pronouns != null && {pronouns: r.pronouns}),
 					...buildSocial(r),
 				}));
+
+			const currentActiveIndex = nsmbReplicant.value?.activeIndex ?? 0;
+			nsmbReplicant.value = {
+				relayData: nsmbRecords
+					.filter(
+						(r) =>
+							r.game != null &&
+							r.platform != null &&
+							r.year != null &&
+							r.runner != null,
+					)
+					.map((r) => ({
+						game: r.game!,
+						platform: r.platform!,
+						year: parseInt(r.year!, 10),
+						runner: r.runner!,
+						commentators:
+							r.commentators != null
+								? r.commentators
+										.split(",")
+										.map((c) => c.trim())
+										.filter((c) => c !== "")
+								: [],
+					})),
+				activeIndex: currentActiveIndex,
+			};
 
 			spreadsheetStatusReplicant.value = {
 				enabled: true,
