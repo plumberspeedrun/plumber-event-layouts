@@ -119,3 +119,7 @@ export const useNsmbActiveRelay = (): NsmbActiveRelay | undefined => {
 		commentators,
 	};
 };
+
+export const useNsmbReplicant = () => {
+	return useReplicant<Nsmb>("nsmb");
+};

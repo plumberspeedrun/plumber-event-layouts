@@ -86,6 +86,14 @@
 				"file": "spreadsheetView.html",
 				"workspace": "Schedule",
 				"headerColor": "#525F78"
+			},
+			{
+				"name": "nsmb",
+				"title": "NSMBリレー",
+				"width": 4,
+				"file": "nsmb.html",
+				"workspace": "NSMB",
+				"headerColor": "#525F78"
 			}
 		],
 		"graphics": [
