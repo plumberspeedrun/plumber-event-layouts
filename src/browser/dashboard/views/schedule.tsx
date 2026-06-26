@@ -139,7 +139,15 @@ const RunEditModal = ({
 				: "",
 		);
 		setRunType(editingRun?.runType ?? "individual");
-	}, [editingRun?.id]);
+	}, [
+		editingRun?.scheduledStartTime,
+		editingRun?.setupTime,
+		editingRun?.estimate,
+		editingRun?.system,
+		editingRun?.runType,
+		editingRun?.game,
+		editingRun?.category,
+	]);
 
 	const candidateCommentators = (sheetCommentators ?? []).filter(
 		(c) => c.game === editingRun?.game,
