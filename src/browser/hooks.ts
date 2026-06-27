@@ -67,57 +67,21 @@ export const useCurrentRunCommentators = () => {
 	return sheetCommentators.filter((c) => c.game === activeRun.game);
 };
 
-type Social = {
-	twitch?: string;
-	youtube?: string;
-	twitter?: string;
-	niconico?: string;
-};
-
-type NsmbActiveRelay = {
-	game: string;
-	platform: string;
-	year: number;
-	runner: {name: string; social?: Social};
-	commentators: Array<{name: string; social?: Social}>;
-};
-
 export const useNsmb = () => {
 	const [nsmb] = useReplicant<Nsmb>("nsmb");
 	if (nsmb == null) return;
 	return nsmb;
 };
 
+type NsmbActiveRelay = NonNullable<NonNullable<Nsmb["relayData"]>[number]>;
+
 export const useNsmbActiveRelay = (): NsmbActiveRelay | undefined => {
 	const nsmb = useNsmb();
-	const sheetRunners = useSheetRunners();
-	const sheetCommentators = useSheetCommentators();
-
-	if (nsmb == null || sheetRunners == null || sheetCommentators == null) return;
+	if (nsmb == null) return;
 
 	const relayData = nsmb.relayData ?? [];
 	const activeIndex = nsmb.activeIndex ?? 0;
-	const relay = relayData[activeIndex];
-	if (relay == null) return;
-
-	const runnerSheet = sheetRunners.find((r) => r.name === relay.runner);
-	const runner = {
-		name: relay.runner,
-		...(runnerSheet?.social != null && {social: runnerSheet.social}),
-	};
-
-	const commentators = (relay.commentators ?? []).map((name) => {
-		const sheet = sheetCommentators.find((c) => c.name === name);
-		return {name, ...(sheet?.social != null && {social: sheet.social})};
-	});
-
-	return {
-		game: relay.game,
-		platform: relay.platform,
-		year: relay.year,
-		runner,
-		commentators,
-	};
+	return relayData[activeIndex];
 };
 
 export const useNsmbReplicant = () => {

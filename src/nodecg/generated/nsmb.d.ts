@@ -9,10 +9,27 @@
 export interface Nsmb {
 	relayData?: {
 		game: string;
+		category: string;
 		platform: string;
 		year: number;
-		runner: string;
-		commentators?: string[];
+		runner: {
+			name: string;
+			social?: {
+				twitch?: string;
+				youtube?: string;
+				twitter?: string;
+				niconico?: string;
+			};
+		};
+		commentators?: {
+			name: string;
+			social?: {
+				twitch?: string;
+				youtube?: string;
+				twitter?: string;
+				niconico?: string;
+			};
+		}[];
 	}[];
 	activeIndex?: number;
 }

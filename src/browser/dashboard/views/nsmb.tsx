@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {useNsmbReplicant, useSheetCommentators} from "../../hooks";
+import {useNsmbReplicant} from "../../hooks";
 import {render} from "../../render";
 
 const containerStyle: React.CSSProperties = {
@@ -54,10 +54,8 @@ const sectionStyle: React.CSSProperties = {
 
 const NsmbPanel = () => {
 	const [nsmb, setNsmb] = useNsmbReplicant();
-	const sheetCommentators = useSheetCommentators();
 
 	const [runnerInput, setRunnerInput] = useState("");
-	const [pickedCommentator, setPickedCommentator] = useState("");
 	const [newCommentatorName, setNewCommentatorName] = useState("");
 
 	const activeIndex = nsmb?.activeIndex ?? 0;
@@ -65,8 +63,8 @@ const NsmbPanel = () => {
 	const activeRelay = relayData[activeIndex];
 
 	useEffect(() => {
-		setRunnerInput(activeRelay?.runner ?? "");
-	}, [activeRelay?.runner]);
+		setRunnerInput(activeRelay?.runner?.name ?? "");
+	}, [activeRelay?.runner?.name]);
 
 	if (nsmb == null) return null;
 
@@ -82,17 +80,19 @@ const NsmbPanel = () => {
 
 	const handleUpdateRunner = () => {
 		const newRelayData = relayData.map((item, i) =>
-			i === activeIndex ? {...item, runner: runnerInput} : item,
+			i === activeIndex
+				? {...item, runner: {...item.runner, name: runnerInput}}
+				: item,
 		);
 		setNsmb({...nsmb, relayData: newRelayData});
 	};
 
 	const handleAddCommentator = (name: string) => {
 		if (activeRelay == null) return;
-		if ((activeRelay.commentators ?? []).includes(name)) return;
+		if ((activeRelay.commentators ?? []).some((c) => c.name === name)) return;
 		const newRelayData = relayData.map((item, i) =>
 			i === activeIndex
-				? {...item, commentators: [...(item.commentators ?? []), name]}
+				? {...item, commentators: [...(item.commentators ?? []), {name}]}
 				: item,
 		);
 		setNsmb({...nsmb, relayData: newRelayData});
@@ -104,7 +104,9 @@ const NsmbPanel = () => {
 			i === activeIndex
 				? {
 						...item,
-						commentators: (item.commentators ?? []).filter((c) => c !== name),
+						commentators: (item.commentators ?? []).filter(
+							(c) => c.name !== name,
+						),
 					}
 				: item,
 		);
@@ -141,7 +143,7 @@ const NsmbPanel = () => {
 						onClick={() => setNsmb({...nsmb, activeIndex: i})}
 					>
 						<div style={{flex: 1}}>
-							{relay.game} / {relay.platform} / {relay.year}
+							{relay.game} / {relay.category} / {relay.platform} / {relay.year}
 						</div>
 					</div>
 				))}
@@ -150,7 +152,8 @@ const NsmbPanel = () => {
 			{activeRelay != null && (
 				<div style={sectionStyle}>
 					<div>
-						{activeRelay.game} / {activeRelay.platform} / {activeRelay.year}
+						{activeRelay.game} / {activeRelay.category} / {activeRelay.platform}{" "}
+						/ {activeRelay.year}
 					</div>
 
 					<div style={{display: "flex", flexDirection: "column", gap: 4}}>
@@ -172,15 +175,15 @@ const NsmbPanel = () => {
 
 					<div style={{display: "flex", flexDirection: "column", gap: 4}}>
 						<strong>解説者</strong>
-						{(activeRelay.commentators ?? []).map((name) => (
+						{(activeRelay.commentators ?? []).map((c) => (
 							<div
-								key={name}
+								key={c.name}
 								style={rowStyle}
 							>
-								<div style={{flex: 1}}>{name}</div>
+								<div style={{flex: 1}}>{c.name}</div>
 								<button
 									style={buttonStyle}
-									onClick={() => handleRemoveCommentator(name)}
+									onClick={() => handleRemoveCommentator(c.name)}
 								>
 									削除
 								</button>
@@ -188,37 +191,9 @@ const NsmbPanel = () => {
 						))}
 
 						<div style={{display: "flex", gap: 8}}>
-							<select
-								style={inputStyle}
-								value={pickedCommentator}
-								onChange={(e) => setPickedCommentator(e.target.value)}
-							>
-								<option value=''>シートから選択</option>
-								{sheetCommentators?.map((c) => (
-									<option
-										key={c.name}
-										value={c.name}
-									>
-										{c.name}
-									</option>
-								))}
-							</select>
-							<button
-								style={buttonStyle}
-								disabled={pickedCommentator === ""}
-								onClick={() => {
-									handleAddCommentator(pickedCommentator);
-									setPickedCommentator("");
-								}}
-							>
-								追加
-							</button>
-						</div>
-
-						<div style={{display: "flex", gap: 8}}>
 							<input
-								style={inputStyle}
-								placeholder='解説者名を直接入力'
+								style={{...inputStyle, flex: 1}}
+								placeholder='解説者名を入力'
 								value={newCommentatorName}
 								onChange={(e) => setNewCommentatorName(e.target.value)}
 							/>

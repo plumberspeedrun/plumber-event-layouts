@@ -2,17 +2,28 @@ import {auth as googleAuth, sheets as googleSheets} from "@googleapis/sheets";
 import type NodeCG from "nodecg/types";
 import type {Configschema} from "../nodecg/generated/configschema.js";
 import type {Nsmb} from "../nodecg/generated/nsmb.js";
+import type {SheetCommentators} from "../nodecg/generated/sheetCommentators.js";
+import type {SheetRunners} from "../nodecg/generated/sheetRunners.js";
 
 const NSMB_COLUMNS = [
 	"game",
+	"category",
 	"platform",
 	"year",
 	"runner",
-	"commentators",
+	"commentator_1",
+	"commentator_2",
 ] as const;
 
 type NsmbColumnKey = (typeof NSMB_COLUMNS)[number];
 type NsmbRow = Partial<Record<NsmbColumnKey, string>>;
+
+type Social = {
+	twitch?: string;
+	youtube?: string;
+	twitter?: string;
+	niconico?: string;
+};
 
 const rowsToRecords = (rows: string[][]): NsmbRow[] => {
 	const [header, ...body] = rows;
@@ -33,8 +44,20 @@ const rowsToRecords = (rows: string[][]): NsmbRow[] => {
 	});
 };
 
+const buildSocialField = (social: Social | undefined) => {
+	if (social == null) return {};
+	const filtered: Record<string, string> = {};
+	for (const [key, value] of Object.entries(social)) {
+		if (value != null) filtered[key] = value;
+	}
+	return Object.keys(filtered).length > 0 ? {social: filtered} : {};
+};
+
 export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	const nsmbReplicant = nodecg.Replicant<Nsmb>("nsmb");
+	const sheetRunnersRep = nodecg.Replicant<SheetRunners>("sheetRunners");
+	const sheetCommentatorsRep =
+		nodecg.Replicant<SheetCommentators>("sheetCommentators");
 
 	const config = nodecg.bundleConfig.googleSpreadsheet;
 	if (config == null) return;
@@ -46,6 +69,41 @@ export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 		scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
 	});
 	const sheets = googleSheets({version: "v4", auth});
+
+	const findRunnerSocial = (name: string) => {
+		const runner = (sheetRunnersRep.value ?? []).find((r) => r.name === name);
+		return runner?.social as Social | undefined;
+	};
+
+	const findCommentatorSocial = (name: string) => {
+		const commentator = (sheetCommentatorsRep.value ?? []).find(
+			(c) => c.name === name,
+		);
+		return commentator?.social as Social | undefined;
+	};
+
+	const enrichRelayData = () => {
+		const current = nsmbReplicant.value;
+		if (current?.relayData == null) return;
+
+		nsmbReplicant.value = {
+			...current,
+			relayData: current.relayData.map((item) => ({
+				...item,
+				runner: {
+					name: item.runner.name,
+					...buildSocialField(findRunnerSocial(item.runner.name)),
+				},
+				commentators: (item.commentators ?? []).map((c) => ({
+					name: c.name,
+					...buildSocialField(findCommentatorSocial(c.name)),
+				})),
+			})),
+		};
+	};
+
+	sheetRunnersRep.on("change", () => enrichRelayData());
+	sheetCommentatorsRep.on("change", () => enrichRelayData());
 
 	const syncNsmb = async () => {
 		try {
@@ -62,22 +120,26 @@ export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 					.filter(
 						(r) =>
 							r.game != null &&
+							r.category != null &&
 							r.platform != null &&
 							r.year != null &&
 							r.runner != null,
 					)
 					.map((r) => ({
 						game: r.game!,
+						category: r.category!,
 						platform: r.platform!,
 						year: parseInt(r.year!, 10),
-						runner: r.runner!,
-						commentators:
-							r.commentators != null
-								? r.commentators
-										.split(",")
-										.map((c) => c.trim())
-										.filter((c) => c !== "")
-								: [],
+						runner: {
+							name: r.runner!,
+							...buildSocialField(findRunnerSocial(r.runner!)),
+						},
+						commentators: [r.commentator_1, r.commentator_2]
+							.filter((c): c is string => c != null && c !== "")
+							.map((name) => ({
+								name,
+								...buildSocialField(findCommentatorSocial(name)),
+							})),
 					})),
 				activeIndex: currentActiveIndex,
 			};

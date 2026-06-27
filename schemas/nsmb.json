@@ -12,6 +12,9 @@
 					"game": {
 						"type": "string"
 					},
+					"category": {
+						"type": "string"
+					},
 					"platform": {
 						"type": "string"
 					},
@@ -19,17 +22,51 @@
 						"type": "integer"
 					},
 					"runner": {
-						"type": "string"
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"social": {
+								"type": "object",
+								"additionalProperties": false,
+								"properties": {
+									"twitch": { "type": "string" },
+									"youtube": { "type": "string" },
+									"twitter": { "type": "string" },
+									"niconico": { "type": "string" }
+								}
+							}
+						},
+						"required": ["name"]
 					},
 					"commentators": {
 						"type": "array",
 						"items": {
-							"type": "string"
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"social": {
+									"type": "object",
+									"additionalProperties": false,
+									"properties": {
+										"twitch": { "type": "string" },
+										"youtube": { "type": "string" },
+										"twitter": { "type": "string" },
+										"niconico": { "type": "string" }
+									}
+								}
+							},
+							"required": ["name"]
 						},
 						"default": []
 					}
 				},
-				"required": ["game", "platform", "year", "runner"]
+				"required": ["game", "category", "platform", "year", "runner"]
 			},
 			"default": []
 		},
