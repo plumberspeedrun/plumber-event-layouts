@@ -4,6 +4,7 @@ import gamepadIcon from "../../assets/icons/gamepad.svg";
 import twitchIcon from "../../assets/icons/twitch.svg";
 import twitterIcon from "../../assets/icons/twitter.svg";
 import youtubeIcon from "../../assets/icons/youtube.svg";
+import {formatTime} from "../../formatTime";
 
 type SnsPlatform = "twitch" | "youtube" | "twitter";
 
@@ -20,6 +21,7 @@ const snsIconUrls: Record<SnsPlatform, string> = {
 const iconStyle: CSSProperties = {
 	width: "1em",
 	height: "1em",
+	marginLeft: "5px",
 	flexShrink: 0,
 };
 
@@ -29,13 +31,24 @@ const gamepadIconStyle: CSSProperties = {
 	height: "1.25em",
 };
 
-const SnsIcon = ({platform}: {platform: SnsPlatform}) => (
+const SnsIcon = ({
+	platform,
+	style,
+}: {
+	platform: SnsPlatform;
+	style?: CSSProperties;
+}) => (
 	<img
 		src={snsIconUrls[platform]}
 		alt={platform}
-		style={iconStyle}
+		style={{...iconStyle, ...style}}
 	/>
 );
+
+const twitterIconStyle: CSSProperties = {
+	width: "0.875em",
+	height: "0.875em",
+};
 
 export const getPlayerDisplayItems = (
 	player: RunDataPlayer,
@@ -76,9 +89,15 @@ export const useNameplateCycle = (
 	return slideIndex;
 };
 
+interface NameplateResult {
+	time: string;
+	state: "completed" | "forfeit";
+}
+
 interface NameplateProps {
 	items: NameplateDisplayItem[];
 	slideIndex: number;
+	result?: NameplateResult;
 	style?: CSSProperties;
 }
 
@@ -86,10 +105,10 @@ const containerStyle: CSSProperties = {
 	position: "relative",
 	display: "flex",
 	alignItems: "center",
-	fontFamily: '"M PLUS 1p"',
-	fontWeight: 900,
+	fontFamily: '"Inter Variable", "M PLUS 1p"',
+	fontWeight: 800,
 	color: "white",
-	backgroundColor: "gray",
+	backgroundColor: "black",
 };
 
 const contentStyle: CSSProperties = {
@@ -100,9 +119,24 @@ const contentStyle: CSSProperties = {
 	overflow: "hidden",
 	textOverflow: "ellipsis",
 	transition: "opacity 300ms ease-in-out",
+	flex: 1,
+	minWidth: 0,
 };
 
-export const Nameplate = ({items, slideIndex, style}: NameplateProps) => {
+const resultStyle: CSSProperties = {
+	marginLeft: "auto",
+	flexShrink: 0,
+	fontVariantNumeric: "tabular-nums",
+	paddingLeft: "12px",
+	paddingRight: "8px",
+};
+
+export const Nameplate = ({
+	items,
+	slideIndex,
+	result,
+	style,
+}: NameplateProps) => {
 	const [opacity, setOpacity] = useState(1);
 	const [displayedItem, setDisplayedItem] =
 		useState<NameplateDisplayItem | null>(
@@ -153,7 +187,14 @@ export const Nameplate = ({items, slideIndex, style}: NameplateProps) => {
 		<div style={{...containerStyle, ...style}}>
 			<div style={{...contentStyle, opacity}}>
 				{displayedItem?.type === "sns" && (
-					<SnsIcon platform={displayedItem.platform} />
+					<SnsIcon
+						platform={displayedItem.platform}
+						style={
+							displayedItem.platform === "twitter"
+								? twitterIconStyle
+								: undefined
+						}
+					/>
 				)}
 				{displayedItem?.type === "name" && (
 					<img
@@ -164,6 +205,16 @@ export const Nameplate = ({items, slideIndex, style}: NameplateProps) => {
 				)}
 				<span style={textStyle}>{displayedItem?.value ?? ""}</span>
 			</div>
+			{result && (
+				<span
+					style={{
+						...resultStyle,
+						color: result.state === "completed" ? "gold" : "gray",
+					}}
+				>
+					{formatTime(result.time)}
+				</span>
+			)}
 		</div>
 	);
 };
