@@ -117,9 +117,13 @@ export const Nameplate = ({items, slideIndex, style}: NameplateProps) => {
 		const slideChanged = prevSlideIndexRef.current !== slideIndex;
 		prevSlideIndexRef.current = slideIndex;
 
-		const isSameContent =
-			displayedItem?.type === newItem?.type &&
-			displayedItem?.value === newItem?.value;
+		const itemKey = (item: NameplateDisplayItem | null) => {
+			if (!item) return null;
+			return item.type === "sns"
+				? `${item.platform}:${item.value}`
+				: item.value;
+		};
+		const isSameContent = itemKey(displayedItem) === itemKey(newItem);
 
 		if (!isFirst && slideChanged && !isSameContent) {
 			setOpacity(0);
