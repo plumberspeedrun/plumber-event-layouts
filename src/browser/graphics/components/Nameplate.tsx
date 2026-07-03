@@ -4,7 +4,7 @@ import gamepadIcon from "../../assets/icons/gamepad.svg";
 import twitchIcon from "../../assets/icons/twitch.svg";
 import twitterIcon from "../../assets/icons/twitter.svg";
 import youtubeIcon from "../../assets/icons/youtube.svg";
-import {formatTime} from "../../formatTime";
+import {formatTime} from "../../utils/formatTime";
 
 type SnsPlatform = "twitch" | "youtube" | "twitter";
 
