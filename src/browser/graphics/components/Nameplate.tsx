@@ -98,6 +98,9 @@ interface NameplateProps {
 	items: NameplateDisplayItem[];
 	slideIndex: number;
 	result?: NameplateResult;
+	nameIcon?: string;
+	nameIconAlt?: string;
+	nameIconStyle?: CSSProperties;
 	style?: CSSProperties;
 }
 
@@ -135,6 +138,9 @@ export const Nameplate = ({
 	items,
 	slideIndex,
 	result,
+	nameIcon = gamepadIcon,
+	nameIconAlt = "name",
+	nameIconStyle,
 	style,
 }: NameplateProps) => {
 	const [opacity, setOpacity] = useState(1);
@@ -175,7 +181,7 @@ export const Nameplate = ({
 				timerRef.current = null;
 			}
 		};
-	}, [slideIndex, items]);
+	}, [slideIndex, items, displayedItem]);
 
 	const textStyle: CSSProperties = {
 		overflow: "hidden",
@@ -198,9 +204,9 @@ export const Nameplate = ({
 				)}
 				{displayedItem?.type === "name" && (
 					<img
-						src={gamepadIcon}
-						alt='name'
-						style={gamepadIconStyle}
+						src={nameIcon}
+						alt={nameIconAlt}
+						style={{...gamepadIconStyle, ...nameIconStyle}}
 					/>
 				)}
 				<span style={textStyle}>{displayedItem?.value ?? ""}</span>
