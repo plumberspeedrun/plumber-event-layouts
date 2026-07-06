@@ -18,6 +18,7 @@ type AddRunInput = {
 	game?: string;
 	category?: string;
 	system?: string;
+	releaseYear?: string;
 	estimate?: string;
 	setupTime?: string;
 	scheduledStartTime?: string;
@@ -50,6 +51,7 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				...(data.game != null && {game: data.game}),
 				...(data.category != null && {category: data.category}),
 				...(data.system != null && {system: data.system}),
+				...(data.releaseYear != null && {releaseYear: data.releaseYear}),
 				...(data.estimate != null && {estimate: data.estimate}),
 				...(data.setupTime != null && {setupTime: data.setupTime}),
 				...(data.scheduledStartTime != null && {

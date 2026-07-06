@@ -1,0 +1,17 @@
+@use "mixins/text-outline";
+
+body {
+	color: white;
+}
+
+.text-outline-white {
+	@include text-outline.text-outline(#fff, 5px);
+}
+
+.text-outline-black {
+	@include text-outline.text-outline(#000, 5px);
+}
+
+.text-outline-black-sm {
+	@include text-outline.text-outline(#000, 2px);
+}

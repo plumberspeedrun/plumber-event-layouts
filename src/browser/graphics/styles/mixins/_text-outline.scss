@@ -1,0 +1,15 @@
+@use "sass:math";
+@use "sass:list";
+
+@mixin text-outline($color, $width: 5px, $steps: 32) {
+	$shadows: ();
+
+	@for $i from 0 to $steps {
+		$angle: math.div(360deg, $steps) * $i;
+		$x: $width * math.cos($angle);
+		$y: $width * math.sin($angle);
+		$shadows: list.append($shadows, #{$color} #{$x} #{$y} 0, comma);
+	}
+
+	text-shadow: $shadows;
+}
