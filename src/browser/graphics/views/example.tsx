@@ -1,5 +1,6 @@
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
+import "../styles/index.scss";
 
 const App = () => {
 	// const upcomingRunData = useUpcomingRunData();
