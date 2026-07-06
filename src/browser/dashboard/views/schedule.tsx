@@ -112,6 +112,7 @@ const RunEditModal = ({
 	const [game, setGame] = useState("");
 	const [category, setCategory] = useState("");
 	const [system, setSystem] = useState("");
+	const [releaseYear, setReleaseYear] = useState("");
 	const [estimate, setEstimate] = useState("");
 	const [setupTime, setSetupTime] = useState("");
 	const [scheduledStartTime, setScheduledStartTime] = useState("");
@@ -131,6 +132,7 @@ const RunEditModal = ({
 		setGame(editingRun?.game ?? "");
 		setCategory(editingRun?.category ?? "");
 		setSystem(editingRun?.system ?? "");
+		setReleaseYear(editingRun?.releaseYear ?? "");
 		setEstimate(editingRun?.estimate ?? "");
 		setSetupTime(editingRun?.setupTime ?? "");
 		setScheduledStartTime(
@@ -144,6 +146,7 @@ const RunEditModal = ({
 		editingRun?.setupTime,
 		editingRun?.estimate,
 		editingRun?.system,
+		editingRun?.releaseYear,
 		editingRun?.runType,
 		editingRun?.game,
 		editingRun?.category,
@@ -161,6 +164,7 @@ const RunEditModal = ({
 				game,
 				category,
 				system,
+				releaseYear,
 				estimate,
 				setupTime,
 				scheduledStartTime: scheduledStartTime
@@ -369,6 +373,12 @@ const RunEditModal = ({
 							placeholder='システム'
 							value={system}
 							onChange={(e) => setSystem(e.target.value)}
+						/>
+						<input
+							style={inputStyle}
+							placeholder='発売年'
+							value={releaseYear}
+							onChange={(e) => setReleaseYear(e.target.value)}
 						/>
 						<input
 							style={inputStyle}
@@ -726,6 +736,7 @@ const Schedule = () => {
 	const [game, setGame] = useState("");
 	const [category, setCategory] = useState("");
 	const [system, setSystem] = useState("");
+	const [releaseYear, setReleaseYear] = useState("");
 	const [estimate, setEstimate] = useState("");
 	const [runnerName, setRunnerName] = useState("");
 	const [scheduledStartTime, setScheduledStartTime] = useState("");
@@ -809,6 +820,7 @@ const Schedule = () => {
 			...(game && {game}),
 			...(category && {category}),
 			...(system && {system}),
+			...(releaseYear && {releaseYear}),
 			...(estimate && {estimate}),
 			...(scheduledStartTime && {
 				scheduledStartTime: new Date(scheduledStartTime).toISOString(),
@@ -820,6 +832,7 @@ const Schedule = () => {
 		setGame("");
 		setCategory("");
 		setSystem("");
+		setReleaseYear("");
 		setEstimate("");
 		setRunnerName("");
 		setScheduledStartTime("");
@@ -944,6 +957,12 @@ const Schedule = () => {
 					placeholder='システム'
 					value={system}
 					onChange={(e) => setSystem(e.target.value)}
+				/>
+				<input
+					style={inputStyle}
+					placeholder='発売年'
+					value={releaseYear}
+					onChange={(e) => setReleaseYear(e.target.value)}
 				/>
 				<input
 					style={inputStyle}

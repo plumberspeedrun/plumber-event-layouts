@@ -17,6 +17,9 @@
 			"system": {
 				"type": "string"
 			},
+			"releaseYear": {
+				"type": "string"
+			},
 			"estimate": {
 				"type": "string"
 			},
