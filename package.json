@@ -15,10 +15,12 @@
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:update": "playwright test --update-snapshots",
+		"fix": "biome check --write .",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
+		"check:biome": "biome ci .",
 		"clean": "trash node_modules/.cache && trash dashboard && trash extension && trash db && trash graphics",
-		"check": "pnpm typecheck && biome ci ."
+		"check": "pnpm typecheck && pnpm check:biome"
 	},
 	"keywords": [],
 	"author": "",

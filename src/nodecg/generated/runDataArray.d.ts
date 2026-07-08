@@ -15,7 +15,7 @@ export type RunDataArray = {
 	estimate?: string;
 	setupTime?: string;
 	scheduledStartTime?: string;
-	runType?: 'individual' | 'team';
+	runType?: "individual" | "team";
 	teams: {
 		id: string;
 		name?: string;
@@ -47,7 +47,7 @@ export type RunDataArray = {
 			time: string;
 			milliseconds: number;
 			placement?: number;
-			state: 'completed' | 'forfeit';
+			state: "completed" | "forfeit";
 		};
 	};
 }[];

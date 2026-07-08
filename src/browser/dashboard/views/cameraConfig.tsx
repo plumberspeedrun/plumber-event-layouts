@@ -158,9 +158,7 @@ const CameraConfig = () => {
 								style={{...inputStyle, flex: 1}}
 								placeholder='ラベル'
 								value={feed.label ?? ""}
-								onChange={(e) =>
-									handleUpdate(feed.id, "label", e.target.value)
-								}
+								onChange={(e) => handleUpdate(feed.id, "label", e.target.value)}
 							/>
 							<label
 								style={{
