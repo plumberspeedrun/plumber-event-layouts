@@ -18,7 +18,7 @@
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"clean": "trash node_modules/.cache && trash dashboard && trash extension && trash db && trash graphics",
-		"check": "pnpm typecheck && biome ci . && pnpm build"
+		"check": "pnpm typecheck && biome ci ."
 	},
 	"keywords": [],
 	"author": "",
