@@ -1,5 +1,6 @@
 import {useReplicant} from "@nodecg/react-hooks";
 import type {ActiveRunId} from "../nodecg/generated/activeRunId";
+import type {CameraFeeds} from "../nodecg/generated/cameraFeeds";
 import type {Nsmb} from "../nodecg/generated/nsmb";
 import type {RunDataArray} from "../nodecg/generated/runDataArray";
 import type {SheetCommentators} from "../nodecg/generated/sheetCommentators";
@@ -86,4 +87,8 @@ export const useNsmbActiveRelay = (): NsmbActiveRelay | undefined => {
 
 export const useNsmbReplicant = () => {
 	return useReplicant<Nsmb>("nsmb");
+};
+
+export const useCameraFeeds = () => {
+	return useReplicant<CameraFeeds>("cameraFeeds");
 };

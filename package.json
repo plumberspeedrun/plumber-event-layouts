@@ -97,6 +97,14 @@
 				"file": "nsmb.html",
 				"workspace": "NSMB",
 				"headerColor": "#525F78"
+			},
+			{
+				"name": "cameraConfig",
+				"title": "カメラ設定",
+				"width": 4,
+				"file": "cameraConfig.html",
+				"workspace": "Camera",
+				"headerColor": "#525F78"
 			}
 		],
 		"graphics": [
