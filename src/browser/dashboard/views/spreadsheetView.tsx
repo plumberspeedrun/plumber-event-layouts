@@ -1,8 +1,4 @@
-import {
-	useSheetCommentators,
-	useSheetRunners,
-	useSpreadsheetStatus,
-} from "../../hooks";
+import {useSheetStaff, useSpreadsheetStatus} from "../../hooks";
 import {render} from "../../render";
 
 declare const nodecg: {
@@ -52,17 +48,17 @@ const sectionStyle: React.CSSProperties = {
 };
 
 const formatSocial = (social?: {
+	discord?: string;
 	twitch?: string;
 	youtube?: string;
 	twitter?: string;
-	niconico?: string;
 }) => {
 	if (social == null) return "";
 	return [
+		social.discord && `Discord: ${social.discord}`,
 		social.twitch && `Twitch: ${social.twitch}`,
 		social.youtube && `YouTube: ${social.youtube}`,
 		social.twitter && `Twitter: ${social.twitter}`,
-		social.niconico && `niconico: ${social.niconico}`,
 	]
 		.filter(Boolean)
 		.join(" / ");
@@ -70,8 +66,9 @@ const formatSocial = (social?: {
 
 const SpreadsheetView = () => {
 	const status = useSpreadsheetStatus();
-	const sheetRunners = useSheetRunners();
-	const sheetCommentators = useSheetCommentators();
+	const sheetStaff = useSheetStaff();
+	const sheetRunners = sheetStaff?.filter((s) => s.role === "runner");
+	const sheetCommentators = sheetStaff?.filter((s) => s.role === "commentator");
 
 	return (
 		<div style={containerStyle}>
@@ -132,7 +129,6 @@ const SpreadsheetView = () => {
 							<div style={{flex: 1}}>
 								<div>
 									<strong>{commentator.game}</strong> {commentator.name}
-									{commentator.pronouns && ` (${commentator.pronouns})`}
 								</div>
 								<div style={{fontSize: 11, color: "#b9c2d4"}}>
 									{formatSocial(commentator.social)}

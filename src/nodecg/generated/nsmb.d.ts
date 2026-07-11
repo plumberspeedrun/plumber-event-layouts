@@ -15,6 +15,7 @@ export interface Nsmb {
 		runner: {
 			name: string;
 			social?: {
+				discord?: string;
 				twitch?: string;
 				youtube?: string;
 				twitter?: string;
@@ -24,6 +25,7 @@ export interface Nsmb {
 		commentators?: {
 			name: string;
 			social?: {
+				discord?: string;
 				twitch?: string;
 				youtube?: string;
 				twitter?: string;

@@ -15,7 +15,7 @@ export type RunDataArray = {
 	estimate?: string;
 	setupTime?: string;
 	scheduledStartTime?: string;
-	runType?: "individual" | "team";
+	runType?: "ffa" | "team";
 	teams: {
 		id: string;
 		name?: string;
@@ -25,6 +25,7 @@ export type RunDataArray = {
 			name: string;
 			pronouns?: string;
 			social?: {
+				discord?: string;
 				twitch?: string;
 				youtube?: string;
 				twitter?: string;
@@ -36,6 +37,7 @@ export type RunDataArray = {
 		name: string;
 		pronouns?: string;
 		social?: {
+			discord?: string;
 			twitch?: string;
 			youtube?: string;
 			twitter?: string;

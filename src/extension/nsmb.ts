@@ -2,8 +2,7 @@ import {auth as googleAuth, sheets as googleSheets} from "@googleapis/sheets";
 import type NodeCG from "nodecg/types";
 import type {Configschema} from "../nodecg/generated/configschema.js";
 import type {Nsmb} from "../nodecg/generated/nsmb.js";
-import type {SheetCommentators} from "../nodecg/generated/sheetCommentators.js";
-import type {SheetRunners} from "../nodecg/generated/sheetRunners.js";
+import type {SheetStaff} from "../nodecg/generated/sheetStaff.js";
 
 const NSMB_COLUMNS = [
 	"game",
@@ -19,6 +18,7 @@ type NsmbColumnKey = (typeof NSMB_COLUMNS)[number];
 type NsmbRow = Partial<Record<NsmbColumnKey, string>>;
 
 type Social = {
+	discord?: string;
 	twitch?: string;
 	youtube?: string;
 	twitter?: string;
@@ -55,9 +55,7 @@ const buildSocialField = (social: Social | undefined) => {
 
 export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	const nsmbReplicant = nodecg.Replicant<Nsmb>("nsmb");
-	const sheetRunnersRep = nodecg.Replicant<SheetRunners>("sheetRunners");
-	const sheetCommentatorsRep =
-		nodecg.Replicant<SheetCommentators>("sheetCommentators");
+	const sheetStaffRep = nodecg.Replicant<SheetStaff>("sheetStaff");
 
 	const config = nodecg.bundleConfig.googleSpreadsheet;
 	if (config == null) return;
@@ -71,15 +69,17 @@ export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	const sheets = googleSheets({version: "v4", auth});
 
 	const findRunnerSocial = (name: string) => {
-		const runner = (sheetRunnersRep.value ?? []).find((r) => r.name === name);
-		return runner?.social as Social | undefined;
+		const staffMember = (sheetStaffRep.value ?? []).find(
+			(s) => s.role === "runner" && s.name === name,
+		);
+		return staffMember?.social as Social | undefined;
 	};
 
 	const findCommentatorSocial = (name: string) => {
-		const commentator = (sheetCommentatorsRep.value ?? []).find(
-			(c) => c.name === name,
+		const staffMember = (sheetStaffRep.value ?? []).find(
+			(s) => s.role === "commentator" && s.name === name,
 		);
-		return commentator?.social as Social | undefined;
+		return staffMember?.social as Social | undefined;
 	};
 
 	const enrichRelayData = () => {
@@ -102,8 +102,7 @@ export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 		};
 	};
 
-	sheetRunnersRep.on("change", () => enrichRelayData());
-	sheetCommentatorsRep.on("change", () => enrichRelayData());
+	sheetStaffRep.on("change", () => enrichRelayData());
 
 	const syncNsmb = async () => {
 		try {

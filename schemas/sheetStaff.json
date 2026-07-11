@@ -5,21 +5,23 @@
 		"type": "object",
 		"additionalProperties": false,
 		"properties": {
-			"name": {
-				"type": "string"
-			},
+			"name": { "type": "string" },
+			"role": { "type": "string", "enum": ["runner", "commentator"] },
+			"game": { "type": "string" },
+			"category": { "type": "string" },
+			"teamName": { "type": "string" },
 			"social": {
 				"type": "object",
 				"additionalProperties": false,
 				"properties": {
+					"discord": { "type": "string" },
 					"twitch": { "type": "string" },
 					"youtube": { "type": "string" },
-					"twitter": { "type": "string" },
-					"niconico": { "type": "string" }
+					"twitter": { "type": "string" }
 				}
 			}
 		},
-		"required": ["name"]
+		"required": ["name", "role"]
 	},
 	"default": []
 }

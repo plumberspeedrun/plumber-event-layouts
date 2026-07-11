@@ -13,17 +13,13 @@
 				"spreadsheetId": {
 					"type": "string"
 				},
-				"runnerSheetName": {
+				"staffSheetName": {
 					"type": "string",
-					"default": "Runners"
-				},
-				"commentatorSheetName": {
-					"type": "string",
-					"default": "Commentators"
+					"default": "Staff"
 				},
 				"scheduleSheetName": {
 					"type": "string",
-					"default": "Commentators"
+					"default": "Schedule"
 				},
 				"nsmbSheetName": {
 					"type": "string",

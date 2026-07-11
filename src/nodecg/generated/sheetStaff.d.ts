@@ -6,12 +6,16 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type SheetRunners = {
+export type SheetStaff = {
 	name: string;
+	role: "runner" | "commentator";
+	game?: string;
+	category?: string;
+	teamName?: string;
 	social?: {
+		discord?: string;
 		twitch?: string;
 		youtube?: string;
 		twitter?: string;
-		niconico?: string;
 	};
 }[];

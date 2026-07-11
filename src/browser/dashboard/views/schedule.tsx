@@ -116,7 +116,7 @@ const RunEditModal = ({
 	const [estimate, setEstimate] = useState("");
 	const [setupTime, setSetupTime] = useState("");
 	const [scheduledStartTime, setScheduledStartTime] = useState("");
-	const [runType, setRunType] = useState<"individual" | "team">("individual");
+	const [runType, setRunType] = useState<"ffa" | "team">("ffa");
 	const [pickedRunner, setPickedRunner] = useState("");
 	const [newRunnerName, setNewRunnerName] = useState("");
 	const [newCommentatorName, setNewCommentatorName] = useState("");
@@ -140,7 +140,7 @@ const RunEditModal = ({
 				? editingRun.scheduledStartTime.slice(0, 16)
 				: "",
 		);
-		setRunType(editingRun?.runType ?? "individual");
+		setRunType(editingRun?.runType ?? "ffa");
 	}, [
 		editingRun?.scheduledStartTime,
 		editingRun?.setupTime,
@@ -405,8 +405,8 @@ const RunEditModal = ({
 								<input
 									type='radio'
 									name='runType'
-									checked={runType === "individual"}
-									onChange={() => setRunType("individual")}
+									checked={runType === "ffa"}
+									onChange={() => setRunType("ffa")}
 								/>
 								個人
 							</label>
@@ -424,7 +424,7 @@ const RunEditModal = ({
 
 					<div style={sectionStyle}>
 						<strong>走者</strong>
-						{runType === "individual" ? (
+						{runType === "ffa" ? (
 							<>
 								{editingRun.teams.flatMap((team) =>
 									team.players.map((player) => (
@@ -654,7 +654,6 @@ const RunEditModal = ({
 										value={c.name}
 									>
 										{c.name}
-										{c.pronouns ? ` (${c.pronouns})` : ""}
 									</option>
 								))}
 							</select>
@@ -668,9 +667,6 @@ const RunEditModal = ({
 									if (commentator == null) return;
 									handleAddCommentator({
 										name: commentator.name,
-										...(commentator.pronouns != null && {
-											pronouns: commentator.pronouns,
-										}),
 										...(commentator.social != null && {
 											social: commentator.social,
 										}),
@@ -744,7 +740,7 @@ const Schedule = () => {
 	const [addPickedCommentator, setAddPickedCommentator] = useState("");
 	const [addNewCommentatorName, setAddNewCommentatorName] = useState("");
 	const [addCommentators, setAddCommentators] = useState<Commentator[]>([]);
-	const [runType, setRunType] = useState<"individual" | "team">("individual");
+	const [runType, setRunType] = useState<"ffa" | "team">("ffa");
 	const [newTeams, setNewTeams] = useState<NewTeam[]>([]);
 	const [pickedNewTeamRunner, setPickedNewTeamRunner] = useState<
 		Record<number, string>
@@ -807,7 +803,7 @@ const Schedule = () => {
 
 	const handleAddRun = () => {
 		const teams =
-			runType === "individual"
+			runType === "ffa"
 				? [{players: [{name: runnerName || "Unknown"}]}]
 				: newTeams
 						.filter((team) => team.players.length > 0)
@@ -839,7 +835,7 @@ const Schedule = () => {
 		setAddCommentators([]);
 		setAddPickedCommentator("");
 		setAddNewCommentatorName("");
-		setRunType("individual");
+		setRunType("ffa");
 		setNewTeams([]);
 		setPickedNewTeamRunner({});
 		setNewTeamRunnerInput({});
@@ -982,8 +978,8 @@ const Schedule = () => {
 						<input
 							type='radio'
 							name='addRunType'
-							checked={runType === "individual"}
-							onChange={() => setRunType("individual")}
+							checked={runType === "ffa"}
+							onChange={() => setRunType("ffa")}
 						/>
 						個人
 					</label>
@@ -999,7 +995,7 @@ const Schedule = () => {
 				</div>
 
 				<label style={{fontSize: 11, color: "#aab"}}>走者</label>
-				{runType === "individual" ? (
+				{runType === "ffa" ? (
 					<div style={{display: "flex", gap: 8}}>
 						<select
 							style={inputStyle}
@@ -1188,7 +1184,6 @@ const Schedule = () => {
 							if (c == null) return;
 							handleAddCommentatorToNew({
 								name: c.name,
-								...(c.pronouns != null && {pronouns: c.pronouns}),
 								...(c.social != null && {social: c.social}),
 							});
 							setAddPickedCommentator("");

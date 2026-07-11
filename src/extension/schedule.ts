@@ -3,7 +3,7 @@ import type NodeCG from "nodecg/types";
 import type {ActiveRunId} from "../nodecg/generated/activeRunId.js";
 import type {Configschema} from "../nodecg/generated/configschema.js";
 import type {RunDataArray} from "../nodecg/generated/runDataArray.js";
-import type {SheetRunners} from "../nodecg/generated/sheetRunners.js";
+import type {SheetStaff} from "../nodecg/generated/sheetStaff.js";
 
 type RunData = RunDataArray[number];
 
@@ -22,7 +22,7 @@ type AddRunInput = {
 	estimate?: string;
 	setupTime?: string;
 	scheduledStartTime?: string;
-	runType?: "individual" | "team";
+	runType?: "ffa" | "team";
 	teams: {
 		name?: string;
 		players: {
@@ -35,13 +35,13 @@ type AddRunInput = {
 export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	const runDataArrayRep = nodecg.Replicant<RunDataArray>("runDataArray");
 	const activeRunIdRep = nodecg.Replicant<ActiveRunId>("activeRunId");
-	const sheetRunnersRep = nodecg.Replicant<SheetRunners>("sheetRunners");
+	const sheetStaffRep = nodecg.Replicant<SheetStaff>("sheetStaff");
 
 	const enrichPlayerSocial = (playerName: string) => {
-		const sheetRunner = sheetRunnersRep.value?.find(
-			(r) => r.name === playerName,
+		const staffMember = sheetStaffRep.value?.find(
+			(s) => s.role === "runner" && s.name === playerName,
 		);
-		return sheetRunner?.social ? {social: {...sheetRunner.social}} : {};
+		return staffMember?.social ? {social: {...staffMember.social}} : {};
 	};
 
 	nodecg.listenFor("scheduleAddRun", (data: AddRunInput, ack) => {

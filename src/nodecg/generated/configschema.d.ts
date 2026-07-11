@@ -10,8 +10,7 @@ export interface Configschema {
 	googleSpreadsheet?: {
 		credentialsPath: string;
 		spreadsheetId: string;
-		runnerSheetName?: string;
-		commentatorSheetName?: string;
+		staffSheetName?: string;
 		scheduleSheetName?: string;
 		nsmbSheetName?: string;
 	};

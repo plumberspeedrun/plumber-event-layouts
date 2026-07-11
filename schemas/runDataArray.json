@@ -32,7 +32,7 @@
 			},
 			"runType": {
 				"type": "string",
-				"enum": ["individual", "team"]
+				"enum": ["ffa", "team"]
 			},
 			"teams": {
 				"type": "array",
@@ -68,6 +68,7 @@
 										"type": "object",
 										"additionalProperties": false,
 										"properties": {
+											"discord": { "type": "string" },
 											"twitch": { "type": "string" },
 											"youtube": { "type": "string" },
 											"twitter": { "type": "string" },
@@ -98,6 +99,7 @@
 							"type": "object",
 							"additionalProperties": false,
 							"properties": {
+								"discord": { "type": "string" },
 								"twitch": { "type": "string" },
 								"youtube": { "type": "string" },
 								"twitter": { "type": "string" },
