@@ -23,6 +23,7 @@ type AddRunInput = {
 	setupTime?: string;
 	scheduledStartTime?: string;
 	runType?: "ffa" | "team";
+	obsSceneName?: string;
 	teams: {
 		name?: string;
 		players: {
@@ -58,6 +59,9 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 					scheduledStartTime: data.scheduledStartTime,
 				}),
 				...(data.runType != null && {runType: data.runType}),
+				...(data.obsSceneName != null && {
+					obsSceneName: data.obsSceneName,
+				}),
 				teams: data.teams.map((team) => {
 					const teamId = crypto.randomUUID();
 					return {

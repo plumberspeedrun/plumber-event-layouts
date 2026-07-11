@@ -2,6 +2,7 @@ import {useReplicant} from "@nodecg/react-hooks";
 import type {ActiveRunId} from "../nodecg/generated/activeRunId";
 import type {CameraFeeds} from "../nodecg/generated/cameraFeeds";
 import type {Nsmb} from "../nodecg/generated/nsmb";
+import type {ObsConfig} from "../nodecg/generated/obsConfig";
 import type {RunDataArray} from "../nodecg/generated/runDataArray";
 import type {SheetStaff} from "../nodecg/generated/sheetStaff";
 import type {SpreadsheetStatus} from "../nodecg/generated/spreadsheetStatus";
@@ -97,4 +98,16 @@ export const useNsmbReplicant = () => {
 
 export const useCameraFeeds = () => {
 	return useReplicant<CameraFeeds>("cameraFeeds");
+};
+
+export const useObsScenes = () => {
+	const [scenes] = useReplicant<string[]>("scenes", {
+		bundle: "nodecg-obs-browser",
+	});
+	if (scenes == null) return;
+	return scenes;
+};
+
+export const useObsConfig = () => {
+	return useReplicant<ObsConfig>("obsConfig");
 };

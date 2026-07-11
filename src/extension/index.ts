@@ -1,6 +1,7 @@
 import type NodeCG from "nodecg/types";
 import {assets} from "./assets.js";
 import {nsmb} from "./nsmb.js";
+import {obs} from "./obs.js";
 import {schedule} from "./schedule.js";
 import {spreadsheet} from "./spreadsheet.js";
 import {timer} from "./timer.js";
@@ -12,4 +13,5 @@ export default (nodecg: NodeCG.ServerAPI) => {
 	nsmb(nodecg);
 	schedule(nodecg);
 	timer(nodecg);
+	obs(nodecg);
 };

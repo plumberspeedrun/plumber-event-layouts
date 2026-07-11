@@ -1,6 +1,9 @@
 import {useEffect, useState} from "react";
 import {
+	useActiveRun,
 	useActiveRunId,
+	useObsConfig,
+	useObsScenes,
 	useRunDataArray,
 	useSheetCommentators,
 	useSheetRunners,
@@ -107,6 +110,7 @@ const RunEditModal = ({
 	const runDataArray = useRunDataArray();
 	const sheetRunners = useSheetRunners();
 	const sheetCommentators = useSheetCommentators();
+	const obsScenes = useObsScenes();
 	const editingRun = runDataArray?.find((r) => r.id === runId);
 
 	const [game, setGame] = useState("");
@@ -117,6 +121,7 @@ const RunEditModal = ({
 	const [setupTime, setSetupTime] = useState("");
 	const [scheduledStartTime, setScheduledStartTime] = useState("");
 	const [runType, setRunType] = useState<"ffa" | "team">("ffa");
+	const [obsSceneName, setObsSceneName] = useState("");
 	const [pickedRunner, setPickedRunner] = useState("");
 	const [newRunnerName, setNewRunnerName] = useState("");
 	const [newCommentatorName, setNewCommentatorName] = useState("");
@@ -141,6 +146,7 @@ const RunEditModal = ({
 				: "",
 		);
 		setRunType(editingRun?.runType ?? "ffa");
+		setObsSceneName(editingRun?.obsSceneName ?? "");
 	}, [
 		editingRun?.scheduledStartTime,
 		editingRun?.setupTime,
@@ -150,6 +156,7 @@ const RunEditModal = ({
 		editingRun?.runType,
 		editingRun?.game,
 		editingRun?.category,
+		editingRun?.obsSceneName,
 	]);
 
 	const candidateCommentators = (sheetCommentators ?? []).filter(
@@ -171,6 +178,7 @@ const RunEditModal = ({
 					? new Date(scheduledStartTime).toISOString()
 					: null,
 				runType,
+				obsSceneName,
 			},
 		});
 	};
@@ -420,6 +428,22 @@ const RunEditModal = ({
 								チーム
 							</label>
 						</div>
+						<label style={{fontSize: 11, color: "#aab"}}>OBSシーン</label>
+						<select
+							style={inputStyle}
+							value={obsSceneName}
+							onChange={(e) => setObsSceneName(e.target.value)}
+						>
+							<option value=''>未選択</option>
+							{obsScenes?.map((scene) => (
+								<option
+									key={scene}
+									value={scene}
+								>
+									{scene}
+								</option>
+							))}
+						</select>
 					</div>
 
 					<div style={sectionStyle}>
@@ -726,8 +750,11 @@ type NewTeam = {
 const Schedule = () => {
 	const runDataArray = useRunDataArray();
 	const activeRunId = useActiveRunId();
+	const activeRun = useActiveRun();
 	const sheetRunners = useSheetRunners();
 	const sheetCommentators = useSheetCommentators();
+	const obsScenes = useObsScenes();
+	const [obsConfig, setObsConfig] = useObsConfig();
 
 	const [game, setGame] = useState("");
 	const [category, setCategory] = useState("");
@@ -748,6 +775,7 @@ const Schedule = () => {
 	const [newTeamRunnerInput, setNewTeamRunnerInput] = useState<
 		Record<number, string>
 	>({});
+	const [addObsSceneName, setAddObsSceneName] = useState("");
 
 	const addCandidateCommentators = (sheetCommentators ?? []).filter(
 		(c) => c.game === game,
@@ -822,6 +850,7 @@ const Schedule = () => {
 				scheduledStartTime: new Date(scheduledStartTime).toISOString(),
 			}),
 			...(addCommentators.length > 0 && {commentators: addCommentators}),
+			...(addObsSceneName && {obsSceneName: addObsSceneName}),
 			runType,
 			teams,
 		});
@@ -839,6 +868,7 @@ const Schedule = () => {
 		setNewTeams([]);
 		setPickedNewTeamRunner({});
 		setNewTeamRunnerInput({});
+		setAddObsSceneName("");
 	};
 
 	return (
@@ -862,6 +892,46 @@ const Schedule = () => {
 				>
 					シート同期
 				</button>
+				<button
+					style={buttonStyle}
+					disabled={!activeRun?.obsSceneName}
+					onClick={() =>
+						nodecg.sendMessage("obsChangeScene", activeRun?.obsSceneName)
+					}
+				>
+					開始
+				</button>
+				<button
+					style={buttonStyle}
+					disabled={!obsConfig?.setupSceneName}
+					onClick={() => nodecg.sendMessage("obsSetupScene")}
+				>
+					セットアップ画面
+				</button>
+			</div>
+
+			<div style={{display: "flex", gap: 8, alignItems: "center"}}>
+				<label style={{fontSize: 11, color: "#aab"}}>セットアップシーン</label>
+				<select
+					style={inputStyle}
+					value={obsConfig?.setupSceneName ?? ""}
+					onChange={(e) =>
+						setObsConfig({
+							...obsConfig,
+							setupSceneName: e.target.value || undefined,
+						})
+					}
+				>
+					<option value=''>未選択</option>
+					{obsScenes?.map((scene) => (
+						<option
+							key={scene}
+							value={scene}
+						>
+							{scene}
+						</option>
+					))}
+				</select>
 			</div>
 
 			<div style={{display: "flex", flexDirection: "column", gap: 4}}>
@@ -1212,6 +1282,23 @@ const Schedule = () => {
 						追加
 					</button>
 				</div>
+
+				<label style={{fontSize: 11, color: "#aab"}}>OBSシーン</label>
+				<select
+					style={inputStyle}
+					value={addObsSceneName}
+					onChange={(e) => setAddObsSceneName(e.target.value)}
+				>
+					<option value=''>未選択</option>
+					{obsScenes?.map((scene) => (
+						<option
+							key={scene}
+							value={scene}
+						>
+							{scene}
+						</option>
+					))}
+				</select>
 
 				<button
 					style={buttonStyle}

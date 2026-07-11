@@ -16,6 +16,7 @@ export type RunDataArray = {
 	setupTime?: string;
 	scheduledStartTime?: string;
 	runType?: "ffa" | "team";
+	obsSceneName?: string;
 	teams: {
 		id: string;
 		name?: string;

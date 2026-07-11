@@ -34,6 +34,9 @@
 				"type": "string",
 				"enum": ["ffa", "team"]
 			},
+			"obsSceneName": {
+				"type": "string"
+			},
 			"teams": {
 				"type": "array",
 				"items": {
