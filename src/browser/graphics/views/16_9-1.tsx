@@ -19,11 +19,11 @@ import {
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
 
-const SCREEN_W = 960;
-const SCREEN_H = 540;
+const SCREEN_W = 1280;
+const SCREEN_H = 720;
 const NAMEPLATE_H = 48;
 const FOOTER_H = 50;
-const MARGIN_RIGHT = 80;
+const MARGIN_RIGHT = 40;
 
 const SCREEN_X = 1920 - MARGIN_RIGHT - SCREEN_W;
 const SCREEN_Y = (1080 - FOOTER_H - (SCREEN_H + NAMEPLATE_H)) / 2;
@@ -71,12 +71,12 @@ const App = () => {
 				style={overlayStyle}
 			/>
 			<Logo
-				width={320}
-				x={INFO_CENTER_X - 160}
+				width={260}
+				x={INFO_CENTER_X - 130}
 				y={60}
 			/>
 			<GameInfo
-				fontSize={32}
+				fontSize={28}
 				style={{
 					position: "absolute",
 					top: 200,
@@ -88,7 +88,7 @@ const App = () => {
 				<div
 					style={{
 						position: "absolute",
-						top: 310,
+						top: 300,
 						left: 0,
 						width: `${SCREEN_X}px`,
 						display: "flex",
@@ -103,9 +103,9 @@ const App = () => {
 							commentator={commentator}
 							slideIndex={slideIndex}
 							style={{
-								width: 380,
-								height: 40,
-								fontSize: 24,
+								width: 340,
+								height: 38,
+								fontSize: 22,
 							}}
 						/>
 					))}
@@ -116,18 +116,18 @@ const App = () => {
 					url={visibleFeeds[0].url}
 					style={{
 						position: "absolute",
-						left: INFO_CENTER_X - 200,
-						top: 430,
-						width: 400,
-						height: 225,
+						left: INFO_CENTER_X - 160,
+						top: 410,
+						width: 320,
+						height: 180,
 					}}
 				/>
 			)}
 			<TimerAndEstimate
-				fontSize={64}
+				fontSize={52}
 				style={{
 					position: "absolute",
-					top: 720,
+					top: 650,
 					left: 0,
 					width: `${SCREEN_X}px`,
 				}}

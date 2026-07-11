@@ -19,20 +19,20 @@ import {
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
 
-const SCREEN_W = 576;
-const SCREEN_H = 432;
-const GAP_Y = 16;
+const SCREEN_W = 640;
+const SCREEN_H = 480;
+const GAP_X = 16;
 const NAMEPLATE_H = 48;
 const FOOTER_H = 50;
-const MARGIN_RIGHT = 80;
-const ROW_H = SCREEN_H + NAMEPLATE_H;
+const MARGIN_RIGHT = 40;
 
-const SCREEN_X = 1920 - MARGIN_RIGHT - SCREEN_W;
-const TOP_Y = (1080 - FOOTER_H - (ROW_H * 2 + GAP_Y)) / 2;
+const GRID_W = SCREEN_W * 2 + GAP_X;
+const GRID_X = 1920 - MARGIN_RIGHT - GRID_W;
+const SCREEN_Y = (1080 - FOOTER_H - (SCREEN_H + NAMEPLATE_H)) / 2;
 
 const screenPositions = [
-	{x: SCREEN_X, y: TOP_Y},
-	{x: SCREEN_X, y: TOP_Y + ROW_H + GAP_Y},
+	{x: GRID_X, y: SCREEN_Y},
+	{x: GRID_X + SCREEN_W + GAP_X, y: SCREEN_Y},
 ];
 
 const clipPath = `path(evenodd, "${[
@@ -51,7 +51,7 @@ const overlayStyle: CSSProperties = {
 	clipPath,
 };
 
-const INFO_CENTER_X = SCREEN_X / 2;
+const INFO_CENTER_X = GRID_X / 2;
 
 const App = () => {
 	const [bgAsset] = useReplicant<Assets[]>("assets:background");
@@ -83,26 +83,26 @@ const App = () => {
 				style={overlayStyle}
 			/>
 			<Logo
-				width={360}
-				x={INFO_CENTER_X - 180}
+				width={280}
+				x={INFO_CENTER_X - 140}
 				y={60}
 			/>
 			<GameInfo
-				fontSize={36}
+				fontSize={28}
 				style={{
 					position: "absolute",
 					top: 200,
 					left: 0,
-					width: `${SCREEN_X}px`,
+					width: `${GRID_X}px`,
 				}}
 			/>
 			{commentators.length > 0 && (
 				<div
 					style={{
 						position: "absolute",
-						top: 320,
+						top: 300,
 						left: 0,
-						width: `${SCREEN_X}px`,
+						width: `${GRID_X}px`,
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
@@ -115,9 +115,9 @@ const App = () => {
 							commentator={commentator}
 							slideIndex={slideIndex}
 							style={{
-								width: 420,
-								height: 42,
-								fontSize: 26,
+								width: 340,
+								height: 38,
+								fontSize: 22,
 							}}
 						/>
 					))}
@@ -128,20 +128,20 @@ const App = () => {
 					url={visibleFeeds[0].url}
 					style={{
 						position: "absolute",
-						left: INFO_CENTER_X - 220,
-						top: 440,
-						width: 440,
-						height: 248,
+						left: INFO_CENTER_X - 170,
+						top: 410,
+						width: 340,
+						height: 191,
 					}}
 				/>
 			)}
 			<TimerAndEstimate
-				fontSize={72}
+				fontSize={56}
 				style={{
 					position: "absolute",
-					top: 750,
+					top: 660,
 					left: 0,
-					width: `${SCREEN_X}px`,
+					width: `${GRID_X}px`,
 				}}
 			/>
 			{screenPositions.map((pos, i) => {
