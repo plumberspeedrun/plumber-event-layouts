@@ -104,6 +104,18 @@ export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 
 	sheetStaffRep.on("change", () => enrichRelayData());
 
+	nsmbReplicant.on("change", (newVal, oldVal) => {
+		if (oldVal === undefined || newVal === undefined) return;
+		if (newVal.activeIndex === oldVal.activeIndex) return;
+
+		const activeIndex = newVal.activeIndex ?? 0;
+		const activeRelay = newVal.relayData?.[activeIndex];
+		const sceneName = activeRelay?.obsSceneName;
+		if (sceneName == null) return;
+
+		nodecg.sendMessageToBundle("change-scene", "nodecg-obs-browser", sceneName);
+	});
+
 	const syncNsmb = async () => {
 		try {
 			const res = await sheets.spreadsheets.values.get({
@@ -114,6 +126,10 @@ export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 			const records = rowsToRecords(rows);
 
 			const currentActiveIndex = nsmbReplicant.value?.activeIndex ?? 0;
+			const previousRelayData = nsmbReplicant.value?.relayData ?? [];
+			const findObsSceneName = (game: string) =>
+				previousRelayData.find((item) => item.game === game)?.obsSceneName;
+
 			nsmbReplicant.value = {
 				relayData: records
 					.filter(
@@ -133,6 +149,9 @@ export const nsmb = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 							name: r.runner!,
 							...buildSocialField(findRunnerSocial(r.runner!)),
 						},
+						...(findObsSceneName(r.game!) != null
+							? {obsSceneName: findObsSceneName(r.game!)}
+							: {}),
 						commentators: [r.commentator_1, r.commentator_2]
 							.filter((c): c is string => c != null && c !== "")
 							.map((name) => ({

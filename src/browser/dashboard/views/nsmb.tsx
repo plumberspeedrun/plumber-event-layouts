@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {useNsmbReplicant} from "../../hooks";
+import {useNsmbReplicant, useObsScenes} from "../../hooks";
 import {render} from "../../render";
 
 const containerStyle: React.CSSProperties = {
@@ -54,6 +54,7 @@ const sectionStyle: React.CSSProperties = {
 
 const NsmbPanel = () => {
 	const [nsmb, setNsmb] = useNsmbReplicant();
+	const obsScenes = useObsScenes();
 
 	const [runnerInput, setRunnerInput] = useState("");
 	const [newCommentatorName, setNewCommentatorName] = useState("");
@@ -110,6 +111,15 @@ const NsmbPanel = () => {
 					}
 				: item,
 		);
+		setNsmb({...nsmb, relayData: newRelayData});
+	};
+
+	const handleUpdateObsSceneName = (sceneName: string) => {
+		const newRelayData = relayData.map((item, i) => {
+			if (i !== activeIndex) return item;
+			const {obsSceneName: _obsSceneName, ...rest} = item;
+			return sceneName === "" ? rest : {...rest, obsSceneName: sceneName};
+		});
 		setNsmb({...nsmb, relayData: newRelayData});
 	};
 
@@ -208,6 +218,25 @@ const NsmbPanel = () => {
 								追加
 							</button>
 						</div>
+					</div>
+
+					<div style={{display: "flex", flexDirection: "column", gap: 4}}>
+						<strong>OBSシーン</strong>
+						<select
+							style={inputStyle}
+							value={activeRelay.obsSceneName ?? ""}
+							onChange={(e) => handleUpdateObsSceneName(e.target.value)}
+						>
+							<option value=''>未設定</option>
+							{(obsScenes ?? []).map((scene) => (
+								<option
+									key={scene}
+									value={scene}
+								>
+									{scene}
+								</option>
+							))}
+						</select>
 					</div>
 				</div>
 			)}

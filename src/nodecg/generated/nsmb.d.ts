@@ -22,6 +22,7 @@ export interface Nsmb {
 				niconico?: string;
 			};
 		};
+		obsSceneName?: string;
 		commentators?: {
 			name: string;
 			social?: {

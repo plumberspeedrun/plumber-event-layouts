@@ -42,6 +42,9 @@
 						},
 						"required": ["name"]
 					},
+					"obsSceneName": {
+						"type": "string"
+					},
 					"commentators": {
 						"type": "array",
 						"items": {
