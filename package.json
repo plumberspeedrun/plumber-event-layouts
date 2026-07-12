@@ -123,6 +123,12 @@
 				"singleInstance": false
 			},
 			{
+				"file": "16_9-1.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
 				"file": "ScheduleList.html",
 				"width": 1920,
 				"height": 1080,
