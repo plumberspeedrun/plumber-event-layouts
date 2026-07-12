@@ -7,6 +7,9 @@ import "../styles/index.scss";
 interface GameInfoProps {
 	style?: CSSProperties;
 	fontSize?: number;
+	subFontSize?: number;
+	metadataSeparator?: string;
+	systemYearSeparator?: string;
 }
 
 const baseStyle: CSSProperties = {
@@ -16,11 +19,15 @@ const baseStyle: CSSProperties = {
 	lineHeight: 1.2,
 };
 
-export const GameInfo = ({style, fontSize = 36}: GameInfoProps) => {
+export const GameInfo = ({
+	style,
+	fontSize = 36,
+	subFontSize = fontSize * 0.8,
+	metadataSeparator = " / ",
+	systemYearSeparator = " - ",
+}: GameInfoProps) => {
 	const activeRun = useActiveRun();
 	if (!activeRun?.game) return null;
-
-	const subFontSize = fontSize * 0.8;
 
 	return (
 		<div
@@ -53,10 +60,10 @@ export const GameInfo = ({style, fontSize = 36}: GameInfoProps) => {
 						activeRun.category,
 						[activeRun.system, activeRun.releaseYear]
 							.filter(Boolean)
-							.join(" - "),
+							.join(systemYearSeparator),
 					]
 						.filter(Boolean)
-						.join(" / ")}
+						.join(metadataSeparator)}
 				</div>
 			)}
 		</div>

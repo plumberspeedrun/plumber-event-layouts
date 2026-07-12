@@ -1,9 +1,10 @@
 import {useReplicant} from "@nodecg/react-hooks";
 import type {CSSProperties} from "react";
 import type {Assets} from "../../../types/assets";
-import {useActiveRun} from "../../hooks";
+import {useActiveRun, useCameraFeeds} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
+import {CameraFeed} from "../components/CameraFeed";
 import {
 	Commentator,
 	getCommentatorDisplayItems,
@@ -60,6 +61,7 @@ const LOGO_Y = 60;
 
 const App = () => {
 	const [bgAsset] = useReplicant<Assets[]>("assets:background");
+	const [feeds] = useCameraFeeds();
 	const activeRun = useActiveRun();
 
 	const players = activeRun?.teams.flatMap((t) => t.players) ?? [];
@@ -73,6 +75,8 @@ const App = () => {
 	);
 	const slideIndex = useNameplateCycle(maxSlides);
 
+	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
+
 	if (!bgAsset || bgAsset.length === 0) {
 		return <div>レイアウト画像をアセットにアップロードしてください。</div>;
 	}
@@ -84,16 +88,28 @@ const App = () => {
 				alt=''
 				style={overlayStyle}
 			/>
+			{visibleFeeds[0] && (
+				<CameraFeed
+					url={visibleFeeds[0].url}
+					style={{
+						position: "absolute",
+						left: 718,
+						top: 300,
+						width: 480,
+						height: 270,
+					}}
+				/>
+			)}
 			<Logo
 				width={LOGO_W}
 				x={LOGO_X}
 				y={LOGO_Y}
 			/>
 			<GameInfo
-				fontSize={36}
+				fontSize={40}
 				style={{
 					position: "absolute",
-					top: 430,
+					top: 600,
 					left: 0,
 					width: "1920px",
 				}}
@@ -102,7 +118,7 @@ const App = () => {
 				<div
 					style={{
 						position: "absolute",
-						top: 540,
+						top: 700,
 						left: 0,
 						width: "1920px",
 						display: "flex",
