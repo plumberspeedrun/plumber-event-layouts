@@ -1,6 +1,7 @@
 import type {CSSProperties} from "react";
 import type {RunDataCommentator} from "../../../types/schedule";
 import commentatorIcon from "../../assets/icons/commentator.svg";
+import {getSnsItems} from "../utils/social";
 import {Nameplate, type NameplateDisplayItem} from "./Nameplate";
 
 export const getCommentatorDisplayItems = (
@@ -10,19 +11,8 @@ export const getCommentatorDisplayItems = (
 		{type: "name", value: commentator.name},
 	];
 
-	const {social} = commentator;
-	if (!social) return items;
-
-	const platforms: Array<"twitch" | "youtube" | "twitter"> = [
-		"twitch",
-		"youtube",
-		"twitter",
-	];
-	for (const platform of platforms) {
-		const value = social[platform];
-		if (value) {
-			items.push({type: "sns", platform, value});
-		}
+	for (const snsItem of getSnsItems(commentator.social)) {
+		items.push({type: "sns", ...snsItem});
 	}
 
 	return items;

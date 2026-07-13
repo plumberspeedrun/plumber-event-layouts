@@ -5,8 +5,7 @@ import twitchIcon from "../../assets/icons/twitch.svg";
 import twitterIcon from "../../assets/icons/twitter.svg";
 import youtubeIcon from "../../assets/icons/youtube.svg";
 import {formatTime} from "../../utils/formatTime";
-
-type SnsPlatform = "twitch" | "youtube" | "twitter";
+import {getSnsItems, type SnsPlatform} from "../utils/social";
 
 export type NameplateDisplayItem =
 	| {type: "name"; value: string}
@@ -55,15 +54,8 @@ export const getPlayerDisplayItems = (
 ): NameplateDisplayItem[] => {
 	const items: NameplateDisplayItem[] = [{type: "name", value: player.name}];
 
-	const {social} = player;
-	if (!social) return items;
-
-	const platforms: SnsPlatform[] = ["twitch", "youtube", "twitter"];
-	for (const platform of platforms) {
-		const value = social[platform];
-		if (value) {
-			items.push({type: "sns", platform, value});
-		}
+	for (const snsItem of getSnsItems(player.social)) {
+		items.push({type: "sns", ...snsItem});
 	}
 
 	return items;

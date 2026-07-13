@@ -2,13 +2,7 @@ import {type CSSProperties, useEffect, useRef, useState} from "react";
 import twitchIcon from "../../assets/icons/twitch.svg";
 import twitterIcon from "../../assets/icons/twitter.svg";
 import youtubeIcon from "../../assets/icons/youtube.svg";
-
-type SnsPlatform = "twitch" | "youtube" | "twitter";
-
-export interface SnsItem {
-	platform: SnsPlatform;
-	value: string;
-}
+import type {SnsItem, SnsPlatform} from "../utils/social";
 
 const snsIconUrls: Record<SnsPlatform, string> = {
 	twitch: twitchIcon,

@@ -1,18 +1,16 @@
-import {useReplicant} from "@nodecg/react-hooks";
 import type {CSSProperties} from "react";
-import type {Assets} from "../../../types/assets";
 import commentatorIcon from "../../assets/icons/commentator.svg";
 import gamepadIcon from "../../assets/icons/gamepad.svg";
-import {useActiveRun, useCameraFeeds} from "../../hooks";
+import {useActiveRun, useBackgroundAsset, useCameraFeeds} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
 import {CameraFeed} from "../components/CameraFeed";
 import {GameInfo} from "../components/GameInfo";
 import {Logo} from "../components/Logo";
-import type {SnsItem} from "../components/NameplateCard";
 import {NameplateCard} from "../components/NameplateCard";
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
+import {getSnsItems} from "../utils/social";
 
 const SCREEN_X = 500;
 const SCREEN_Y = 25;
@@ -35,27 +33,8 @@ const overlayStyle: CSSProperties = {
 	clipPath,
 };
 
-const extractSnsItems = (social?: {
-	twitch?: string;
-	youtube?: string;
-	twitter?: string;
-}): SnsItem[] => {
-	if (!social) return [];
-	const items: SnsItem[] = [];
-	const platforms: Array<"twitch" | "youtube" | "twitter"> = [
-		"twitch",
-		"youtube",
-		"twitter",
-	];
-	for (const platform of platforms) {
-		const value = social[platform];
-		if (value) items.push({platform, value});
-	}
-	return items;
-};
-
 const App = () => {
-	const [bgAsset] = useReplicant<Assets[]>("assets:background");
+	const backgroundAsset = useBackgroundAsset();
 	const [feeds] = useCameraFeeds();
 	const activeRun = useActiveRun();
 
@@ -63,14 +42,14 @@ const App = () => {
 	const commentators = activeRun?.commentators ?? [];
 	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
 
-	if (!bgAsset || bgAsset.length === 0) {
+	if (!backgroundAsset) {
 		return <div>レイアウト画像をアセットにアップロードしてください。</div>;
 	}
 
 	return (
 		<BaseLayout>
 			<img
-				src={bgAsset[0]?.url}
+				src={backgroundAsset.url}
 				alt=''
 				style={overlayStyle}
 			/>
@@ -82,7 +61,7 @@ const App = () => {
 			{players[0] && (
 				<NameplateCard
 					name={players[0].name}
-					snsItems={extractSnsItems(players[0].social)}
+					snsItems={getSnsItems(players[0].social)}
 					icon={gamepadIcon}
 					iconAlt='runner'
 					fontSize={32}
@@ -104,7 +83,7 @@ const App = () => {
 				<NameplateCard
 					key={commentator.name}
 					name={commentator.name}
-					snsItems={extractSnsItems(commentator.social)}
+					snsItems={getSnsItems(commentator.social)}
 					icon={commentatorIcon}
 					iconAlt='commentator'
 					fontSize={32}
