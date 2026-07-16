@@ -111,7 +111,25 @@
 		],
 		"graphics": [
 			{
+				"file": "4_3-1.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
 				"file": "4_3-4.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
+				"file": "16_9-1.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
+				"file": "16_9-4.html",
 				"width": 1920,
 				"height": 1080,
 				"singleInstance": false
