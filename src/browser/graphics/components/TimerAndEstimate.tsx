@@ -1,5 +1,6 @@
 import type {CSSProperties} from "react";
 import {useActiveRun, useTimer} from "../../hooks";
+import {formatTime} from "../../utils/formatTime";
 import "@fontsource-variable/inconsolata/wght.css";
 import "@fontsource-variable/inter/wght.css";
 import "../styles/index.scss";
@@ -7,6 +8,9 @@ import "../styles/index.scss";
 interface TimerProps {
 	fontSize?: number;
 	style?: CSSProperties;
+	showEstimateDivider?: boolean;
+	estimateFontSize?: number;
+	estimateMarginTop?: number;
 }
 
 const timerBaseStyle: CSSProperties = {
@@ -24,7 +28,13 @@ const stateColor: Record<string, string> = {
 	stopped: "#ffffff",
 };
 
-export const TimerAndEstimate = ({fontSize = 200, style}: TimerProps) => {
+export const TimerAndEstimate = ({
+	fontSize = 200,
+	style,
+	showEstimateDivider = true,
+	estimateFontSize = 28,
+	estimateMarginTop = showEstimateDivider ? 8 : 12,
+}: TimerProps) => {
 	const timer = useTimer();
 	const activeRun = useActiveRun();
 	if (!timer) return null;
@@ -52,30 +62,32 @@ export const TimerAndEstimate = ({fontSize = 200, style}: TimerProps) => {
 						color: stateColor[timer.state] ?? "#ffffff",
 					}}
 				>
-					{timer.time}
+					{formatTime(timer.time)}
 				</span>
 			</div>
 			{activeRun?.estimate && (
 				<>
-					<div
-						style={{
-							width: 400,
-							height: 3,
-							backgroundColor: "white",
-							margin: "12px 0",
-							borderRadius: 2,
-						}}
-					/>
+					{showEstimateDivider && (
+						<div
+							style={{
+								width: 400,
+								height: 3,
+								backgroundColor: "white",
+								margin: "12px 0",
+								borderRadius: 2,
+							}}
+						/>
+					)}
 					<div
 						style={{
 							fontFamily: '"Inter Variable", "M PLUS 1p"',
 							fontWeight: 700,
-							fontSize: 28,
+							fontSize: estimateFontSize,
 							color: "white",
-							marginTop: 8,
+							marginTop: estimateMarginTop,
 						}}
 					>
-						予定時間: {activeRun.estimate}
+						予定タイム: {activeRun.estimate}
 					</div>
 				</>
 			)}

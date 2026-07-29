@@ -7,6 +7,7 @@ import type {RunDataArray} from "../nodecg/generated/runDataArray";
 import type {SheetStaff} from "../nodecg/generated/sheetStaff";
 import type {SpreadsheetStatus} from "../nodecg/generated/spreadsheetStatus";
 import type {Timer} from "../nodecg/generated/timer";
+import type {Assets} from "../types/assets";
 
 export const useRunDataArray = () => {
 	const [runDataArray] = useReplicant<RunDataArray>("runDataArray");
@@ -98,6 +99,16 @@ export const useNsmbReplicant = () => {
 
 export const useCameraFeeds = () => {
 	return useReplicant<CameraFeeds>("cameraFeeds");
+};
+
+export const useBackgroundAsset = () => {
+	const [assets] = useReplicant<Assets[]>("assets:background");
+	return assets?.[0];
+};
+
+export const useLogoAsset = () => {
+	const [assets] = useReplicant<Assets[]>("assets:logo");
+	return assets?.[0];
 };
 
 export const useObsScenes = () => {

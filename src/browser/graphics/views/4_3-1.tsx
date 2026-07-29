@@ -1,52 +1,28 @@
 import type {CSSProperties} from "react";
 import commentatorIcon from "../../assets/icons/commentator.svg";
+import gamepadIcon from "../../assets/icons/gamepad.svg";
 import {useActiveRun, useBackgroundAsset, useCameraFeeds} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
 import {CameraFeed} from "../components/CameraFeed";
 import {GameInfo} from "../components/GameInfo";
 import {Logo} from "../components/Logo";
-import {
-	getPlayerDisplayItems,
-	Nameplate,
-	useNameplateCycle,
-} from "../components/Nameplate";
 import {NameplateCard} from "../components/NameplateCard";
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
 import {getSnsItems} from "../utils/social";
 
-const SCREEN_W = 520;
-const SCREEN_H = 390;
-const SCREEN_GAP_X = 100;
-const SCREEN_GAP_Y = 10;
-const NAMEPLATE_H = 48;
-const NAMEPLATE_GAP = 0;
-const ROW_H = SCREEN_H + NAMEPLATE_GAP + NAMEPLATE_H;
-
-const SCREEN_RIGHT = 1743;
-const LEFT_X = SCREEN_RIGHT - SCREEN_W * 2 - SCREEN_GAP_X;
-const RIGHT_X = SCREEN_RIGHT - SCREEN_W;
-const TOP_Y = 4;
+const SCREEN_X = 697;
+const SCREEN_Y = 25;
+const SCREEN_W = 1046;
+const SCREEN_H = 784;
 
 const CAMERA_X = 15;
 const CAMERA_Y = 737;
 const CAMERA_W = 495;
 const CAMERA_H = 278;
 
-const screenPositions = [
-	{x: LEFT_X, y: TOP_Y},
-	{x: RIGHT_X, y: TOP_Y},
-	{x: LEFT_X, y: TOP_Y + ROW_H + SCREEN_GAP_Y},
-	{x: RIGHT_X, y: TOP_Y + ROW_H + SCREEN_GAP_Y},
-];
-
-const clipPath = `path(evenodd, "${[
-	`M0 0 H1920 V1080 H0 Z`,
-	...screenPositions.map(
-		({x, y}) => `M${x} ${y} H${x + SCREEN_W} V${y + SCREEN_H} H${x} Z`,
-	),
-].join(" ")}")`;
+const clipPath = `path(evenodd, "M0 0 H1920 V1080 H0 Z M${SCREEN_X} ${SCREEN_Y} H${SCREEN_X + SCREEN_W} V${SCREEN_Y + SCREEN_H} H${SCREEN_X} Z")`;
 
 const overlayStyle: CSSProperties = {
 	position: "absolute",
@@ -64,9 +40,6 @@ const App = () => {
 
 	const players = activeRun?.teams.flatMap((t) => t.players) ?? [];
 	const commentators = activeRun?.commentators ?? [];
-	const playerItems = players.map(getPlayerDisplayItems);
-	const maxSlides = Math.max(...playerItems.map((items) => items.length), 1);
-	const slideIndex = useNameplateCycle(maxSlides);
 	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
 
 	if (!backgroundAsset) {
@@ -85,6 +58,27 @@ const App = () => {
 				x={30}
 				y={20}
 			/>
+			{players[0] && (
+				<NameplateCard
+					name={players[0].name}
+					snsItems={getSnsItems(players[0].social)}
+					icon={gamepadIcon}
+					iconAlt='runner'
+					fontSize={32}
+					iconSize={48}
+					iconStyle={{alignSelf: "center"}}
+					style={{
+						position: "absolute",
+						left: 58,
+						top: 297,
+						width: 402,
+						height: 120,
+						boxSizing: "border-box",
+						alignItems: "flex-start",
+						padding: "8px 10px 8px 22px",
+					}}
+				/>
+			)}
 			{commentators.map((commentator, i) => (
 				<NameplateCard
 					key={commentator.name}
@@ -124,9 +118,9 @@ const App = () => {
 				style={{
 					position: "absolute",
 					left: 530,
-					top: 895,
+					top: 839,
 					width: 1380,
-					height: 125,
+					height: 176,
 					backgroundColor: "rgba(0, 0, 0, 0.5)",
 					borderRadius: 24,
 					boxSizing: "border-box",
@@ -136,12 +130,7 @@ const App = () => {
 				}}
 			>
 				<GameInfo
-					style={{
-						width: 895,
-						height: "100%",
-						justifySelf: "center",
-						justifyContent: "center",
-					}}
+					style={{width: 895, justifySelf: "center"}}
 					fontSize={48}
 					subFontSize={36}
 					metadataSeparator=' - '
@@ -150,7 +139,7 @@ const App = () => {
 				<div
 					style={{
 						width: 3,
-						height: "calc(100% - 20px)",
+						height: 145,
 						backgroundColor: "white",
 					}}
 				/>
@@ -159,36 +148,9 @@ const App = () => {
 					estimateFontSize={32}
 					estimateMarginTop={0}
 					showEstimateDivider={false}
-					style={{
-						width: 380,
-						height: "100%",
-						justifySelf: "center",
-						justifyContent: "center",
-					}}
+					style={{width: 380, justifySelf: "center"}}
 				/>
 			</div>
-			{screenPositions.map((pos, i) => {
-				const player = players[i];
-				if (!player) return null;
-				const playerResult = activeRun?.result?.[player.teamId];
-				return (
-					<Nameplate
-						key={player.id}
-						items={playerItems[i] ?? []}
-						slideIndex={slideIndex}
-						result={playerResult}
-						style={{
-							position: "absolute",
-							left: pos.x,
-							top: pos.y + SCREEN_H + NAMEPLATE_GAP,
-							width: SCREEN_W,
-							height: NAMEPLATE_H,
-							fontSize: 32,
-							backgroundColor: "rgba(0, 0, 0, 0.5)",
-						}}
-					/>
-				);
-			})}
 		</BaseLayout>
 	);
 };

@@ -16,23 +16,22 @@ import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
 import {getSnsItems} from "../utils/social";
 
-const SCREEN_W = 520;
-const SCREEN_H = 390;
-const SCREEN_GAP_X = 100;
-const SCREEN_GAP_Y = 10;
+const SCREEN_W = 688;
+const SCREEN_H = 387;
+const SCREEN_GAP_X = 22;
+const SCREEN_GAP_Y = 12;
 const NAMEPLATE_H = 48;
 const NAMEPLATE_GAP = 0;
 const ROW_H = SCREEN_H + NAMEPLATE_GAP + NAMEPLATE_H;
 
-const SCREEN_RIGHT = 1743;
-const LEFT_X = SCREEN_RIGHT - SCREEN_W * 2 - SCREEN_GAP_X;
-const RIGHT_X = SCREEN_RIGHT - SCREEN_W;
+const LEFT_X = 500;
+const RIGHT_X = LEFT_X + SCREEN_W + SCREEN_GAP_X;
 const TOP_Y = 4;
 
 const CAMERA_X = 15;
-const CAMERA_Y = 737;
-const CAMERA_W = 495;
-const CAMERA_H = 278;
+const CAMERA_Y = 760;
+const CAMERA_W = 464;
+const CAMERA_H = 261;
 
 const screenPositions = [
 	{x: LEFT_X, y: TOP_Y},
@@ -97,7 +96,7 @@ const App = () => {
 					iconStyle={{alignSelf: "center"}}
 					style={{
 						position: "absolute",
-						left: 58,
+						left: 50,
 						top: 456 + i * 130,
 						width: 402,
 						height: 120,
@@ -123,9 +122,9 @@ const App = () => {
 			<div
 				style={{
 					position: "absolute",
-					left: 530,
-					top: 895,
-					width: 1380,
+					left: 500,
+					top: 896,
+					width: 1394,
 					height: 125,
 					backgroundColor: "rgba(0, 0, 0, 0.5)",
 					borderRadius: 24,

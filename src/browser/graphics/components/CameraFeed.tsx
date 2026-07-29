@@ -3,6 +3,7 @@ import {type CSSProperties, useMemo} from "react";
 interface CameraFeedProps {
 	url: string;
 	style?: CSSProperties;
+	framed?: boolean;
 }
 
 const cleanUrl = (url: string): string => {
@@ -17,7 +18,7 @@ const cleanUrl = (url: string): string => {
 	}
 };
 
-export const CameraFeed = ({url, style}: CameraFeedProps) => {
+export const CameraFeed = ({url, style, framed = true}: CameraFeedProps) => {
 	const src = useMemo(() => cleanUrl(url), [url]);
 
 	return (
@@ -26,8 +27,9 @@ export const CameraFeed = ({url, style}: CameraFeedProps) => {
 				position: "relative",
 				overflow: "hidden",
 				background: "#000",
-				border: "3px solid #fff",
-				borderRadius: 15,
+				boxSizing: "border-box",
+				border: framed ? "3px solid #fff" : "none",
+				borderRadius: framed ? 15 : 0,
 				...style,
 			}}
 		>
@@ -40,7 +42,7 @@ export const CameraFeed = ({url, style}: CameraFeedProps) => {
 					width: "110%",
 					height: "110%",
 					border: "none",
-					borderRadius: 8,
+					borderRadius: framed ? 8 : 0,
 				}}
 				allow='autoplay; camera; microphone'
 			/>

@@ -1,5 +1,4 @@
-import {useReplicant} from "@nodecg/react-hooks";
-import type {Assets} from "../../../types/assets";
+import {useLogoAsset} from "../../hooks";
 
 interface LogoProps {
 	width?: number;
@@ -9,12 +8,12 @@ interface LogoProps {
 }
 
 export const Logo = (props: LogoProps) => {
-	const [assets] = useReplicant<Assets[]>("assets:logo");
+	const asset = useLogoAsset();
 
-	if (!assets || assets.length === 0) return null;
+	if (!asset) return null;
 	return (
 		<img
-			src={assets[0]?.url}
+			src={asset.url}
 			style={{
 				position: "absolute",
 				width: props.width,

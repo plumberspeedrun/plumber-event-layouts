@@ -1,4 +1,5 @@
 import type {CSSProperties} from "react";
+import type {RunDataCommentator} from "../../../types/schedule";
 import commentatorIcon from "../../assets/icons/commentator.svg";
 import {useActiveRun, useBackgroundAsset, useCameraFeeds} from "../../hooks";
 import {render} from "../../render";
@@ -9,36 +10,41 @@ import {Logo} from "../components/Logo";
 import {
 	getPlayerDisplayItems,
 	Nameplate,
+	type NameplateDisplayItem,
 	useNameplateCycle,
 } from "../components/Nameplate";
-import {NameplateCard} from "../components/NameplateCard";
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
 import {getSnsItems} from "../utils/social";
 
-const SCREEN_W = 520;
-const SCREEN_H = 390;
-const SCREEN_GAP_X = 100;
-const SCREEN_GAP_Y = 10;
+// ゲーム画面を可能な限り拡大し、左右余白を最小化する（4:3厳密比）。
+const SCREEN_W = 940;
+const SCREEN_H = 705;
+const SCREEN_GAP_X = 20;
 const NAMEPLATE_H = 48;
 const NAMEPLATE_GAP = 0;
-const ROW_H = SCREEN_H + NAMEPLATE_GAP + NAMEPLATE_H;
+const SCREEN_Y = 15;
 
-const SCREEN_RIGHT = 1743;
-const LEFT_X = SCREEN_RIGHT - SCREEN_W * 2 - SCREEN_GAP_X;
-const RIGHT_X = SCREEN_RIGHT - SCREEN_W;
-const TOP_Y = 4;
+// 2画面を中央寄せ配置（左右余白 各10px）。
+const LEFT_X = 10;
+const RIGHT_X = LEFT_X + SCREEN_W + SCREEN_GAP_X;
 
 const CAMERA_X = 15;
-const CAMERA_Y = 737;
-const CAMERA_W = 495;
-const CAMERA_H = 278;
+const CAMERA_Y = 783;
+const CAMERA_W = 427;
+const CAMERA_H = 240;
+
+// 下部情報帯: ロゴ・コメンテーター・ゲーム情報・タイマーを1つの帯に集約する。
+const BAR_X = 462;
+const BAR_Y = 847;
+const BAR_W = 1448;
+const BAR_H = 176;
+const LOGO_H = 128;
+const LOGO_COLUMN_W = 260;
 
 const screenPositions = [
-	{x: LEFT_X, y: TOP_Y},
-	{x: RIGHT_X, y: TOP_Y},
-	{x: LEFT_X, y: TOP_Y + ROW_H + SCREEN_GAP_Y},
-	{x: RIGHT_X, y: TOP_Y + ROW_H + SCREEN_GAP_Y},
+	{x: LEFT_X, y: SCREEN_Y},
+	{x: RIGHT_X, y: SCREEN_Y},
 ];
 
 const clipPath = `path(evenodd, "${[
@@ -57,6 +63,15 @@ const overlayStyle: CSSProperties = {
 	clipPath,
 };
 
+const getCommentatorItems = (
+	commentator: RunDataCommentator,
+): NameplateDisplayItem[] => [
+	{type: "name", value: commentator.name},
+	...getSnsItems(commentator.social).map(
+		(item): NameplateDisplayItem => ({type: "sns", ...item}),
+	),
+];
+
 const App = () => {
 	const backgroundAsset = useBackgroundAsset();
 	const [feeds] = useCameraFeeds();
@@ -67,6 +82,14 @@ const App = () => {
 	const playerItems = players.map(getPlayerDisplayItems);
 	const maxSlides = Math.max(...playerItems.map((items) => items.length), 1);
 	const slideIndex = useNameplateCycle(maxSlides);
+
+	const commentatorItems = commentators.map(getCommentatorItems);
+	const maxCommentatorSlides = Math.max(
+		...commentatorItems.map((items) => items.length),
+		1,
+	);
+	const commentatorSlideIndex = useNameplateCycle(maxCommentatorSlides);
+
 	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
 
 	if (!backgroundAsset) {
@@ -80,33 +103,6 @@ const App = () => {
 				alt=''
 				style={overlayStyle}
 			/>
-			<Logo
-				width={440}
-				x={30}
-				y={20}
-			/>
-			{commentators.map((commentator, i) => (
-				<NameplateCard
-					key={commentator.name}
-					name={commentator.name}
-					snsItems={getSnsItems(commentator.social)}
-					icon={commentatorIcon}
-					iconAlt='commentator'
-					fontSize={32}
-					iconSize={48}
-					iconStyle={{alignSelf: "center"}}
-					style={{
-						position: "absolute",
-						left: 58,
-						top: 456 + i * 130,
-						width: 402,
-						height: 120,
-						boxSizing: "border-box",
-						alignItems: "flex-start",
-						padding: "8px 10px 8px 22px",
-					}}
-				/>
-			))}
 			{visibleFeeds[0] && (
 				<CameraFeed
 					url={visibleFeeds[0].url}
@@ -120,51 +116,80 @@ const App = () => {
 					}}
 				/>
 			)}
+			<Logo
+				height={LOGO_H}
+				x={BAR_X + 16}
+				y={BAR_Y + (BAR_H - LOGO_H) / 2}
+			/>
 			<div
 				style={{
 					position: "absolute",
-					left: 530,
-					top: 895,
-					width: 1380,
-					height: 125,
+					left: BAR_X,
+					top: BAR_Y,
+					width: BAR_W,
+					height: BAR_H,
 					backgroundColor: "rgba(0, 0, 0, 0.5)",
 					borderRadius: 24,
 					boxSizing: "border-box",
+					paddingLeft: LOGO_COLUMN_W,
 					display: "grid",
-					gridTemplateColumns: "2.14fr 3px 1fr",
+					gridTemplateColumns: "300px 3px 1fr 3px 320px",
 					alignItems: "center",
 				}}
 			>
-				<GameInfo
+				<div
 					style={{
-						width: 895,
-						height: "100%",
-						justifySelf: "center",
+						display: "flex",
+						flexDirection: "column",
 						justifyContent: "center",
+						gap: 6,
+						height: "100%",
+						boxSizing: "border-box",
+						padding: "16px 20px",
 					}}
-					fontSize={48}
-					subFontSize={36}
+				>
+					{commentators.map((commentator, i) => (
+						<Nameplate
+							key={commentator.name}
+							items={commentatorItems[i] ?? []}
+							slideIndex={commentatorSlideIndex}
+							nameIcon={commentatorIcon}
+							nameIconAlt='commentator'
+							style={{
+								height: 48,
+								fontSize: 24,
+								backgroundColor: "transparent",
+							}}
+						/>
+					))}
+				</div>
+				<div
+					style={{
+						width: 3,
+						height: 145,
+						backgroundColor: "white",
+					}}
+				/>
+				<GameInfo
+					style={{justifySelf: "center"}}
+					fontSize={38}
+					subFontSize={28}
 					metadataSeparator=' - '
 					systemYearSeparator=' '
 				/>
 				<div
 					style={{
 						width: 3,
-						height: "calc(100% - 20px)",
+						height: 145,
 						backgroundColor: "white",
 					}}
 				/>
 				<TimerAndEstimate
-					fontSize={72}
-					estimateFontSize={32}
+					fontSize={60}
+					estimateFontSize={26}
 					estimateMarginTop={0}
 					showEstimateDivider={false}
-					style={{
-						width: 380,
-						height: "100%",
-						justifySelf: "center",
-						justifyContent: "center",
-					}}
+					style={{justifySelf: "center"}}
 				/>
 			</div>
 			{screenPositions.map((pos, i) => {
