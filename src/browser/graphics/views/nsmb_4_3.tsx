@@ -1,16 +1,22 @@
 import type {CSSProperties} from "react";
-import commentatorIcon from "../../assets/icons/commentator.svg";
-import gamepadIcon from "../../assets/icons/gamepad.svg";
-import {useActiveRun, useBackgroundAsset, useCameraFeeds} from "../../hooks";
+import {useBackgroundAsset, useCameraFeeds, useNsmb} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
 import {CameraFeed} from "../components/CameraFeed";
+import {
+	Commentator,
+	getCommentatorDisplayItems,
+} from "../components/Commentator";
 import {GameInfo} from "../components/GameInfo";
 import {Logo} from "../components/Logo";
-import {NameplateCard} from "../components/NameplateCard";
+import {
+	getPlayerDisplayItems,
+	Nameplate,
+	useNameplateCycle,
+} from "../components/Nameplate";
+import {RelayProgress} from "../components/RelayProgress";
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
-import {getSnsItems} from "../utils/social";
 
 const SCREEN_X = 697;
 const SCREEN_Y = 25;
@@ -21,6 +27,31 @@ const CAMERA_X = 15;
 const CAMERA_Y = 737;
 const CAMERA_W = 495;
 const CAMERA_H = 278;
+
+// リレー進行度を置くため、ネームプレートは 1 行の細型にして上に詰める。
+const NAMEPLATE_X = 58;
+const NAMEPLATE_W = 402;
+const NAMEPLATE_H = 64;
+const NAMEPLATE_GAP = 10;
+const RUNNER_Y = 292;
+const COMMENTATOR_Y = RUNNER_Y + NAMEPLATE_H + NAMEPLATE_GAP;
+
+// 進行度はゲーム名を 1 行で収めたいので、カメラと同じ左端・幅にそろえて広く取る。
+const PROGRESS_X = CAMERA_X;
+const PROGRESS_W = CAMERA_W;
+const PROGRESS_Y = 514;
+
+const nameplateStyle: CSSProperties = {
+	position: "absolute",
+	left: NAMEPLATE_X,
+	width: NAMEPLATE_W,
+	height: NAMEPLATE_H,
+	boxSizing: "border-box",
+	backgroundColor: "rgba(0, 0, 0, 0.5)",
+	borderRadius: 16,
+	padding: "0 18px",
+	fontSize: 30,
+};
 
 const clipPath = `path(evenodd, "M0 0 H1920 V1080 H0 Z M${SCREEN_X} ${SCREEN_Y} H${SCREEN_X + SCREEN_W} V${SCREEN_Y + SCREEN_H} H${SCREEN_X} Z")`;
 
@@ -36,10 +67,23 @@ const overlayStyle: CSSProperties = {
 const App = () => {
 	const backgroundAsset = useBackgroundAsset();
 	const [feeds] = useCameraFeeds();
-	const activeRun = useActiveRun();
+	const nsmb = useNsmb();
 
-	const players = activeRun?.teams.flatMap((t) => t.players) ?? [];
-	const commentators = activeRun?.commentators ?? [];
+	const relayData = nsmb?.relayData ?? [];
+	const activeIndex = nsmb?.activeIndex ?? 0;
+	const activeRelay = relayData[activeIndex];
+	const commentators = activeRelay?.commentators ?? [];
+
+	const runnerItems = activeRelay
+		? getPlayerDisplayItems(activeRelay.runner)
+		: [];
+	const runnerSlideIndex = useNameplateCycle(Math.max(runnerItems.length, 1));
+
+	const commentatorItems = commentators.map(getCommentatorDisplayItems);
+	const commentatorSlideIndex = useNameplateCycle(
+		Math.max(...commentatorItems.map((items) => items.length), 1),
+	);
+
 	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
 
 	if (!backgroundAsset) {
@@ -58,49 +102,37 @@ const App = () => {
 				x={30}
 				y={20}
 			/>
-			{players[0] && (
-				<NameplateCard
-					name={players[0].name}
-					snsItems={getSnsItems(players[0].social)}
-					icon={gamepadIcon}
-					iconAlt='runner'
-					fontSize={32}
-					iconSize={48}
-					iconStyle={{alignSelf: "center"}}
-					style={{
-						position: "absolute",
-						left: 58,
-						top: 297,
-						width: 402,
-						height: 120,
-						boxSizing: "border-box",
-						alignItems: "flex-start",
-						padding: "8px 10px 8px 22px",
-					}}
+			{runnerItems.length > 0 && (
+				<Nameplate
+					items={runnerItems}
+					slideIndex={runnerSlideIndex}
+					style={{...nameplateStyle, top: RUNNER_Y}}
 				/>
 			)}
 			{commentators.map((commentator, i) => (
-				<NameplateCard
+				<Commentator
 					key={commentator.name}
-					name={commentator.name}
-					snsItems={getSnsItems(commentator.social)}
-					icon={commentatorIcon}
-					iconAlt='commentator'
-					fontSize={32}
-					iconSize={48}
-					iconStyle={{alignSelf: "center"}}
+					commentator={commentator}
+					slideIndex={commentatorSlideIndex}
 					style={{
-						position: "absolute",
-						left: 58,
-						top: 456 + i * 130,
-						width: 402,
-						height: 120,
-						boxSizing: "border-box",
-						alignItems: "flex-start",
-						padding: "8px 10px 8px 22px",
+						...nameplateStyle,
+						top: COMMENTATOR_Y + i * (NAMEPLATE_H + NAMEPLATE_GAP),
 					}}
 				/>
 			))}
+			<RelayProgress
+				games={relayData.map((relay) => relay.game)}
+				activeIndex={activeIndex}
+				rowHeight={40}
+				fontSize={24}
+				style={{
+					position: "absolute",
+					left: PROGRESS_X,
+					top: PROGRESS_Y,
+					width: PROGRESS_W,
+					padding: "8px 14px",
+				}}
+			/>
 			{visibleFeeds[0] && (
 				<CameraFeed
 					url={visibleFeeds[0].url}

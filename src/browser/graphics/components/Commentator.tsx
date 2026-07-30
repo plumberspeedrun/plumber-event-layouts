@@ -4,8 +4,9 @@ import commentatorIcon from "../../assets/icons/commentator.svg";
 import {getSnsItems} from "../utils/social";
 import {Nameplate, type NameplateDisplayItem} from "./Nameplate";
 
+/** 解説者の表示項目を組み立てる。`name` と `social` のみを持つデータも渡せる。 */
 export const getCommentatorDisplayItems = (
-	commentator: RunDataCommentator,
+	commentator: Pick<RunDataCommentator, "name" | "social">,
 ): NameplateDisplayItem[] => {
 	const items: NameplateDisplayItem[] = [
 		{type: "name", value: commentator.name},
@@ -19,7 +20,7 @@ export const getCommentatorDisplayItems = (
 };
 
 interface CommentatorProps {
-	commentator: RunDataCommentator;
+	commentator: Pick<RunDataCommentator, "name" | "social">;
 	slideIndex: number;
 	style?: CSSProperties;
 }
