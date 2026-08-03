@@ -12,16 +12,20 @@ interface RelayProgressProps {
 	style?: CSSProperties;
 }
 
-/** 走行済み区間の色。タイマーの running と同じ緑を用いる。 */
-const DONE_COLOR = "#4ade80";
-/** 走行中区間の色。 */
-const ACTIVE_COLOR = "#facc15";
-/** 未走行区間の色。 */
-const PENDING_COLOR = "rgba(255, 255, 255, 0.35)";
+/** 走行済み・走行中区間のドット外周の色。 */
+const YELLOW = "#facc15";
+/** 走行中区間のドット中心の色。 */
+const ACTIVE_CENTER_COLOR = "#ef4444";
+/** 走行済み区間のドット中心の色。 */
+const DONE_CENTER_COLOR = "#3b82f6";
+/** 未走行区間の外周の色。 */
+const PENDING_COLOR = "rgba(250, 204, 21, 0.4)";
+/** 未走行区間のドット中心の色。 */
+const PENDING_CENTER_COLOR = "#000000";
 
 const RAIL_WIDTH = 30;
 const LINE_WIDTH = 3;
-const DOT_SIZE = 14;
+const DOT_SIZE = 16;
 const ACTIVE_DOT_SIZE = 22;
 
 const containerStyle: CSSProperties = {
@@ -43,27 +47,23 @@ const lineStyle: CSSProperties = {
 	height: "50%",
 };
 
-const CheckMark = ({size}: {size: number}) => (
-	<svg
-		width={size}
-		height={size}
-		viewBox='0 0 24 24'
-		fill='none'
-		stroke='#0b2b16'
-		strokeWidth={4}
-		strokeLinecap='round'
-		strokeLinejoin='round'
-		aria-hidden='true'
-	>
-		<path d='M5 13 L10 18 L19 7' />
-	</svg>
+/** ドット中心の小さい円。光源を左上とし、ハイライトを起点にグラデーションを描く。 */
+const CenterDot = ({color, size}: {color: string; size: number}) => (
+	<div
+		style={{
+			width: size,
+			height: size,
+			borderRadius: "50%",
+			background: `radial-gradient(circle at 32% 28%, color-mix(in srgb, ${color} 69%, white) 0%, ${color} 65%, color-mix(in srgb, ${color} 75%, black) 100%)`,
+		}}
+	/>
 );
 
 /**
  * リレーの進行度を縦タイムラインで表示する。
  *
- * 走行済みの区間はチェック付きの緑、走行中の区間は大きな黄色のドット、
- * 未走行の区間は淡いドットで示す。
+ * 走行済みの区間は中心が青の黄色いドット、走行中の区間は中心が赤の大きな黄色いドット、
+ * 未走行の区間は中心が黒の淡いドットで示す。
  */
 export const RelayProgress = ({
 	games,
@@ -79,11 +79,12 @@ export const RelayProgress = ({
 			{games.map((game, i) => {
 				const isDone = i < activeIndex;
 				const isActive = i === activeIndex;
-				const color = isDone
-					? DONE_COLOR
-					: isActive
-						? ACTIVE_COLOR
-						: PENDING_COLOR;
+				const color = isDone || isActive ? YELLOW : PENDING_COLOR;
+				const centerColor = isActive
+					? ACTIVE_CENTER_COLOR
+					: isDone
+						? DONE_CENTER_COLOR
+						: PENDING_CENTER_COLOR;
 				const dotSize = isActive ? ACTIVE_DOT_SIZE : DOT_SIZE;
 
 				return (
@@ -112,7 +113,7 @@ export const RelayProgress = ({
 										top: 0,
 										// 直前の区間を走り終えていれば済みの色でつなぐ。
 										backgroundColor:
-											isDone || isActive ? DONE_COLOR : PENDING_COLOR,
+											isDone || isActive ? YELLOW : PENDING_COLOR,
 									}}
 								/>
 							)}
@@ -121,7 +122,7 @@ export const RelayProgress = ({
 									style={{
 										...lineStyle,
 										top: "50%",
-										backgroundColor: isDone ? DONE_COLOR : PENDING_COLOR,
+										backgroundColor: isDone ? YELLOW : PENDING_COLOR,
 									}}
 								/>
 							)}
@@ -137,10 +138,13 @@ export const RelayProgress = ({
 									display: "flex",
 									alignItems: "center",
 									justifyContent: "center",
-									boxShadow: isActive ? `0 0 12px ${ACTIVE_COLOR}` : undefined,
+									boxShadow: isActive ? `0 0 12px ${centerColor}` : undefined,
 								}}
 							>
-								{isDone && <CheckMark size={dotSize * 0.8} />}
+								<CenterDot
+									color={centerColor}
+									size={dotSize * 0.7}
+								/>
 							</div>
 						</div>
 						<div
