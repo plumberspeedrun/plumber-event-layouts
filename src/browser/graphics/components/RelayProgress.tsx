@@ -25,8 +25,7 @@ const PENDING_CENTER_COLOR = "#000000";
 
 const RAIL_WIDTH = 30;
 const LINE_WIDTH = 3;
-const DOT_SIZE = 16;
-const ACTIVE_DOT_SIZE = 22;
+const DOT_SIZE = 22;
 
 const containerStyle: CSSProperties = {
 	display: "flex",
@@ -85,7 +84,7 @@ export const RelayProgress = ({
 					: isDone
 						? DONE_CENTER_COLOR
 						: PENDING_CENTER_COLOR;
-				const dotSize = isActive ? ACTIVE_DOT_SIZE : DOT_SIZE;
+				const dotSize = DOT_SIZE;
 
 				return (
 					<div
