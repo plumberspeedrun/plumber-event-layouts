@@ -147,6 +147,30 @@
 				"singleInstance": false
 			},
 			{
+				"file": "nsmb_4_3.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
+				"file": "nsmb_16_9.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
+				"file": "nsmb_ds.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
+				"file": "nsmb_3ds.html",
+				"width": 1920,
+				"height": 1080,
+				"singleInstance": false
+			},
+			{
 				"file": "ScheduleList.html",
 				"width": 1920,
 				"height": 1080,

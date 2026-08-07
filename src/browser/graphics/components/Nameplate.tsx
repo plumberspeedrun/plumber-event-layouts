@@ -49,8 +49,14 @@ const twitterIconStyle: CSSProperties = {
 	height: "0.875em",
 };
 
+/**
+ * 走者の表示項目を組み立てる。
+ *
+ * スケジュール由来の走者だけでなく、リレー用 Replicant の走者のように
+ * `name` と `social` だけを持つデータも渡せるようにしている。
+ */
 export const getPlayerDisplayItems = (
-	player: RunDataPlayer,
+	player: Pick<RunDataPlayer, "name" | "social">,
 ): NameplateDisplayItem[] => {
 	const items: NameplateDisplayItem[] = [{type: "name", value: player.name}];
 
