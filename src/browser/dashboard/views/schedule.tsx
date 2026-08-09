@@ -937,7 +937,7 @@ const Schedule = () => {
 			<div style={{display: "flex", flexDirection: "column", gap: 4}}>
 				{runDataArray?.map((runData) => {
 					const runnerNames = runData.teams
-						.flatMap((t) => t.players.map((p) => p.name))
+						.map((t) => t.name ?? t.players.map((p) => p.name).join(", "))
 						.join(", ");
 					const isActive = runData.id === activeRunId;
 
