@@ -1,4 +1,5 @@
 import type {ActiveRunId} from "../src/nodecg/generated/activeRunId";
+import type {CameraFeeds} from "../src/nodecg/generated/cameraFeeds";
 import type {RunDataArray} from "../src/nodecg/generated/runDataArray";
 import type {SheetCommentators} from "../src/nodecg/generated/sheetCommentators";
 import type {SheetRunners} from "../src/nodecg/generated/sheetRunners";
@@ -52,6 +53,15 @@ export const sampleTimer: Timer = {
 	milliseconds: 754000,
 	timestamp: 0,
 };
+
+export const sampleCameraFeeds: CameraFeeds = [
+	{
+		id: "cam-1",
+		label: "Camera 1",
+		url: solidSvg(160, 90, "#1f4a24"),
+		visible: true,
+	},
+];
 
 export const sampleRunDataArray: RunDataArray = [
 	{

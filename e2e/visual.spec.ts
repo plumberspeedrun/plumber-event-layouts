@@ -1,6 +1,7 @@
 import {
 	sampleActiveRunId,
 	sampleBackgroundAsset,
+	sampleCameraFeeds,
 	sampleLogoAsset,
 	sampleRunDataArray,
 } from "./data";
@@ -46,14 +47,20 @@ test.describe("visual regression", () => {
 	});
 
 	test("ScheduleList レイアウト", async ({page, nodecg}) => {
-		await nodecg.gotoGraphics("ScheduleList.html");
+		await nodecg.gotoGraphics("setup.html");
 
-		// run データとアクティブ run を注入してスケジュールを描画させる。
+		// run データ、アクティブ run、背景・カメラ・ロゴアセットを注入して描画させる。
+		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
+		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
+		await nodecg.setReplicant("cameraFeeds", sampleCameraFeeds);
 		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 
-		// scheduledStartTime の表示はロケール依存のため、ゲーム名のみ検証する。
-		await expect(page.getByText("Super Mario World")).toBeVisible();
+		// アクティブ run (run-1) 以降の「今後走行」のみが表示される。
+		await expect(page.getByText("Super Metroid")).toBeVisible();
+		await expect(page.getByText("Super Mario World")).toBeHidden();
+
+		// scheduledStartTime の表示はロケール依存のため、game 名のみ検証する。
 		await waitForImages(page);
 
 		await expect(page).toHaveScreenshot("schedule-list.png");

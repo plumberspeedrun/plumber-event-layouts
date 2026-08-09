@@ -108,9 +108,9 @@ src/
 │   │   └── views/         # ダッシュボードパネル（各 .tsx が独立した HTML ページになる）
 │   └── graphics/
 │       ├── views/         # グラフィックスオーバーレイ（各 .tsx が独立した HTML ページになる）
-│       ├── BaseLayout.tsx # 1920×1080 のベースレイアウトコンポーネント
-│       ├── Timer.tsx      # タイマー表示コンポーネント
-│       └── ScheduleList.tsx # 走者・ゲーム一覧表示コンポーネント
+│       ├── components/    # 表示用コンポーネント
+│       │   └── ScheduleList.tsx # 走者・ゲーム一覧表示コンポーネント
+│       └── BaseLayout.tsx # 1920×1080 のベースレイアウトコンポーネント
 ├── types/
 │   └── speedcontrol/      # nodecg-speedcontrol の型定義
 vite/
