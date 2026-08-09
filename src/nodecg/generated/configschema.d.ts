@@ -7,6 +7,21 @@
  */
 
 export interface Configschema {
+	horaro?: {
+		baseUrl?: string;
+		scheduleId: string;
+		columns?: {
+			game?: string;
+			category?: string;
+			system?: string;
+			runner?: string;
+			runType?: string;
+		};
+		runTypes?: {
+			ffa?: string[];
+			team?: string[];
+		};
+	};
 	googleSpreadsheet?: {
 		credentialsPath: string;
 		spreadsheetId: string;

@@ -3,6 +3,66 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"horaro": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"baseUrl": {
+					"type": "string",
+					"default": "https://horaro.net/-/api/v1/schedules/"
+				},
+				"scheduleId": {
+					"type": "string"
+				},
+				"columns": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"game": {
+							"type": "string",
+							"default": "ゲーム"
+						},
+						"category": {
+							"type": "string",
+							"default": "カテゴリ"
+						},
+						"system": {
+							"type": "string",
+							"default": "機種"
+						},
+						"runner": {
+							"type": "string",
+							"default": "走者"
+						},
+						"runType": {
+							"type": "string",
+							"default": "種別"
+						}
+					}
+				},
+				"runTypes": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"ffa": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"default": ["個人", "ffa"]
+						},
+						"team": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"default": ["チーム", "team", "リレー"]
+						}
+					}
+				}
+			},
+			"required": ["scheduleId"]
+		},
 		"googleSpreadsheet": {
 			"type": "object",
 			"additionalProperties": false,
