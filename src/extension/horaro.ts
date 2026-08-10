@@ -182,18 +182,31 @@ export const horaro = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 
 	const rebuild = () => {
 		if (!hasCached) return;
+		const prevRuns = runDataArrayReplicant.value ?? [];
 		const runDataArray = cachedItems
 			.map((item) =>
 				buildRunData(item, cachedColumns, sheetStaffReplicant.value ?? []),
 			)
 			.filter((run): run is RunData => run != null);
-		runDataArrayReplicant.value = runDataArray;
+
+		const activeRunId = activeRunIdReplicant.value;
 		if (
-			activeRunIdReplicant.value != null &&
-			!runDataArray.some((run) => run.id === activeRunIdReplicant.value)
+			activeRunId != null &&
+			!runDataArray.some((run) => run.id === activeRunId)
 		) {
-			activeRunIdReplicant.value = null;
+			const prevActiveRun = prevRuns.find((run) => run.id === activeRunId);
+			const matchedRun =
+				prevActiveRun != null
+					? runDataArray.find(
+							(run) =>
+								run.game === prevActiveRun.game &&
+								run.category === prevActiveRun.category,
+						)
+					: undefined;
+			activeRunIdReplicant.value = matchedRun?.id ?? null;
 		}
+
+		runDataArrayReplicant.value = runDataArray;
 	};
 
 	const syncSchedule = async () => {
