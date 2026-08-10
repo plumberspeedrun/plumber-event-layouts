@@ -1,56 +1,17 @@
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import ChevronRight from "@mui/icons-material/ChevronRight";
+import {
+	Button,
+	IconButton,
+	MenuItem,
+	Stack,
+	TextField,
+	Typography,
+} from "@mui/material";
 import {useEffect, useState} from "react";
 import {useNsmbReplicant, useObsScenes} from "../../hooks";
-import {render} from "../../render";
-
-const containerStyle: React.CSSProperties = {
-	display: "flex",
-	flexDirection: "column",
-	gap: 8,
-	background: "#2f3a4f",
-	color: "#fff",
-	padding: 12,
-	fontFamily: "sans-serif",
-	fontSize: 13,
-};
-
-const buttonStyle: React.CSSProperties = {
-	background: "#475873",
-	color: "#fff",
-	border: "1px solid #5b6e8c",
-	borderRadius: 4,
-	padding: "2px 6px",
-	cursor: "pointer",
-};
-
-const rowStyle: React.CSSProperties = {
-	display: "flex",
-	alignItems: "center",
-	gap: 8,
-	padding: 6,
-	borderRadius: 4,
-	background: "#3a4760",
-};
-
-const activeRowStyle: React.CSSProperties = {
-	...rowStyle,
-	background: "#5a7a4f",
-};
-
-const inputStyle: React.CSSProperties = {
-	background: "#1f2937",
-	color: "#fff",
-	border: "1px solid #5b6e8c",
-	borderRadius: 4,
-	padding: "4px 6px",
-};
-
-const sectionStyle: React.CSSProperties = {
-	display: "flex",
-	flexDirection: "column",
-	gap: 4,
-	borderTop: "1px solid #5b6e8c",
-	paddingTop: 8,
-};
+import {Panel, Row, Section, SectionTitle} from "../components";
+import {renderDashboard} from "../index";
 
 const NsmbPanel = () => {
 	const [nsmb, setNsmb] = useNsmbReplicant();
@@ -124,91 +85,102 @@ const NsmbPanel = () => {
 	};
 
 	return (
-		<div style={containerStyle}>
-			<div style={{display: "flex", gap: 8, alignItems: "center"}}>
-				<button
-					style={buttonStyle}
+		<Panel height={520}>
+			<Stack
+				direction='row'
+				spacing={0.5}
+				sx={{alignItems: "center"}}
+			>
+				<IconButton
+					size='small'
+					aria-label='前へ'
 					disabled={activeIndex <= 0}
 					onClick={handlePrev}
 				>
-					前へ
-				</button>
-				<button
-					style={buttonStyle}
+					<ChevronLeft fontSize='small' />
+				</IconButton>
+				<IconButton
+					size='small'
+					aria-label='次へ'
 					disabled={activeIndex >= relayData.length - 1}
 					onClick={handleNext}
 				>
-					次へ
-				</button>
-				<span>
+					<ChevronRight fontSize='small' />
+				</IconButton>
+				<Typography color='text.secondary'>
 					{activeIndex + 1} / {relayData.length}
-				</span>
-			</div>
+				</Typography>
+			</Stack>
 
-			<div style={{display: "flex", flexDirection: "column", gap: 4}}>
+			<Stack spacing={0.5}>
 				{relayData.map((relay, i) => (
-					<div
+					<Row
 						key={i}
-						style={i === activeIndex ? activeRowStyle : rowStyle}
+						active={i === activeIndex}
 						onClick={() => setNsmb({...nsmb, activeIndex: i})}
 					>
-						<div style={{flex: 1}}>
+						<Typography sx={{flex: 1}}>
 							{relay.game} / {relay.category} / {relay.platform} / {relay.year}
-						</div>
-					</div>
+						</Typography>
+					</Row>
 				))}
-			</div>
+			</Stack>
 
 			{activeRelay != null && (
-				<div style={sectionStyle}>
-					<div>
+				<>
+					<Typography>
 						{activeRelay.game} / {activeRelay.category} / {activeRelay.platform}{" "}
 						/ {activeRelay.year}
-					</div>
+					</Typography>
 
-					<div style={{display: "flex", flexDirection: "column", gap: 4}}>
-						<strong>走者</strong>
-						<div style={{display: "flex", gap: 8}}>
-							<input
-								style={{...inputStyle, flex: 1}}
+					<Section>
+						<SectionTitle>走者</SectionTitle>
+						<Stack
+							direction='row'
+							spacing={1}
+						>
+							<TextField
+								fullWidth
 								value={runnerInput}
 								onChange={(e) => setRunnerInput(e.target.value)}
 							/>
-							<button
-								style={buttonStyle}
+							<Button
+								variant='contained'
 								onClick={handleUpdateRunner}
 							>
 								更新
-							</button>
-						</div>
-					</div>
+							</Button>
+						</Stack>
+					</Section>
 
-					<div style={{display: "flex", flexDirection: "column", gap: 4}}>
-						<strong>解説者</strong>
-						{(activeRelay.commentators ?? []).map((c) => (
-							<div
-								key={c.name}
-								style={rowStyle}
-							>
-								<div style={{flex: 1}}>{c.name}</div>
-								<button
-									style={buttonStyle}
-									onClick={() => handleRemoveCommentator(c.name)}
-								>
-									削除
-								</button>
-							</div>
-						))}
-
-						<div style={{display: "flex", gap: 8}}>
-							<input
-								style={{...inputStyle, flex: 1}}
+					<Section>
+						<SectionTitle>解説者</SectionTitle>
+						<Stack spacing={0.5}>
+							{(activeRelay.commentators ?? []).map((c) => (
+								<Row key={c.name}>
+									<Typography sx={{flex: 1}}>{c.name}</Typography>
+									<Button
+										variant='outlined'
+										color='error'
+										onClick={() => handleRemoveCommentator(c.name)}
+									>
+										削除
+									</Button>
+								</Row>
+							))}
+						</Stack>
+						<Stack
+							direction='row'
+							spacing={1}
+						>
+							<TextField
+								fullWidth
 								placeholder='解説者名を入力'
 								value={newCommentatorName}
 								onChange={(e) => setNewCommentatorName(e.target.value)}
 							/>
-							<button
-								style={buttonStyle}
+							<Button
+								variant='contained'
 								disabled={newCommentatorName.trim() === ""}
 								onClick={() => {
 									handleAddCommentator(newCommentatorName.trim());
@@ -216,32 +188,32 @@ const NsmbPanel = () => {
 								}}
 							>
 								追加
-							</button>
-						</div>
-					</div>
+							</Button>
+						</Stack>
+					</Section>
 
-					<div style={{display: "flex", flexDirection: "column", gap: 4}}>
-						<strong>OBSシーン</strong>
-						<select
-							style={inputStyle}
+					<Section>
+						<SectionTitle>OBSシーン</SectionTitle>
+						<TextField
+							select
 							value={activeRelay.obsSceneName ?? ""}
 							onChange={(e) => handleUpdateObsSceneName(e.target.value)}
 						>
-							<option value=''>未設定</option>
+							<MenuItem value=''>未設定</MenuItem>
 							{(obsScenes ?? []).map((scene) => (
-								<option
+								<MenuItem
 									key={scene}
 									value={scene}
 								>
 									{scene}
-								</option>
+								</MenuItem>
 							))}
-						</select>
-					</div>
-				</div>
+						</TextField>
+					</Section>
+				</>
 			)}
-		</div>
+		</Panel>
 	);
 };
 
-render(<NsmbPanel />);
+renderDashboard(<NsmbPanel />);

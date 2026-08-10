@@ -26,10 +26,14 @@
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.1",
 		"@fontsource-variable/inconsolata": "^5.2.8",
 		"@fontsource-variable/inter": "^5.2.8",
 		"@fontsource/m-plus-1p": "^5.2.9",
 		"@googleapis/sheets": "^13.0.2",
+		"@mui/icons-material": "^9.3.1",
+		"@mui/material": "^9.3.1",
 		"@nodecg/react-hooks": "^1.0.3",
 		"googleapis": "^173.0.0",
 		"nodecg": "^2.6.4",
@@ -69,19 +73,10 @@
 	"nodecg": {
 		"dashboardPanels": [
 			{
-				"name": "schedule",
-				"title": "スケジュール管理",
-				"width": 4,
-				"file": "schedule.html",
-				"workspace": "Schedule",
-				"headerColor": "#525F78"
-			},
-			{
-				"name": "timerControl",
-				"title": "タイマー操作",
-				"width": 3,
-				"file": "timerControl.html",
-				"workspace": "Schedule",
+				"name": "overview",
+				"title": "タイマー・スケジュール",
+				"file": "overview.html",
+				"fullbleed": true,
 				"headerColor": "#525F78"
 			},
 			{
@@ -89,7 +84,7 @@
 				"title": "スプレッドシート",
 				"width": 4,
 				"file": "spreadsheetView.html",
-				"workspace": "Schedule",
+				"workspace": "外部連携",
 				"headerColor": "#525F78"
 			},
 			{

@@ -1,60 +1,17 @@
+import {
+	Button,
+	Checkbox,
+	FormControlLabel,
+	Paper,
+	Stack,
+	TextField,
+	Typography,
+} from "@mui/material";
 import {useEffect, useState} from "react";
 import type {CameraFeeds} from "../../../nodecg/generated/cameraFeeds";
 import {useCameraFeeds} from "../../hooks";
-import {render} from "../../render";
-
-declare const nodecg: {
-	sendMessage(name: string, cb?: (err: Error | null) => void): void;
-	sendMessage(
-		name: string,
-		data: unknown,
-		cb?: (err: Error | null) => void,
-	): void;
-};
-
-const containerStyle: React.CSSProperties = {
-	display: "flex",
-	flexDirection: "column",
-	gap: 8,
-	background: "#2f3a4f",
-	color: "#fff",
-	padding: 12,
-	fontFamily: "sans-serif",
-	fontSize: 13,
-};
-
-const rowStyle: React.CSSProperties = {
-	display: "flex",
-	flexDirection: "column",
-	gap: 4,
-	padding: 8,
-	borderRadius: 4,
-	background: "#3a4760",
-};
-
-const inputStyle: React.CSSProperties = {
-	background: "#1f2937",
-	color: "#fff",
-	border: "1px solid #5b6e8c",
-	borderRadius: 4,
-	padding: "4px 6px",
-};
-
-const buttonStyle: React.CSSProperties = {
-	background: "#475873",
-	color: "#fff",
-	border: "1px solid #5b6e8c",
-	borderRadius: 4,
-	padding: "4px 8px",
-	cursor: "pointer",
-};
-
-const updateButtonStyle: React.CSSProperties = {
-	...buttonStyle,
-	background: "#3d7a3d",
-	borderColor: "#5a9a5a",
-	fontWeight: "bold",
-};
+import {Panel} from "../components";
+import {renderDashboard} from "../index";
 
 const CameraConfig = () => {
 	const [feeds, setFeeds] = useCameraFeeds();
@@ -109,105 +66,114 @@ const CameraConfig = () => {
 
 	if (feeds == null) {
 		return (
-			<div style={containerStyle}>
-				<div>読み込み中...</div>
-			</div>
+			<Panel height={460}>
+				<Typography color='text.secondary'>読み込み中...</Typography>
+			</Panel>
 		);
 	}
 
 	return (
-		<div style={containerStyle}>
-			<div
-				style={{
-					display: "flex",
-					justifyContent: "space-between",
-					alignItems: "center",
-				}}
+		<Panel height={460}>
+			<Stack
+				direction='row'
+				sx={{justifyContent: "space-between", alignItems: "center"}}
 			>
-				<strong>カメラ設定</strong>
-				<button
-					style={buttonStyle}
+				<Typography variant='subtitle1'>カメラ設定</Typography>
+				<Button
+					variant='contained'
 					onClick={handleAdd}
 				>
 					追加
-				</button>
-			</div>
+				</Button>
+			</Stack>
 
 			{draft.length === 0 && (
-				<div style={{color: "#889", fontSize: 12}}>
+				<Typography
+					color='text.secondary'
+					sx={{fontSize: 12}}
+				>
 					カメラがありません。「追加」ボタンから追加してください。
-				</div>
+				</Typography>
 			)}
 
-			{draft.map((feed) => {
-				const original = feeds.find((f) => f.id === feed.id);
-				const changed =
-					original != null &&
-					(original.url !== feed.url ||
-						original.visible !== feed.visible ||
-						original.label !== feed.label);
-				const isNew = original == null;
+			<Stack spacing={0.5}>
+				{draft.map((feed) => {
+					const original = feeds.find((f) => f.id === feed.id);
+					const changed =
+						original != null &&
+						(original.url !== feed.url ||
+							original.visible !== feed.visible ||
+							original.label !== feed.label);
+					const isNew = original == null;
 
-				return (
-					<div
-						key={feed.id}
-						style={rowStyle}
-					>
-						<div style={{display: "flex", gap: 8, alignItems: "center"}}>
-							<input
-								style={{...inputStyle, flex: 1}}
-								placeholder='ラベル'
-								value={feed.label ?? ""}
-								onChange={(e) => handleUpdate(feed.id, "label", e.target.value)}
-							/>
-							<label
-								style={{
-									display: "flex",
-									gap: 4,
-									alignItems: "center",
-									fontSize: 12,
-								}}
+					return (
+						<Paper
+							key={feed.id}
+							variant='outlined'
+							sx={{
+								display: "flex",
+								flexDirection: "column",
+								gap: 0.5,
+								p: 1,
+								backgroundColor: "background.paper",
+								borderColor: "divider",
+							}}
+						>
+							<Stack
+								direction='row'
+								spacing={1}
+								sx={{alignItems: "center"}}
 							>
-								<input
-									type='checkbox'
-									checked={feed.visible}
+								<TextField
+									sx={{flex: 1}}
+									placeholder='ラベル'
+									value={feed.label ?? ""}
 									onChange={(e) =>
-										handleUpdate(feed.id, "visible", e.target.checked)
+										handleUpdate(feed.id, "label", e.target.value)
 									}
 								/>
-								表示
-							</label>
-							{(changed || isNew) && (
-								<button
-									style={updateButtonStyle}
-									onClick={() => handleApplyFeed(feed.id)}
+								<FormControlLabel
+									control={
+										<Checkbox
+											size='small'
+											checked={feed.visible}
+											onChange={(e) =>
+												handleUpdate(feed.id, "visible", e.target.checked)
+											}
+										/>
+									}
+									label='表示'
+								/>
+								{(changed || isNew) && (
+									<Button
+										variant='contained'
+										color='success'
+										onClick={() => handleApplyFeed(feed.id)}
+									>
+										更新
+									</Button>
+								)}
+								<Button
+									variant='outlined'
+									color='error'
+									onClick={() => handleRemove(feed.id)}
 								>
-									更新
-								</button>
-							)}
-							<button
-								style={{
-									...buttonStyle,
-									background: "#8b3a3a",
-									borderColor: "#a55",
-								}}
-								onClick={() => handleRemove(feed.id)}
-							>
-								削除
-							</button>
-						</div>
+									削除
+								</Button>
+							</Stack>
 
-						<input
-							style={inputStyle}
-							placeholder='VDO.Ninja URL (例: https://vdo.ninja/?view=XXXX)'
-							value={feed.url}
-							onChange={(e) => handleUpdate(feed.id, "url", e.target.value)}
-						/>
-					</div>
-				);
-			})}
-		</div>
+							<TextField
+								fullWidth
+								placeholder='VDO.Ninja URL (例: https://vdo.ninja/?view=XXXX)'
+								value={feed.url}
+								onChange={(e) => handleUpdate(feed.id, "url", e.target.value)}
+							/>
+						</Paper>
+					);
+				})}
+			</Stack>
+		</Panel>
 	);
 };
 
-render(<CameraConfig />);
+renderDashboard(<CameraConfig />);

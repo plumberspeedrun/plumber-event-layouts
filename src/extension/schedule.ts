@@ -36,6 +36,31 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	const activeRunIdRep = nodecg.Replicant<ActiveRunId>("activeRunId");
 	const sheetStaffRep = nodecg.Replicant<SheetStaff>("sheetStaff");
 
+	// アクティブな走行が存在しない（または削除済み）場合に、先頭の走行をアクティブに設定する。
+	const reconcileActiveRun = () => {
+		const runs = runDataArrayRep.value ?? [];
+		if (runs.length === 0) {
+			if (activeRunIdRep.value != null) {
+				activeRunIdRep.value = null;
+			}
+			return;
+		}
+		const activeId = activeRunIdRep.value;
+		if (activeId == null || !runs.some((run) => run.id === activeId)) {
+			activeRunIdRep.value = runs[0]!.id;
+		}
+	};
+
+	runDataArrayRep.on("change", () => {
+		reconcileActiveRun();
+	});
+	activeRunIdRep.on("change", (newVal) => {
+		if (newVal == null) {
+			reconcileActiveRun();
+		}
+	});
+	reconcileActiveRun();
+
 	const enrichPlayerSocial = (playerName: string) => {
 		const staffMember = sheetStaffRep.value?.find(
 			(s) => s.role === "runner" && s.name === playerName,
@@ -115,9 +140,7 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 		try {
 			const runs = runDataArrayRep.value ?? [];
 			runDataArrayRep.value = runs.filter((run) => run.id !== data.id);
-			if (activeRunIdRep.value === data.id) {
-				activeRunIdRep.value = null;
-			}
+			// アクティブの整合は reconcileActiveRun が行う
 			if (ack && !ack.handled) ack(null);
 		} catch (err) {
 			if (ack && !ack.handled) ack(err as Error);
@@ -129,40 +152,6 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 			const runs = runDataArrayRep.value ?? [];
 			if (runs.some((run) => run.id === data.id)) {
 				activeRunIdRep.value = data.id;
-			}
-			if (ack && !ack.handled) ack(null);
-		} catch (err) {
-			if (ack && !ack.handled) ack(err as Error);
-		}
-	});
-
-	nodecg.listenFor("scheduleNextRun", (_data, ack) => {
-		try {
-			const runs = runDataArrayRep.value ?? [];
-			if (runs.length > 0) {
-				const currentIndex = runs.findIndex(
-					(run) => run.id === activeRunIdRep.value,
-				);
-				if (currentIndex < 0) {
-					activeRunIdRep.value = runs[0]!.id;
-				} else if (currentIndex < runs.length - 1) {
-					activeRunIdRep.value = runs[currentIndex + 1]!.id;
-				}
-			}
-			if (ack && !ack.handled) ack(null);
-		} catch (err) {
-			if (ack && !ack.handled) ack(err as Error);
-		}
-	});
-
-	nodecg.listenFor("schedulePreviousRun", (_data, ack) => {
-		try {
-			const runs = runDataArrayRep.value ?? [];
-			const currentIndex = runs.findIndex(
-				(run) => run.id === activeRunIdRep.value,
-			);
-			if (currentIndex > 0) {
-				activeRunIdRep.value = runs[currentIndex - 1]!.id;
 			}
 			if (ack && !ack.handled) ack(null);
 		} catch (err) {

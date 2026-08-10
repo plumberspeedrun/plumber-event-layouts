@@ -49,7 +49,7 @@ test.describe("dashboard", () => {
 			page,
 			nodecg,
 		}) => {
-			await nodecg.gotoDashboard("timerControl.html");
+			await nodecg.gotoDashboard("overview.html");
 
 			// 他テストの残存状態に依存しないよう、初期化してから開始する。
 			await nodecg.sendMessage("timerReset");
@@ -61,7 +61,6 @@ test.describe("dashboard", () => {
 			await expect
 				.poll(async () => (await nodecg.readReplicant<Timer>("timer"))?.state)
 				.toBe("running");
-			await expect(page.getByText("状態: running")).toBeVisible();
 			await expect(page.getByRole("button", {name: "一時停止"})).toBeEnabled();
 
 			// 走行中は時間が進む。
@@ -98,7 +97,7 @@ test.describe("dashboard", () => {
 			page,
 			nodecg,
 		}) => {
-			await nodecg.gotoDashboard("timerControl.html");
+			await nodecg.gotoDashboard("overview.html");
 			await nodecg.setReplicant("runDataArray", sampleRunForTimer);
 			await nodecg.setReplicant("activeRunId", sampleActiveRunIdForTimer);
 			await nodecg.sendMessage("timerReset");
@@ -222,33 +221,36 @@ test.describe("dashboard", () => {
 	});
 
 	test.describe("スケジュール", () => {
-		test("走行を Active に設定でき、前後の走行へ移動できる", async ({
+		test("カーソルで走行を選び、アクティブに設定できる", async ({
 			page,
 			nodecg,
 		}) => {
-			await nodecg.gotoDashboard("schedule.html");
+			await nodecg.gotoDashboard("overview.html");
 			await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 			await nodecg.setReplicant("activeRunId", null);
-			await expect(page.getByText("Super Mario World")).toBeVisible();
-			expect(await nodecg.readReplicant<ActiveRunId>("activeRunId")).toBeNull();
 
-			// 2番目の走行 (Super Metroid) を Active に設定。
-			await page.getByRole("button", {name: "Activeに設定"}).nth(1).click();
+			// アクティブ未設定時は先頭の走行がアクティブになる。
 			await expect
 				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
-				.toBe("run-2");
-			await expect(
-				page.getByRole("button", {name: "Activeに設定"}).nth(1),
-			).toBeDisabled();
+				.toBe("run-1");
+			await expect(page.getByText("Super Mario World")).toBeVisible();
 
-			// 前へ → run-1 に戻る。
-			await page.getByRole("button", {name: "前へ"}).click();
+			// 次へ → カーソルが run-2 に移動する（アクティブは変わらない）。
+			await page.getByRole("button", {name: "次へ"}).click();
+			await expect(page.getByText("Super Metroid")).toBeVisible();
 			await expect
 				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
 				.toBe("run-1");
 
-			// 次へ → 再び run-2。
-			await page.getByRole("button", {name: "次へ"}).click();
+			// アクティブにする → run-2 がアクティブになる。
+			await page.getByRole("button", {name: "アクティブにする"}).click();
+			await expect
+				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
+				.toBe("run-2");
+
+			// 前へ → カーソルが run-1 に戻る（アクティブは run-2 のまま）。
+			await page.getByRole("button", {name: "前へ"}).click();
+			await expect(page.getByText("Super Mario World")).toBeVisible();
 			await expect
 				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
 				.toBe("run-2");
@@ -258,7 +260,7 @@ test.describe("dashboard", () => {
 			page,
 			nodecg,
 		}) => {
-			await nodecg.gotoDashboard("schedule.html");
+			await nodecg.gotoDashboard("overview.html");
 			await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 			await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 			await expect(page.getByText("Super Mario World")).toBeVisible();

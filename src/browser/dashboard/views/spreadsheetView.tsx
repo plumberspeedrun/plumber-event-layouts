@@ -1,5 +1,7 @@
+import {Button, Stack, Typography} from "@mui/material";
 import {useSheetStaff, useSpreadsheetStatus} from "../../hooks";
-import {render} from "../../render";
+import {Panel, Row, Section, SectionTitle} from "../components";
+import {renderDashboard} from "../index";
 
 declare const nodecg: {
 	sendMessage(name: string, cb?: (err: Error | null) => void): void;
@@ -8,43 +10,6 @@ declare const nodecg: {
 		data: unknown,
 		cb?: (err: Error | null) => void,
 	): void;
-};
-
-const containerStyle: React.CSSProperties = {
-	display: "flex",
-	flexDirection: "column",
-	gap: 8,
-	background: "#2f3a4f",
-	color: "#fff",
-	padding: 12,
-	fontFamily: "sans-serif",
-	fontSize: 13,
-};
-
-const buttonStyle: React.CSSProperties = {
-	background: "#475873",
-	color: "#fff",
-	border: "1px solid #5b6e8c",
-	borderRadius: 4,
-	padding: "4px 8px",
-	cursor: "pointer",
-};
-
-const rowStyle: React.CSSProperties = {
-	display: "flex",
-	alignItems: "center",
-	gap: 8,
-	padding: 6,
-	borderRadius: 4,
-	background: "#3a4760",
-};
-
-const sectionStyle: React.CSSProperties = {
-	display: "flex",
-	flexDirection: "column",
-	gap: 4,
-	borderTop: "1px solid #5b6e8c",
-	paddingTop: 8,
 };
 
 const formatSocial = (social?: {
@@ -71,75 +36,93 @@ const SpreadsheetView = () => {
 	const sheetCommentators = sheetStaff?.filter((s) => s.role === "commentator");
 
 	return (
-		<div style={containerStyle}>
-			<div style={rowStyle}>
-				<div style={{flex: 1}}>
-					<div>
+		<Panel height={560}>
+			<Row>
+				<Stack sx={{flex: 1}}>
+					<Typography>
 						状態:{" "}
 						{status?.enabled ? (
-							<span style={{color: "#8fdc7a"}}>有効</span>
+							<Typography
+								component='span'
+								color='success.main'
+							>
+								有効
+							</Typography>
 						) : (
-							<span style={{color: "#dc7a7a"}}>無効</span>
+							<Typography
+								component='span'
+								color='error.main'
+							>
+								無効
+							</Typography>
 						)}
-					</div>
-					<div>最終同期: {status?.lastSynced ?? "未同期"}</div>
+					</Typography>
+					<Typography color='text.secondary'>
+						最終同期: {status?.lastSynced ?? "未同期"}
+					</Typography>
 					{status?.lastError && (
-						<div style={{color: "#dc7a7a"}}>エラー: {status.lastError}</div>
+						<Typography color='error.main'>
+							エラー: {status.lastError}
+						</Typography>
 					)}
-				</div>
-				<button
-					style={buttonStyle}
+				</Stack>
+				<Button
+					variant='contained'
 					onClick={() => nodecg.sendMessage("syncSpreadsheet")}
 				>
 					シート同期
-				</button>
-			</div>
+				</Button>
+			</Row>
 
-			<div style={sectionStyle}>
-				<strong>ランナー一覧</strong>
+			<Section>
+				<SectionTitle>ランナー一覧</SectionTitle>
 				{sheetRunners == null || sheetRunners.length === 0 ? (
-					<div>データがありません</div>
+					<Typography color='text.secondary'>データがありません</Typography>
 				) : (
-					sheetRunners.map((runner, index) => (
-						<div
-							key={`${runner.name}-${index}`}
-							style={rowStyle}
-						>
-							<div style={{flex: 1}}>
-								<div>{runner.name}</div>
-								<div style={{fontSize: 11, color: "#b9c2d4"}}>
-									{formatSocial(runner.social)}
-								</div>
-							</div>
-						</div>
-					))
+					<Stack spacing={0.5}>
+						{sheetRunners.map((runner, index) => (
+							<Row key={`${runner.name}-${index}`}>
+								<Stack sx={{flex: 1}}>
+									<Typography>{runner.name}</Typography>
+									<Typography
+										variant='caption'
+										color='text.secondary'
+									>
+										{formatSocial(runner.social)}
+									</Typography>
+								</Stack>
+							</Row>
+						))}
+					</Stack>
 				)}
-			</div>
+			</Section>
 
-			<div style={sectionStyle}>
-				<strong>解説者一覧</strong>
+			<Section>
+				<SectionTitle>解説者一覧</SectionTitle>
 				{sheetCommentators == null || sheetCommentators.length === 0 ? (
-					<div>データがありません</div>
+					<Typography color='text.secondary'>データがありません</Typography>
 				) : (
-					sheetCommentators.map((commentator, index) => (
-						<div
-							key={`${commentator.game}-${commentator.name}-${index}`}
-							style={rowStyle}
-						>
-							<div style={{flex: 1}}>
-								<div>
-									<strong>{commentator.game}</strong> {commentator.name}
-								</div>
-								<div style={{fontSize: 11, color: "#b9c2d4"}}>
-									{formatSocial(commentator.social)}
-								</div>
-							</div>
-						</div>
-					))
+					<Stack spacing={0.5}>
+						{sheetCommentators.map((commentator, index) => (
+							<Row key={`${commentator.game}-${commentator.name}-${index}`}>
+								<Stack sx={{flex: 1}}>
+									<Typography>
+										<strong>{commentator.game}</strong> {commentator.name}
+									</Typography>
+									<Typography
+										variant='caption'
+										color='text.secondary'
+									>
+										{formatSocial(commentator.social)}
+									</Typography>
+								</Stack>
+							</Row>
+						))}
+					</Stack>
 				)}
-			</div>
-		</div>
+			</Section>
+		</Panel>
 	);
 };
 
-render(<SpreadsheetView />);
+renderDashboard(<SpreadsheetView />);
