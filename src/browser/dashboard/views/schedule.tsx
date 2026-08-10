@@ -116,10 +116,8 @@ const RunEditModal = ({
 	const [game, setGame] = useState("");
 	const [category, setCategory] = useState("");
 	const [system, setSystem] = useState("");
-	const [releaseYear, setReleaseYear] = useState("");
 	const [estimate, setEstimate] = useState("");
 	const [setupTime, setSetupTime] = useState("");
-	const [scheduledStartTime, setScheduledStartTime] = useState("");
 	const [runType, setRunType] = useState<"ffa" | "team">("ffa");
 	const [obsSceneName, setObsSceneName] = useState("");
 	const [pickedRunner, setPickedRunner] = useState("");
@@ -140,22 +138,14 @@ const RunEditModal = ({
 		setGame(editingRun?.game ?? "");
 		setCategory(editingRun?.category ?? "");
 		setSystem(editingRun?.system ?? "");
-		setReleaseYear(editingRun?.releaseYear ?? "");
 		setEstimate(editingRun?.estimate ?? "");
 		setSetupTime(editingRun?.setupTime ?? "");
-		setScheduledStartTime(
-			editingRun?.scheduledStartTime
-				? editingRun.scheduledStartTime.slice(0, 16)
-				: "",
-		);
 		setRunType(editingRun?.runType ?? "ffa");
 		setObsSceneName(editingRun?.obsSceneName ?? "");
 	}, [
-		editingRun?.scheduledStartTime,
 		editingRun?.setupTime,
 		editingRun?.estimate,
 		editingRun?.system,
-		editingRun?.releaseYear,
 		editingRun?.runType,
 		editingRun?.game,
 		editingRun?.category,
@@ -174,12 +164,8 @@ const RunEditModal = ({
 				game,
 				category,
 				system,
-				releaseYear,
 				estimate,
 				setupTime,
-				scheduledStartTime: scheduledStartTime
-					? new Date(scheduledStartTime).toISOString()
-					: null,
 				runType,
 				obsSceneName,
 			},
@@ -403,12 +389,6 @@ const RunEditModal = ({
 						/>
 						<input
 							style={inputStyle}
-							placeholder='発売年'
-							value={releaseYear}
-							onChange={(e) => setReleaseYear(e.target.value)}
-						/>
-						<input
-							style={inputStyle}
 							placeholder='予想時間'
 							value={estimate}
 							onChange={(e) => setEstimate(e.target.value)}
@@ -418,13 +398,6 @@ const RunEditModal = ({
 							placeholder='セットアップ時間'
 							value={setupTime}
 							onChange={(e) => setSetupTime(e.target.value)}
-						/>
-						<label style={{fontSize: 11, color: "#aab"}}>開始時刻</label>
-						<input
-							style={inputStyle}
-							type='datetime-local'
-							value={scheduledStartTime}
-							onChange={(e) => setScheduledStartTime(e.target.value)}
 						/>
 						<label style={{fontSize: 11, color: "#aab"}}>走行種別</label>
 						<div style={{display: "flex", gap: 12}}>
@@ -782,10 +755,8 @@ const Schedule = () => {
 	const [game, setGame] = useState("");
 	const [category, setCategory] = useState("");
 	const [system, setSystem] = useState("");
-	const [releaseYear, setReleaseYear] = useState("");
 	const [estimate, setEstimate] = useState("");
 	const [runnerName, setRunnerName] = useState("");
-	const [scheduledStartTime, setScheduledStartTime] = useState("");
 	const [editingRunId, setEditingRunId] = useState<string | null>(null);
 	const [addPickedCommentator, setAddPickedCommentator] = useState("");
 	const [addNewCommentatorName, setAddNewCommentatorName] = useState("");
@@ -867,11 +838,7 @@ const Schedule = () => {
 			...(game && {game}),
 			...(category && {category}),
 			...(system && {system}),
-			...(releaseYear && {releaseYear}),
 			...(estimate && {estimate}),
-			...(scheduledStartTime && {
-				scheduledStartTime: new Date(scheduledStartTime).toISOString(),
-			}),
 			...(addCommentators.length > 0 && {commentators: addCommentators}),
 			...(addObsSceneName && {obsSceneName: addObsSceneName}),
 			runType,
@@ -880,10 +847,8 @@ const Schedule = () => {
 		setGame("");
 		setCategory("");
 		setSystem("");
-		setReleaseYear("");
 		setEstimate("");
 		setRunnerName("");
-		setScheduledStartTime("");
 		setAddCommentators([]);
 		setAddPickedCommentator("");
 		setAddNewCommentatorName("");
@@ -1049,21 +1014,9 @@ const Schedule = () => {
 				/>
 				<input
 					style={inputStyle}
-					placeholder='発売年'
-					value={releaseYear}
-					onChange={(e) => setReleaseYear(e.target.value)}
-				/>
-				<input
-					style={inputStyle}
 					placeholder='予想時間'
 					value={estimate}
 					onChange={(e) => setEstimate(e.target.value)}
-				/>
-				<input
-					style={inputStyle}
-					type='datetime-local'
-					value={scheduledStartTime}
-					onChange={(e) => setScheduledStartTime(e.target.value)}
 				/>
 				<label style={{fontSize: 11, color: "#aab"}}>走行種別</label>
 				<div style={{display: "flex", gap: 12}}>

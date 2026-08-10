@@ -14,6 +14,7 @@ export interface Configschema {
 			game?: string;
 			category?: string;
 			system?: string;
+			releaseYear?: string;
 			runner?: string;
 			runType?: string;
 		};

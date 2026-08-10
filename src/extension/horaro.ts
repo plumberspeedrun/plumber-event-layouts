@@ -150,6 +150,9 @@ export const horaro = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 
 		const category = columnMap.category ? row[columnMap.category] : undefined;
 		const system = columnMap.system ? row[columnMap.system] : undefined;
+		const releaseYear = columnMap.releaseYear
+			? row[columnMap.releaseYear]
+			: undefined;
 		const runType = resolveRunType(
 			columnMap.runType ? row[columnMap.runType] : undefined,
 			config.runTypes,
@@ -166,6 +169,7 @@ export const horaro = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 			game,
 			...(category != null && {category}),
 			...(system != null && {system}),
+			...(releaseYear != null && {releaseYear}),
 			...(estimateSeconds != null && {
 				estimate: formatSeconds(estimateSeconds),
 			}),

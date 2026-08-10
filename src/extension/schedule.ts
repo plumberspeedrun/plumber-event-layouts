@@ -18,10 +18,8 @@ type AddRunInput = {
 	game?: string;
 	category?: string;
 	system?: string;
-	releaseYear?: string;
 	estimate?: string;
 	setupTime?: string;
-	scheduledStartTime?: string;
 	runType?: "ffa" | "team";
 	obsSceneName?: string;
 	teams: {
@@ -52,12 +50,8 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				...(data.game != null && {game: data.game}),
 				...(data.category != null && {category: data.category}),
 				...(data.system != null && {system: data.system}),
-				...(data.releaseYear != null && {releaseYear: data.releaseYear}),
 				...(data.estimate != null && {estimate: data.estimate}),
 				...(data.setupTime != null && {setupTime: data.setupTime}),
-				...(data.scheduledStartTime != null && {
-					scheduledStartTime: data.scheduledStartTime,
-				}),
 				...(data.runType != null && {runType: data.runType}),
 				...(data.obsSceneName != null && {
 					obsSceneName: data.obsSceneName,
@@ -95,11 +89,14 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				const index = runs.findIndex((run) => run.id === data.id);
 				if (index >= 0) {
 					const existingRun = runs[index]!;
-					const {scheduledStartTime, ...restRun} = data.run;
+					const {
+						scheduledStartTime: _scheduledStartTime,
+						releaseYear: _releaseYear,
+						...restRun
+					} = data.run;
 					const updatedRun: RunData = {
 						...existingRun,
 						...restRun,
-						...(scheduledStartTime != null && {scheduledStartTime}),
 						id: existingRun.id,
 					};
 					const newRuns = [...runs];

@@ -30,6 +30,10 @@
 							"type": "string",
 							"default": "機種"
 						},
+						"releaseYear": {
+							"type": "string",
+							"default": "release_year"
+						},
 						"runner": {
 							"type": "string",
 							"default": "走者"
