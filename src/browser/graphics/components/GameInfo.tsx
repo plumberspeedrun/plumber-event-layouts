@@ -58,7 +58,10 @@ export const GameInfo = ({
 				>
 					{[
 						activeRun.category,
-						[activeRun.system, activeRun.releaseYear]
+						[
+							activeRun.system,
+							activeRun.releaseYear ? `(${activeRun.releaseYear})` : null,
+						]
 							.filter(Boolean)
 							.join(systemYearSeparator),
 					]
