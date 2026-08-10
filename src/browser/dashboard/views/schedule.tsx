@@ -132,6 +132,9 @@ const RunEditModal = ({
 	const [newTeamRunnerName, setNewTeamRunnerName] = useState<
 		Record<string, string>
 	>({});
+	const [teamNameDrafts, setTeamNameDrafts] = useState<Record<string, string>>(
+		{},
+	);
 
 	useEffect(() => {
 		setGame(editingRun?.game ?? "");
@@ -260,6 +263,22 @@ const RunEditModal = ({
 					team.id === teamId ? {...team, name} : team,
 				),
 			},
+		});
+	};
+
+	const handleCommitTeamNameDraft = (teamId: string) => {
+		if (editingRun == null) return;
+		const draft = teamNameDrafts[teamId];
+		if (draft == null) return;
+		const team = editingRun.teams.find((t) => t.id === teamId);
+		if (team == null) return;
+		if (draft !== team.name) {
+			handleUpdateTeamName(teamId, draft);
+		}
+		setTeamNameDrafts((prev) => {
+			const next = {...prev};
+			delete next[teamId];
+			return next;
 		});
 	};
 
@@ -532,10 +551,14 @@ const RunEditModal = ({
 											<input
 												style={{...inputStyle, flex: 1}}
 												placeholder='チーム名'
-												value={team.name ?? ""}
+												value={teamNameDrafts[team.id] ?? team.name ?? ""}
 												onChange={(e) =>
-													handleUpdateTeamName(team.id, e.target.value)
+													setTeamNameDrafts({
+														...teamNameDrafts,
+														[team.id]: e.target.value,
+													})
 												}
+												onBlur={() => handleCommitTeamNameDraft(team.id)}
 											/>
 											<button
 												style={buttonStyle}
