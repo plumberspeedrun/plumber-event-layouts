@@ -41,6 +41,7 @@ e2e/
 - `any` / 型アサーション / `@ts-ignore` で型エラーを抑制しない。`nodecg` グローバルは `augment-window` で型付け済み。
 - 基準画像（`*-snapshots/`）はコミットする。`test-results/` 等の生成物は `.gitignore` 済み。
 - 寸法・配置規約（1920x1080 等）は明示要求がない限り変えない。
+- テストは `workers: 1` の**直列実行**が前提（`playwright.config.ts`）。Replicant はサーバー上の共有状態のため、並列実行するとテスト同士が書き込む値で干渉し不定失敗する。
 
 ## よく使うパターン
 
@@ -50,7 +51,7 @@ e2e/
 import {expect, test} from "./fixtures";
 
 test("...", async ({page, nodecg}) => {
-  await nodecg.gotoGraphics("SmwRace.html"); // API とフォントの準備完了まで待つ
+  await nodecg.gotoGraphics("4_3-1.html"); // API とフォントの準備完了まで待つ
   await expect(page.locator("#root")).not.toBeEmpty();
 });
 ```
@@ -77,15 +78,20 @@ speedcontrol の Replicant 名: `runDataArray` / `runDataActiveRun` / `timer`（
 ### ビジュアルリグレッション（VRT）
 
 ```ts
-await nodecg.gotoGraphics("SmwRace.html");
+await nodecg.gotoGraphics("4_3-1.html");
+// 背景・ロゴ・カメラ・run データ、アクティブ run を注入してレイアウトを描画させる。
+// sampleCameraFeeds / sampleRunDataArray / sampleActiveRunId は ./data から import する。
 await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
 await nodecg.setReplicant("assets:logo", sampleLogoAsset);
-await expect(page.getByText("hi")).toBeVisible(); // 描画完了を待つ
+await nodecg.setReplicant("cameraFeeds", sampleCameraFeeds);
+await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+await nodecg.setReplicant("activeRunId", sampleActiveRunId);
+await expect(page.getByText("Super Mario World")).toBeVisible(); // 描画完了を待つ
 // すべての <img> 読込待ち（必要に応じて）
 await page.waitForFunction(() =>
   Array.from(document.images).every((img) => img.complete),
 );
-await expect(page).toHaveScreenshot("smw-race.png");
+await expect(page).toHaveScreenshot("4_3-1.png");
 ```
 
 決定論性のため: 外部リソースに依存しない data URL（`e2e/data.ts` の `solidSvg`）を使う、フォント/画像の読込を待つ、`animations: "disabled"` と `deviceScaleFactor: 1`（`playwright.config.ts` で既定設定済み）。
@@ -107,7 +113,7 @@ pnpm exec tsc -p e2e/tsconfig.json --noEmit   # e2e の型チェック
 
 ## 作業後チェック
 
-1. 変更した e2e ファイルに `pnpm prettier --write` を実行。
+1. 変更した e2e ファイルに `pnpm fix`（Biome の自動修正）を実行。
 2. `pnpm exec tsc -p e2e/tsconfig.json --noEmit` で型チェック。
 3. `pnpm test:e2e` を実行し、全テスト通過を確認。
 4. 新規／更新した基準画像（`*-snapshots/`）が妥当か目視確認してから報告する。

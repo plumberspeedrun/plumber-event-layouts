@@ -33,10 +33,15 @@ export default defineConfig({
 			animations: "disabled",
 		},
 	},
-	fullyParallel: true,
-	forbidOnly: !!process.env.CI,
-	retries: process.env.CI ? 2 : 0,
-	workers: process.env.CI ? 1 : undefined,
+	/*
+	 * グラフィックスはサーバー上の Replicant を共有するため、並列実行すると
+	 * テスト同士が書き込む値（activeRunId / runDataArray など）で互いに干渉し、
+	 * 決定的に失敗する。CI と同じく常に直列で実行する。
+	 */
+	fullyParallel: false,
+	forbidOnly: !!process.env["CI"],
+	retries: process.env["CI"] ? 2 : 0,
+	workers: 1,
 	reporter: "html",
 	projects: [
 		{
@@ -49,7 +54,7 @@ export default defineConfig({
 	webServer: {
 		command: "pnpm build && pnpm start",
 		url: baseURL,
-		reuseExistingServer: !process.env.CI,
+		reuseExistingServer: !process.env["CI"],
 		timeout: 180_000,
 		stdout: "pipe",
 		stderr: "pipe",

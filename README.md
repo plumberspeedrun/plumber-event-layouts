@@ -77,12 +77,27 @@ pnpm run generate-schema-types
 | `src/browser/dashboard/views/*.tsx` | ダッシュボードパネル（オペレーター操作用） |
 | `src/browser/graphics/views/*.tsx` | グラフィックスオーバーレイ（配信画面用） |
 
-### コードスタイル
+### テスト
 
-Prettier を使用しています（タブインデント、シングル JSX クォート、末尾カンマ、80 文字幅）。コミット前に実行してください：
+E2E テスト（Dashboard）とグラフィックスのビジュアルリグレッション（VRT）は Playwright で行います。
+テスト実行時に NodeCG を自動ビルド・起動します（既に `pnpm dev` で起動していればそれを再利用します）。
 
 ```bash
-pnpx prettier --write .
+pnpm test:e2e          # E2E と VRT を実行
+pnpm test:e2e:ui       # デバッグ用 UI モード
+pnpm test:e2e:update   # VRT の基準画像を更新（見た目変更時のみ）
+```
+
+テスト方針・構成・運用ルールの詳細は [docs/TESTING.md](docs/TESTING.md) を参照してください。
+
+### コードスタイル
+
+Biome を使用しています（タブインデント、JSX シングルクォート、末尾カンマ、80 文字幅）。
+コミット前に自動修正とチェックを実行してください：
+
+```bash
+pnpm fix               # Biome によるリント・フォーマットの自動修正
+pnpm check             # 型チェック + リント・フォーマットのチェック
 ```
 
 ## アーキテクチャ

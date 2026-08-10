@@ -16,6 +16,10 @@ const BUNDLE_NAME = "plumber-event-layouts";
 export const graphicsUrl = (file: string) =>
 	`/bundles/${BUNDLE_NAME}/graphics/${file}`;
 
+/** ダッシュボードビューの URL を生成するヘルパー。 */
+export const dashboardUrl = (file: string) =>
+	`/bundles/${BUNDLE_NAME}/dashboard/${file}`;
+
 export interface SetReplicantOptions {
 	/** Replicant が属するバンドル名。省略時はこのバンドル。 */
 	bundle?: string;
@@ -24,6 +28,12 @@ export interface SetReplicantOptions {
 export interface NodeCGFixture {
 	/** グラフィックスページを開き、API とフォントの準備完了を待つ。 */
 	gotoGraphics: (file: string) => Promise<void>;
+	/** ダッシュボードページを開き、API の準備完了を待つ。 */
+	gotoDashboard: (file: string) => Promise<void>;
+	/** NodeCG にメッセージを送信する（ack を待つ）。 */
+	sendMessage: (name: string, data?: unknown) => Promise<unknown>;
+	/** Replicant の現在値を読み取る。 */
+	readReplicant: <T>(name: string, bundle?: string) => Promise<T | undefined>;
 	/**
 	 * Replicant に値を流し込む。
 	 * 元の値は記録され、テスト終了時に自動で復元される。
@@ -82,6 +92,49 @@ export const test = base.extend<{nodecg: NodeCGFixture}>({
 			await page.evaluate(() => document.fonts.ready);
 		};
 
+		const gotoDashboard: NodeCGFixture["gotoDashboard"] = async (file) => {
+			// NodeCG のダッシュボードパネルは通常、ダッシュボード iframe（window.top 経由）前提で
+			// NodeCG API が注入される。standalone クエリを使うと /api.js と /socket.js が直接読み込まれ、
+			// 単独タブでも nodecg グローバルが使えるようになる。
+			await page.goto(dashboardUrl(file) + "?standalone=true");
+			// NodeCG クライアント API が利用可能になるまで待つ。
+			await page.waitForFunction(() => typeof nodecg !== "undefined");
+		};
+
+		const sendMessage: NodeCGFixture["sendMessage"] = async (name, data) => {
+			return page.evaluate(
+				({
+					name,
+					hasData,
+					data,
+				}: {
+					name: string;
+					hasData: boolean;
+					data?: unknown;
+				}) =>
+					hasData ? nodecg.sendMessage(name, data) : nodecg.sendMessage(name),
+				{name, hasData: data !== undefined, data},
+			);
+		};
+
+		const readReplicant: NodeCGFixture["readReplicant"] = async <T>(
+			name: string,
+			bundle?: string,
+		): Promise<T | undefined> => {
+			const value: unknown = await page.evaluate(
+				({name, bundle}: {name: string; bundle?: string}) => {
+					const replicant =
+						bundle == null
+							? nodecg.Replicant<unknown>(name)
+							: nodecg.Replicant<unknown>(name, bundle);
+					return replicant.value;
+				},
+				{name, bundle},
+			);
+			// サーバー側から取得した値を呼び出し側の型として扱う。
+			return value as T | undefined;
+		};
+
 		const setReplicant: NodeCGFixture["setReplicant"] = async (
 			name,
 			value,
@@ -95,7 +148,13 @@ export const test = base.extend<{nodecg: NodeCGFixture}>({
 			}
 		};
 
-		await use({gotoGraphics, setReplicant});
+		await use({
+			gotoGraphics,
+			gotoDashboard,
+			sendMessage,
+			readReplicant,
+			setReplicant,
+		});
 
 		// 注入した Replicant を元の値に復元する（稼働中インスタンスの汚染を防ぐ）。
 		for (const [key, {bundle, value}] of originals) {

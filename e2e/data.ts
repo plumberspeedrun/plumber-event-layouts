@@ -1,8 +1,7 @@
 import type {ActiveRunId} from "../src/nodecg/generated/activeRunId";
 import type {CameraFeeds} from "../src/nodecg/generated/cameraFeeds";
+import type {Nsmb} from "../src/nodecg/generated/nsmb";
 import type {RunDataArray} from "../src/nodecg/generated/runDataArray";
-import type {SheetCommentators} from "../src/nodecg/generated/sheetCommentators";
-import type {SheetRunners} from "../src/nodecg/generated/sheetRunners";
 import type {SpreadsheetStatus} from "../src/nodecg/generated/spreadsheetStatus";
 import type {Timer} from "../src/nodecg/generated/timer";
 import type {Assets} from "../src/types/assets";
@@ -120,22 +119,70 @@ export const sampleRunDataArray: RunDataArray = [
 
 export const sampleActiveRunId: ActiveRunId = "run-1";
 
-export const sampleSheetRunners: SheetRunners = [
+/** タイマーの完走/棄権テスト用: 2チーム構成の走行。 */
+export const sampleRunForTimer: RunDataArray = [
 	{
-		name: "Runner One",
-		social: {twitch: "runner_one", twitter: "runner_one_x"},
+		id: "timer-run",
+		game: "Timer Test",
+		system: "SNES",
+		category: "Any%",
+		teams: [
+			{
+				id: "team-a",
+				players: [
+					{
+						id: "player-a",
+						teamId: "team-a",
+						name: "Runner A",
+						social: {twitch: "runner_a"},
+					},
+				],
+			},
+			{
+				id: "team-b",
+				players: [
+					{
+						id: "player-b",
+						teamId: "team-b",
+						name: "Runner B",
+						social: {twitch: "runner_b"},
+					},
+				],
+			},
+		],
 	},
-	{name: "Runner Two", social: {twitch: "runner_two"}},
 ];
 
-export const sampleSheetCommentators: SheetCommentators = [
-	{
-		game: "Super Mario World",
-		name: "Commentator One",
-		social: {twitter: "comm_one", twitch: "comm_one_twitch"},
-	},
-	{game: "Super Mario World", name: "Commentator Two", pronouns: "they/them"},
-];
+export const sampleActiveRunIdForTimer: ActiveRunId = "timer-run";
+
+/** NSMBリレーのOBSシーン切替テスト用。obsSceneName は一部のリレーのみ設定する。 */
+export const sampleNsmb: Nsmb = {
+	activeIndex: 0,
+	relayData: [
+		{
+			game: "New Super Mario Bros. Wii",
+			category: "Any%",
+			platform: "Wii",
+			year: 2009,
+			runner: {name: "Runner A"},
+		},
+		{
+			game: "New Super Mario Bros. U",
+			category: "Any%",
+			platform: "Wii U",
+			year: 2012,
+			runner: {name: "Runner B"},
+			obsSceneName: "NSMB Relay",
+		},
+		{
+			game: "New Super Mario Bros. DS",
+			category: "Warpless",
+			platform: "DS",
+			year: 2006,
+			runner: {name: "Runner C"},
+		},
+	],
+};
 
 export const sampleSpreadsheetStatus: SpreadsheetStatus = {
 	enabled: true,

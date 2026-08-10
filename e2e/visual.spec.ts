@@ -25,25 +25,38 @@ const waitForImages = async (page: import("@playwright/test").Page) => {
 };
 
 test.describe("visual regression", () => {
-	test("example レイアウト", async ({page, nodecg}) => {
-		await nodecg.gotoGraphics("example.html");
-		await expect(page.getByText("hi")).toBeVisible();
+	test("4_3-1 レイアウト", async ({page, nodecg}) => {
+		await nodecg.gotoGraphics("4_3-1.html");
 
-		await expect(page).toHaveScreenshot("example.png");
-	});
-
-	test("SmwRace レイアウト", async ({page, nodecg}) => {
-		await nodecg.gotoGraphics("SmwRace.html");
-
-		// 背景・ロゴアセットを注入してレイアウトを描画させる。
+		// 背景・ロゴ・カメラ・run データ、アクティブ run を注入してレイアウトを描画させる。
 		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
 		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
+		await nodecg.setReplicant("cameraFeeds", sampleCameraFeeds);
+		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 
-		// フォールバック文言ではなくレイアウトが表示されることを確認。
-		await expect(page.getByText("hi")).toBeVisible();
+		// アクティブ run のゲーム名が描画されていることを確認。
+		await expect(page.getByText("Super Mario World")).toBeVisible();
 		await waitForImages(page);
 
-		await expect(page).toHaveScreenshot("smw-race.png");
+		await expect(page).toHaveScreenshot("4_3-1.png");
+	});
+
+	test("16_9-1 レイアウト", async ({page, nodecg}) => {
+		await nodecg.gotoGraphics("16_9-1.html");
+
+		// 背景・ロゴ・カメラ・run データ、アクティブ run を注入してレイアウトを描画させる。
+		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
+		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
+		await nodecg.setReplicant("cameraFeeds", sampleCameraFeeds);
+		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
+
+		// アクティブ run のゲーム名が描画されていることを確認。
+		await expect(page.getByText("Super Mario World")).toBeVisible();
+		await waitForImages(page);
+
+		await expect(page).toHaveScreenshot("16_9-1.png");
 	});
 
 	test("ScheduleList レイアウト", async ({page, nodecg}) => {
