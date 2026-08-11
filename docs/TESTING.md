@@ -30,7 +30,7 @@ pnpm test:e2e:update   # VRT の基準画像を更新（見た目変更時のみ
 | ファイル | 役割 |
 |----------|------|
 | `e2e/fixtures.ts` | `gotoGraphics` / `gotoDashboard` / `setReplicant` / `readReplicant` / `sendMessage` を提供する。`setReplicant` で注入した値はテスト終了時に元の値へ自動復元される |
-| `e2e/data.ts` | テスト用のサンプルデータ（Run・タイマー・カメラフィード・アセット等）を定義する |
+| `e2e/data.ts` | テスト用のサンプルデータ（Run・タイマー・カメラ表示・アセット等）を定義する |
 | `e2e/dashboard.spec.ts` | Dashboard の E2E（タイマー操作・完走/棄権・NSMB の OBS シーン切替・スケジュール）を記述する |
 | `e2e/visual.spec.ts` | Graphics の VRT（現在は「4_3-1」「16_9-1」「setup（ScheduleList）」の 3 レイアウト）を記述する |
 

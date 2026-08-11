@@ -1,8 +1,8 @@
 import type {CSSProperties} from "react";
-import {useBackgroundAsset, useCameraFeeds, useNsmb} from "../../hooks";
+import {useBackgroundAsset, useCameraVisible, useNsmb} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
-import {CameraFeed} from "../components/CameraFeed";
+import {CameraOffIcon} from "../components/CameraOffIcon";
 import {
 	Commentator,
 	getCommentatorDisplayItems,
@@ -17,6 +17,7 @@ import {
 import {RelayProgress} from "../components/RelayProgress";
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
+import {buildClipPath} from "../utils/clipPath";
 
 // 2 画面ぶんの領域を確保するため、左カラムを 390px まで狭めている。
 const SCREEN_LEFT = 410;
@@ -39,6 +40,22 @@ const CAMERA_X = 12;
 const CAMERA_W = 368;
 const CAMERA_H = 207;
 const CAMERA_Y = 1015 - CAMERA_H;
+
+const CAMERA_RECT = {x: CAMERA_X, y: CAMERA_Y, w: CAMERA_W, h: CAMERA_H};
+
+const MAIN_SCREEN_RECT = {
+	x: MAIN_SCREEN_X,
+	y: MAIN_SCREEN_Y,
+	w: MAIN_SCREEN_W,
+	h: MAIN_SCREEN_H,
+};
+
+const SUB_SCREEN_RECT = {
+	x: SUB_SCREEN_X,
+	y: SUB_SCREEN_Y,
+	w: SUB_SCREEN_W,
+	h: SUB_SCREEN_H,
+};
 
 // リレー進行度を置くため、ネームプレートは 1 行の細型にして上に詰める。
 const NAMEPLATE_X = 44;
@@ -65,23 +82,9 @@ const nameplateStyle: CSSProperties = {
 	fontSize: 26,
 };
 
-const hole = (x: number, y: number, w: number, h: number) =>
-	`M${x} ${y} H${x + w} V${y + h} H${x} Z`;
-
-const clipPath = `path(evenodd, "M0 0 H1920 V1080 H0 Z ${hole(MAIN_SCREEN_X, MAIN_SCREEN_Y, MAIN_SCREEN_W, MAIN_SCREEN_H)} ${hole(SUB_SCREEN_X, SUB_SCREEN_Y, SUB_SCREEN_W, SUB_SCREEN_H)}")`;
-
-const overlayStyle: CSSProperties = {
-	position: "absolute",
-	top: 0,
-	left: 0,
-	width: "1920px",
-	height: "1080px",
-	clipPath,
-};
-
 const App = () => {
 	const backgroundAsset = useBackgroundAsset();
-	const [feeds] = useCameraFeeds();
+	const [cameraVisible] = useCameraVisible();
 	const nsmb = useNsmb();
 
 	const relayData = nsmb?.relayData ?? [];
@@ -99,7 +102,19 @@ const App = () => {
 		Math.max(...commentatorItems.map((items) => items.length), 1),
 	);
 
-	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
+	const cameraOn = cameraVisible !== false;
+	const overlayStyle: CSSProperties = {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		width: "1920px",
+		height: "1080px",
+		clipPath: buildClipPath([
+			MAIN_SCREEN_RECT,
+			SUB_SCREEN_RECT,
+			...(cameraOn ? [CAMERA_RECT] : []),
+		]),
+	};
 
 	if (!backgroundAsset) {
 		return <div>レイアウト画像をアセットにアップロードしてください。</div>;
@@ -148,19 +163,7 @@ const App = () => {
 					padding: "8px 12px",
 				}}
 			/>
-			{visibleFeeds[0] && (
-				<CameraFeed
-					url={visibleFeeds[0].url}
-					framed={false}
-					style={{
-						position: "absolute",
-						left: CAMERA_X,
-						top: CAMERA_Y,
-						width: CAMERA_W,
-						height: CAMERA_H,
-					}}
-				/>
-			)}
+			{!cameraOn && <CameraOffIcon {...CAMERA_RECT} />}
 			<div
 				style={{
 					position: "absolute",

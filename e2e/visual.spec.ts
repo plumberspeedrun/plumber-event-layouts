@@ -1,7 +1,7 @@
 import {
 	sampleActiveRunId,
 	sampleBackgroundAsset,
-	sampleCameraFeeds,
+	sampleCameraVisible,
 	sampleLogoAsset,
 	sampleRunDataArray,
 } from "./data";
@@ -31,7 +31,7 @@ test.describe("visual regression", () => {
 		// 背景・ロゴ・カメラ・run データ、アクティブ run を注入してレイアウトを描画させる。
 		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
 		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
-		await nodecg.setReplicant("cameraFeeds", sampleCameraFeeds);
+		await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
 		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 
@@ -48,7 +48,7 @@ test.describe("visual regression", () => {
 		// 背景・ロゴ・カメラ・run データ、アクティブ run を注入してレイアウトを描画させる。
 		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
 		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
-		await nodecg.setReplicant("cameraFeeds", sampleCameraFeeds);
+		await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
 		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 
@@ -65,7 +65,7 @@ test.describe("visual regression", () => {
 		// run データ、アクティブ run、背景・カメラ・ロゴアセットを注入して描画させる。
 		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
 		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
-		await nodecg.setReplicant("cameraFeeds", sampleCameraFeeds);
+		await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
 		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 

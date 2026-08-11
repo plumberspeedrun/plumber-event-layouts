@@ -1,6 +1,6 @@
 import {useReplicant} from "@nodecg/react-hooks";
 import type {ActiveRunId} from "../nodecg/generated/activeRunId";
-import type {CameraFeeds} from "../nodecg/generated/cameraFeeds";
+import type {CameraVisible} from "../nodecg/generated/cameraVisible";
 import type {Nsmb} from "../nodecg/generated/nsmb";
 import type {ObsConfig} from "../nodecg/generated/obsConfig";
 import type {RunDataArray} from "../nodecg/generated/runDataArray";
@@ -97,8 +97,8 @@ export const useNsmbReplicant = () => {
 	return useReplicant<Nsmb>("nsmb");
 };
 
-export const useCameraFeeds = () => {
-	return useReplicant<CameraFeeds>("cameraFeeds");
+export const useCameraVisible = () => {
+	return useReplicant<CameraVisible>("cameraVisible");
 };
 
 export const useBackgroundAsset = () => {

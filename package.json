@@ -96,10 +96,10 @@
 				"headerColor": "#525F78"
 			},
 			{
-				"name": "cameraConfig",
-				"title": "カメラ設定",
+				"name": "camera",
+				"title": "カメラ",
 				"width": 4,
-				"file": "cameraConfig.html",
+				"file": "camera.html",
 				"workspace": "Camera",
 				"headerColor": "#525F78"
 			}

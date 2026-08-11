@@ -1,10 +1,10 @@
 import type {CSSProperties} from "react";
 import type {RunDataCommentator} from "../../../types/schedule";
 import commentatorIcon from "../../assets/icons/commentator.svg";
-import {useActiveRun, useBackgroundAsset, useCameraFeeds} from "../../hooks";
+import {useActiveRun, useBackgroundAsset, useCameraVisible} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
-import {CameraFeed} from "../components/CameraFeed";
+import {CameraOffIcon} from "../components/CameraOffIcon";
 import {GameInfo} from "../components/GameInfo";
 import {Logo} from "../components/Logo";
 import {
@@ -15,6 +15,7 @@ import {
 } from "../components/Nameplate";
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
+import {buildClipPath} from "../utils/clipPath";
 import {getSnsItems} from "../utils/social";
 
 // ゲーム表示帯: 横幅いっぱい、画面全体の約60%の高さを確保する。
@@ -38,6 +39,8 @@ const CAMERA_Y = 760;
 const CAMERA_W = 464;
 const CAMERA_H = 261;
 
+const CAMERA_RECT = {x: CAMERA_X, y: CAMERA_Y, w: CAMERA_W, h: CAMERA_H};
+
 // 下部情報帯: ロゴ・コメンテーター・ゲーム情報・タイマーを1つの帯に集約する。
 const BAR_X = 500;
 const BAR_Y = 839;
@@ -51,22 +54,6 @@ const screenPositions = [
 	{x: RIGHT_X, y: SCREEN_Y},
 ];
 
-const clipPath = `path(evenodd, "${[
-	`M0 0 H1920 V1080 H0 Z`,
-	...screenPositions.map(
-		({x, y}) => `M${x} ${y} H${x + SCREEN_W} V${y + SCREEN_H} H${x} Z`,
-	),
-].join(" ")}")`;
-
-const overlayStyle: CSSProperties = {
-	position: "absolute",
-	top: 0,
-	left: 0,
-	width: "1920px",
-	height: "1080px",
-	clipPath,
-};
-
 const getCommentatorItems = (
 	commentator: RunDataCommentator,
 ): NameplateDisplayItem[] => [
@@ -78,7 +65,7 @@ const getCommentatorItems = (
 
 const App = () => {
 	const backgroundAsset = useBackgroundAsset();
-	const [feeds] = useCameraFeeds();
+	const [cameraVisible] = useCameraVisible();
 	const activeRun = useActiveRun();
 
 	const players = activeRun?.teams.flatMap((t) => t.players) ?? [];
@@ -94,7 +81,24 @@ const App = () => {
 	);
 	const commentatorSlideIndex = useNameplateCycle(maxCommentatorSlides);
 
-	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
+	const cameraOn = cameraVisible !== false;
+	const screenHoles = screenPositions.map(({x, y}) => ({
+		x,
+		y,
+		w: SCREEN_W,
+		h: SCREEN_H,
+	}));
+	const overlayStyle: CSSProperties = {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		width: "1920px",
+		height: "1080px",
+		clipPath: buildClipPath([
+			...screenHoles,
+			...(cameraOn ? [CAMERA_RECT] : []),
+		]),
+	};
 
 	if (!backgroundAsset) {
 		return <div>レイアウト画像をアセットにアップロードしてください。</div>;
@@ -107,19 +111,7 @@ const App = () => {
 				alt=''
 				style={overlayStyle}
 			/>
-			{visibleFeeds[0] && (
-				<CameraFeed
-					url={visibleFeeds[0].url}
-					framed={false}
-					style={{
-						position: "absolute",
-						left: CAMERA_X,
-						top: CAMERA_Y,
-						width: CAMERA_W,
-						height: CAMERA_H,
-					}}
-				/>
-			)}
+			{!cameraOn && <CameraOffIcon {...CAMERA_RECT} />}
 			<Logo
 				height={LOGO_H}
 				x={BAR_X + 16}

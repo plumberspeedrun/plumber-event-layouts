@@ -1,15 +1,16 @@
 import type {CSSProperties} from "react";
 import commentatorIcon from "../../assets/icons/commentator.svg";
 import gamepadIcon from "../../assets/icons/gamepad.svg";
-import {useActiveRun, useBackgroundAsset, useCameraFeeds} from "../../hooks";
+import {useActiveRun, useBackgroundAsset, useCameraVisible} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
-import {CameraFeed} from "../components/CameraFeed";
+import {CameraOffIcon} from "../components/CameraOffIcon";
 import {GameInfo} from "../components/GameInfo";
 import {Logo} from "../components/Logo";
 import {NameplateCard} from "../components/NameplateCard";
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
+import {buildClipPath} from "../utils/clipPath";
 import {getSnsItems} from "../utils/social";
 
 const SCREEN_X = 697;
@@ -22,25 +23,26 @@ const CAMERA_Y = 737;
 const CAMERA_W = 495;
 const CAMERA_H = 278;
 
-const clipPath = `path(evenodd, "M0 0 H1920 V1080 H0 Z M${SCREEN_X} ${SCREEN_Y} H${SCREEN_X + SCREEN_W} V${SCREEN_Y + SCREEN_H} H${SCREEN_X} Z")`;
+const CAMERA_RECT = {x: CAMERA_X, y: CAMERA_Y, w: CAMERA_W, h: CAMERA_H};
 
-const overlayStyle: CSSProperties = {
-	position: "absolute",
-	top: 0,
-	left: 0,
-	width: "1920px",
-	height: "1080px",
-	clipPath,
-};
+const SCREEN_RECT = {x: SCREEN_X, y: SCREEN_Y, w: SCREEN_W, h: SCREEN_H};
 
 const App = () => {
 	const backgroundAsset = useBackgroundAsset();
-	const [feeds] = useCameraFeeds();
+	const [cameraVisible] = useCameraVisible();
 	const activeRun = useActiveRun();
 
 	const players = activeRun?.teams.flatMap((t) => t.players) ?? [];
 	const commentators = activeRun?.commentators ?? [];
-	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
+	const cameraOn = cameraVisible !== false;
+	const overlayStyle: CSSProperties = {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		width: "1920px",
+		height: "1080px",
+		clipPath: buildClipPath([SCREEN_RECT, ...(cameraOn ? [CAMERA_RECT] : [])]),
+	};
 
 	if (!backgroundAsset) {
 		return <div>レイアウト画像をアセットにアップロードしてください。</div>;
@@ -101,19 +103,7 @@ const App = () => {
 					}}
 				/>
 			))}
-			{visibleFeeds[0] && (
-				<CameraFeed
-					url={visibleFeeds[0].url}
-					framed={false}
-					style={{
-						position: "absolute",
-						left: CAMERA_X,
-						top: CAMERA_Y,
-						width: CAMERA_W,
-						height: CAMERA_H,
-					}}
-				/>
-			)}
+			{!cameraOn && <CameraOffIcon {...CAMERA_RECT} />}
 			<div
 				style={{
 					position: "absolute",

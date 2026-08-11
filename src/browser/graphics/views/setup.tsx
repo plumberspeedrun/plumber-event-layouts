@@ -1,10 +1,11 @@
-import {useBackgroundAsset, useCameraFeeds} from "../../hooks";
+import {useBackgroundAsset, useCameraVisible} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
-import {CameraFeed} from "../components/CameraFeed";
+import {CameraOffIcon} from "../components/CameraOffIcon";
 import {Logo} from "../components/Logo";
 import {ScheduleList} from "../components/ScheduleList";
 import "../styles/index.scss";
+import {buildClipPath} from "../utils/clipPath";
 
 const PANEL_SIZE = {
 	left: 30,
@@ -24,37 +25,29 @@ const LOGO_Y = PANEL_SIZE.top + CAMERA_H + CAMERA_Y_OFFSET + 48;
 const CAMERA_X = PANEL_SIZE.left;
 const CAMERA_Y = PANEL_SIZE.top + CAMERA_Y_OFFSET;
 
+const CAMERA_RECT = {x: CAMERA_X, y: CAMERA_Y, w: CAMERA_W, h: CAMERA_H};
+
 const App = () => {
 	const backgroundAsset = useBackgroundAsset();
-	const [feeds] = useCameraFeeds();
+	const [cameraVisible] = useCameraVisible();
 
-	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
+	const cameraOn = cameraVisible !== false;
 
 	if (!backgroundAsset) {
 		return <div>レイアウト画像をアセットにアップロードしてください。</div>;
 	}
 
 	return (
-		<BaseLayout backgroundUrl={backgroundAsset.url}>
+		<BaseLayout
+			backgroundUrl={backgroundAsset.url}
+			backgroundClipPath={buildClipPath(cameraOn ? [CAMERA_RECT] : [])}
+		>
 			<Logo
 				width={LOGO_W}
 				x={LOGO_X}
 				y={LOGO_Y}
 			/>
-			{visibleFeeds[0] && (
-				<CameraFeed
-					url={visibleFeeds[0].url}
-					framed={false}
-					style={{
-						position: "absolute",
-						left: CAMERA_X,
-						top: CAMERA_Y,
-						width: CAMERA_W,
-						height: CAMERA_H,
-						borderRadius: 24,
-					}}
-				/>
-			)}
+			{!cameraOn && <CameraOffIcon {...CAMERA_RECT} />}
 			<ScheduleList />
 		</BaseLayout>
 	);

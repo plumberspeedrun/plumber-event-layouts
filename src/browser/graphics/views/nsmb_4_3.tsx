@@ -1,8 +1,8 @@
 import type {CSSProperties} from "react";
-import {useBackgroundAsset, useCameraFeeds, useNsmb} from "../../hooks";
+import {useBackgroundAsset, useCameraVisible, useNsmb} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
-import {CameraFeed} from "../components/CameraFeed";
+import {CameraOffIcon} from "../components/CameraOffIcon";
 import {
 	Commentator,
 	getCommentatorDisplayItems,
@@ -17,6 +17,7 @@ import {
 import {RelayProgress} from "../components/RelayProgress";
 import {TimerAndEstimate} from "../components/TimerAndEstimate";
 import "../styles/index.scss";
+import {buildClipPath} from "../utils/clipPath";
 
 const SCREEN_X = 697;
 const SCREEN_Y = 25;
@@ -27,6 +28,10 @@ const CAMERA_X = 15;
 const CAMERA_Y = 737;
 const CAMERA_W = 495;
 const CAMERA_H = 278;
+
+const CAMERA_RECT = {x: CAMERA_X, y: CAMERA_Y, w: CAMERA_W, h: CAMERA_H};
+
+const SCREEN_RECT = {x: SCREEN_X, y: SCREEN_Y, w: SCREEN_W, h: SCREEN_H};
 
 // リレー進行度を置くため、ネームプレートは 1 行の細型にして上に詰める。
 const NAMEPLATE_X = 58;
@@ -53,20 +58,9 @@ const nameplateStyle: CSSProperties = {
 	fontSize: 30,
 };
 
-const clipPath = `path(evenodd, "M0 0 H1920 V1080 H0 Z M${SCREEN_X} ${SCREEN_Y} H${SCREEN_X + SCREEN_W} V${SCREEN_Y + SCREEN_H} H${SCREEN_X} Z")`;
-
-const overlayStyle: CSSProperties = {
-	position: "absolute",
-	top: 0,
-	left: 0,
-	width: "1920px",
-	height: "1080px",
-	clipPath,
-};
-
 const App = () => {
 	const backgroundAsset = useBackgroundAsset();
-	const [feeds] = useCameraFeeds();
+	const [cameraVisible] = useCameraVisible();
 	const nsmb = useNsmb();
 
 	const relayData = nsmb?.relayData ?? [];
@@ -84,7 +78,15 @@ const App = () => {
 		Math.max(...commentatorItems.map((items) => items.length), 1),
 	);
 
-	const visibleFeeds = (feeds ?? []).filter((f) => f.visible);
+	const cameraOn = cameraVisible !== false;
+	const overlayStyle: CSSProperties = {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		width: "1920px",
+		height: "1080px",
+		clipPath: buildClipPath([SCREEN_RECT, ...(cameraOn ? [CAMERA_RECT] : [])]),
+	};
 
 	if (!backgroundAsset) {
 		return <div>レイアウト画像をアセットにアップロードしてください。</div>;
@@ -133,19 +135,7 @@ const App = () => {
 					padding: "8px 14px",
 				}}
 			/>
-			{visibleFeeds[0] && (
-				<CameraFeed
-					url={visibleFeeds[0].url}
-					framed={false}
-					style={{
-						position: "absolute",
-						left: CAMERA_X,
-						top: CAMERA_Y,
-						width: CAMERA_W,
-						height: CAMERA_H,
-					}}
-				/>
-			)}
+			{!cameraOn && <CameraOffIcon {...CAMERA_RECT} />}
 			<div
 				style={{
 					position: "absolute",

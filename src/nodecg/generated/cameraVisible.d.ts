@@ -6,9 +6,4 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type CameraFeeds = {
-	id: string;
-	label?: string;
-	url: string;
-	visible: boolean;
-}[];
+export type CameraVisible = boolean;

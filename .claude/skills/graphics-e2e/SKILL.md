@@ -80,10 +80,10 @@ speedcontrol の Replicant 名: `runDataArray` / `runDataActiveRun` / `timer`（
 ```ts
 await nodecg.gotoGraphics("4_3-1.html");
 // 背景・ロゴ・カメラ・run データ、アクティブ run を注入してレイアウトを描画させる。
-// sampleCameraFeeds / sampleRunDataArray / sampleActiveRunId は ./data から import する。
+// sampleCameraVisible / sampleRunDataArray / sampleActiveRunId は ./data から import する。
 await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
 await nodecg.setReplicant("assets:logo", sampleLogoAsset);
-await nodecg.setReplicant("cameraFeeds", sampleCameraFeeds);
+await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
 await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 await expect(page.getByText("Super Mario World")).toBeVisible(); // 描画完了を待つ
