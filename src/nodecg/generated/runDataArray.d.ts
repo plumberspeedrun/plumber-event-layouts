@@ -49,7 +49,6 @@ export type RunDataArray = {
 		[k: string]: {
 			time: string;
 			milliseconds: number;
-			placement?: number;
 			state: "completed" | "forfeit";
 		};
 	};

@@ -125,9 +125,6 @@
 						"milliseconds": {
 							"type": "number"
 						},
-						"placement": {
-							"type": "number"
-						},
 						"state": {
 							"type": "string",
 							"enum": ["completed", "forfeit"]

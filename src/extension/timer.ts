@@ -54,10 +54,22 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	const finishTimer = () => {
 		stopTick();
 		const ms = getCurrentMs();
+		accumulatedMs = ms;
+		startedAt = null;
 		timerReplicant.value.time = formatTime(ms);
 		timerReplicant.value.milliseconds = ms;
 		timerReplicant.value.timestamp = Date.now();
 		timerReplicant.value.state = "finished";
+	};
+
+	const resumeRunning = () => {
+		startedAt = Date.now();
+		startTick();
+		const ms = getCurrentMs();
+		timerReplicant.value.time = formatTime(ms);
+		timerReplicant.value.milliseconds = ms;
+		timerReplicant.value.timestamp = Date.now();
+		timerReplicant.value.state = "running";
 	};
 
 	const getActiveRun = () => {
@@ -71,13 +83,9 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 			const state = timerReplicant.value.state;
 			if (state === "stopped") {
 				accumulatedMs = 0;
-				startedAt = Date.now();
-				startTick();
-				timerReplicant.value.state = "running";
+				resumeRunning();
 			} else if (state === "paused") {
-				startedAt = Date.now();
-				startTick();
-				timerReplicant.value.state = "running";
+				resumeRunning();
 			}
 			if (ack && !ack.handled) ack(null);
 		} catch (err) {
@@ -95,42 +103,6 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				timerReplicant.value.milliseconds = accumulatedMs;
 				timerReplicant.value.timestamp = Date.now();
 				timerReplicant.value.state = "paused";
-			}
-			if (ack && !ack.handled) ack(null);
-		} catch (err) {
-			if (ack && !ack.handled) ack(err as Error);
-		}
-	});
-
-	nodecg.listenFor("timerStop", (_data, ack) => {
-		try {
-			const state = timerReplicant.value.state;
-			if (state === "running" || state === "paused") {
-				const finalMs = getCurrentMs();
-				accumulatedMs = finalMs;
-				startedAt = null;
-
-				const run = getActiveRun();
-				const activeRunId = activeRunIdRep.value;
-				if (run != null && activeRunId != null) {
-					const result = {...(run.result ?? {})};
-					let placement = Object.keys(result).length;
-					for (const team of run.teams) {
-						if (result[team.id] != null) continue;
-						placement += 1;
-						result[team.id] = {
-							time: formatTime(finalMs),
-							milliseconds: finalMs,
-							placement,
-							state: "completed",
-						};
-					}
-					runDataArrayRep.value = (runDataArrayRep.value ?? []).map((r) =>
-						r.id === activeRunId ? {...r, result} : r,
-					);
-				}
-
-				finishTimer();
 			}
 			if (ack && !ack.handled) ack(null);
 		} catch (err) {
@@ -174,11 +146,9 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 						const result = {...(run.result ?? {})};
 						if (result[data.teamId] == null) {
 							const ms = getCurrentMs();
-							const placement = Object.keys(result).length + 1;
 							result[data.teamId] = {
 								time: formatTime(ms),
 								milliseconds: ms,
-								placement,
 								state: data.state ?? "completed",
 							};
 							runDataArrayRep.value = (runDataArrayRep.value ?? []).map((r) =>
@@ -197,4 +167,36 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 			}
 		},
 	);
+
+	nodecg.listenFor("timerUndoSplit", (data: {teamId: string}, ack) => {
+		try {
+			const run = getActiveRun();
+			const activeRunId = activeRunIdRep.value;
+			if (
+				run != null &&
+				activeRunId != null &&
+				run.result?.[data.teamId] != null
+			) {
+				const result = {...(run.result ?? {})};
+				delete result[data.teamId];
+				runDataArrayRep.value = (runDataArrayRep.value ?? []).map((r) =>
+					r.id === activeRunId
+						? {
+								...r,
+								result: Object.keys(result).length > 0 ? result : undefined,
+							}
+						: r,
+				);
+
+				if (timerReplicant.value.state === "finished") {
+					// 完走〜取り消しまでの停止期間も経過時間に含めてから再開する。
+					accumulatedMs += Date.now() - timerReplicant.value.timestamp;
+					resumeRunning();
+				}
+			}
+			if (ack && !ack.handled) ack(null);
+		} catch (err) {
+			if (ack && !ack.handled) ack(err as Error);
+		}
+	});
 };

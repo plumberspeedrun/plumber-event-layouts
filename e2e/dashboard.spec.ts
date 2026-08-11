@@ -142,8 +142,8 @@ test.describe("dashboard", () => {
 				.toBe("forfeit");
 
 			// UI に各チームの結果が表示される。
-			await expect(page.getByText(/completed/)).toHaveCount(1);
-			await expect(page.getByText(/forfeit/)).toHaveCount(1);
+			await expect(page.getByText("完走")).toHaveCount(1);
+			await expect(page.getByText("棄権")).toHaveCount(1);
 
 			// リセットで結果がクリアされる。
 			await page.getByRole("button", {name: "リセット"}).click();
@@ -156,6 +156,56 @@ test.describe("dashboard", () => {
 					return runs?.find((r) => r.id === "timer-run")?.result;
 				})
 				.toBeUndefined();
+		});
+
+		test("完走の取り消しで結果が消え、タイマーを再開できる", async ({
+			page,
+			nodecg,
+		}) => {
+			await nodecg.gotoDashboard("overview.html");
+			await nodecg.setReplicant("runDataArray", sampleRunForTimer);
+			await nodecg.setReplicant("activeRunId", sampleActiveRunIdForTimer);
+			await nodecg.sendMessage("timerReset");
+
+			// 全チームを完走させ、タイマーを終了させる。
+			await page.getByRole("button", {name: "開始/再開"}).click();
+			await page.getByRole("button", {name: "完走"}).first().click();
+			await expect(page.getByRole("button", {name: "完走"})).toHaveCount(1);
+			await page.getByRole("button", {name: "完走"}).click();
+			await expect
+				.poll(async () => (await nodecg.readReplicant<Timer>("timer"))?.state)
+				.toBe("finished");
+			await expect(page.getByRole("button", {name: "取り消し"})).toHaveCount(2);
+
+			// 全チーム完走時の記録時刻を控えておく。
+			const msFinished =
+				(await nodecg.readReplicant<Timer>("timer"))?.milliseconds ?? 0;
+
+			// 停止状態を挟んでから取り消すと、結果が消えて自動的に再開する。
+			await page.waitForTimeout(500);
+			await page.getByRole("button", {name: "取り消し"}).first().click();
+			await expect
+				.poll(async () => {
+					const runs = await nodecg.readReplicant<RunDataArray>("runDataArray");
+					return runs?.find((r) => r.id === "timer-run")?.result?.["team-a"];
+				})
+				.toBeUndefined();
+			await expect(page.getByRole("button", {name: "取り消し"})).toHaveCount(1);
+			await expect(page.getByRole("button", {name: "完走"})).toHaveCount(1);
+
+			// 停止期間を含んだ時刻から自動再開する。
+			await expect
+				.poll(async () => (await nodecg.readReplicant<Timer>("timer"))?.state)
+				.toBe("running");
+			const msAfterCancel = (await nodecg.readReplicant<Timer>("timer"))
+				?.milliseconds;
+			expect(msAfterCancel).toBeGreaterThanOrEqual(msFinished + 400);
+
+			// 再開後も時間が進む。
+			await page.waitForTimeout(300);
+			const msResumed = (await nodecg.readReplicant<Timer>("timer"))
+				?.milliseconds;
+			expect(msResumed).toBeGreaterThan(msAfterCancel ?? 0);
 		});
 	});
 

@@ -1,5 +1,5 @@
 import "@fontsource/m-plus-1p/400.css";
-import {Box, Button, Divider, Stack, Typography} from "@mui/material";
+import {Box, Button, Chip, Divider, Stack, Typography} from "@mui/material";
 import {Fragment} from "react";
 import {useActiveRun, useTimer} from "../../hooks";
 
@@ -19,7 +19,6 @@ export const TimerControl = () => {
 	const state = timer?.state;
 	const canStart = state === "stopped" || state === "paused";
 	const canPause = state === "running";
-	const canStop = state === "running" || state === "paused";
 	const canReset =
 		state === "finished" || state === "paused" || state === "stopped";
 
@@ -78,14 +77,6 @@ export const TimerControl = () => {
 					一時停止
 				</Button>
 				<Button
-					variant='contained'
-					color='error'
-					disabled={!canStop}
-					onClick={() => nodecg.sendMessage("timerStop")}
-				>
-					停止
-				</Button>
-				<Button
 					variant='outlined'
 					disabled={!canReset}
 					onClick={() => nodecg.sendMessage("timerReset")}
@@ -112,9 +103,30 @@ export const TimerControl = () => {
 											{team.name ?? team.players.map((p) => p.name).join(", ")}
 										</Typography>
 										{result != null ? (
-											<Typography color='text.secondary'>
-												{result.state} / {result.time}
-											</Typography>
+											<>
+												<Chip
+													size='small'
+													color={
+														result.state === "completed" ? "success" : "default"
+													}
+													label={result.state === "completed" ? "完走" : "棄権"}
+												/>
+												<Typography color='text.secondary'>
+													{result.time}
+												</Typography>
+												<Button
+													variant='outlined'
+													color='error'
+													size='small'
+													onClick={() =>
+														nodecg.sendMessage("timerUndoSplit", {
+															teamId: team.id,
+														})
+													}
+												>
+													取り消し
+												</Button>
+											</>
 										) : (
 											<>
 												<Button
