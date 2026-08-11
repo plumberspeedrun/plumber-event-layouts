@@ -61,6 +61,24 @@ test.describe("visual regression", () => {
 		await expect(page).toHaveScreenshot("16_9-1.png");
 	});
 
+	test("SM64 レイアウト", async ({page, nodecg}) => {
+		await nodecg.gotoGraphics("SM64.html");
+
+		// 背景・ロゴ・カメラ・run データ、アクティブ run を注入してレイアウトを描画させる。
+		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
+		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
+		await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
+		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
+
+		// アクティブ run のゲーム名と解説者名が描画されていることを確認。
+		await expect(page.getByText("Super Mario World")).toBeVisible();
+		await expect(page.getByText("Commentator One")).toBeVisible();
+		await waitForImages(page);
+
+		await expect(page).toHaveScreenshot("SM64.png");
+	});
+
 	test("ScheduleList レイアウト", async ({page, nodecg}) => {
 		await nodecg.gotoGraphics("setup.html");
 
