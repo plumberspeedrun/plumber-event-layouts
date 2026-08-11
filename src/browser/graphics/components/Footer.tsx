@@ -15,6 +15,7 @@ const footerStyle: CSSProperties = {
 	fontFamily: '"M PLUS 1p"',
 	fontWeight: 900,
 	color: "white",
+	zIndex: 1001,
 };
 
 export const Footer = () => {

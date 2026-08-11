@@ -1,10 +1,13 @@
 import type {ActiveRunId} from "../src/nodecg/generated/activeRunId";
+import type {AdImage} from "../src/nodecg/generated/adImage";
+import type {CameraVisible} from "../src/nodecg/generated/cameraVisible";
 import type {Nsmb} from "../src/nodecg/generated/nsmb";
 import type {RunDataArray} from "../src/nodecg/generated/runDataArray";
 import type {Timer} from "../src/nodecg/generated/timer";
 import {
 	sampleActiveRunId,
 	sampleActiveRunIdForTimer,
+	sampleAdImageAsset,
 	sampleNsmb,
 	sampleRunDataArray,
 	sampleRunForTimer,
@@ -280,6 +283,70 @@ test.describe("dashboard", () => {
 				})
 				.toBe("Super Mario World 2");
 			await expect(page.getByText("Super Mario World 2")).toBeVisible();
+		});
+	});
+
+	test.describe("カメラ", () => {
+		test("スイッチでカメラ表示を切り替えられる", async ({page, nodecg}) => {
+			await nodecg.gotoDashboard("overview.html");
+			// 前回実行時の永続化値に依存しないよう、OFF から開始する。
+			await nodecg.setReplicant("cameraVisible", false);
+
+			await expect(page.getByRole("heading", {name: "カメラ"})).toBeVisible();
+			await expect(page.getByRole("switch")).not.toBeChecked();
+
+			// ON にすると cameraVisible が true になる。
+			await page.getByRole("switch").click();
+			await expect
+				.poll(async () => nodecg.readReplicant<CameraVisible>("cameraVisible"))
+				.toBe(true);
+
+			// OFF に戻すと false になる。
+			await page.getByRole("switch").click();
+			await expect
+				.poll(async () => nodecg.readReplicant<CameraVisible>("cameraVisible"))
+				.toBe(false);
+		});
+	});
+
+	test.describe("宣伝画像", () => {
+		test("画像を選択して表示・非表示できる", async ({page, nodecg}) => {
+			await nodecg.gotoDashboard("overview.html");
+			await nodecg.setReplicant("assets:adImage", sampleAdImageAsset);
+			// 前回実行時の永続化値に依存しないよう、初期状態にリセットする。
+			await nodecg.setReplicant("adImage", {name: null, visible: false});
+
+			// 初期状態: 画像未選択のため表示ボタンが無効。
+			await expect(
+				page.getByRole("button", {name: "表示", exact: true}),
+			).toBeDisabled();
+
+			// ドロップダウンから画像を選択すると選択中の画像名が反映される。
+			await page.getByLabel("画像").click();
+			await page.getByRole("option", {name: "test-ad"}).click();
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<AdImage>("adImage"))?.name,
+				)
+				.toBe("test-ad");
+
+			// 表示ボタンで visible が true になり、状態表示が切り替わる。
+			await page.getByRole("button", {name: "表示", exact: true}).click();
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<AdImage>("adImage"))?.visible,
+				)
+				.toBe(true);
+			await expect(page.getByText("表示中: test-ad")).toBeVisible();
+
+			// 非表示ボタンで visible が false になる。
+			await page.getByRole("button", {name: "非表示", exact: true}).click();
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<AdImage>("adImage"))?.visible,
+				)
+				.toBe(false);
+			await expect(page.getByText("表示中: test-ad")).toBeHidden();
 		});
 	});
 });

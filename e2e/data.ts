@@ -1,4 +1,5 @@
 import type {ActiveRunId} from "../src/nodecg/generated/activeRunId";
+import type {AdImage} from "../src/nodecg/generated/adImage";
 import type {CameraVisible} from "../src/nodecg/generated/cameraVisible";
 import type {Nsmb} from "../src/nodecg/generated/nsmb";
 import type {RunDataArray} from "../src/nodecg/generated/runDataArray";
@@ -45,6 +46,23 @@ export const sampleLogoAsset: Assets[] = [
 		url: solidSvg(500, 200, "#e0552b"),
 	},
 ];
+
+/** 宣伝画像。16:9 とは異なる比率で、contain 表示の余白（透け）を検証できるようにする。 */
+export const sampleAdImageAsset: Assets[] = [
+	{
+		base: "test-ad",
+		category: "adImage",
+		ext: ".svg",
+		name: "test-ad",
+		namespace: "plumber-event-layouts",
+		url: solidSvg(900, 600, "#d4a017"),
+	},
+];
+
+export const sampleAdImageOverlay: AdImage = {
+	name: "test-ad",
+	visible: true,
+};
 
 export const sampleTimer: Timer = {
 	time: "00:12:34",

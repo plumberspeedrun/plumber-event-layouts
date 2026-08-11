@@ -74,7 +74,7 @@
 		"dashboardPanels": [
 			{
 				"name": "overview",
-				"title": "タイマー・スケジュール",
+				"title": "0-配信管理",
 				"file": "overview.html",
 				"fullbleed": true,
 				"headerColor": "#525F78"
@@ -93,14 +93,6 @@
 				"width": 4,
 				"file": "nsmb.html",
 				"workspace": "NSMB",
-				"headerColor": "#525F78"
-			},
-			{
-				"name": "camera",
-				"title": "カメラ",
-				"width": 4,
-				"file": "camera.html",
-				"workspace": "Camera",
 				"headerColor": "#525F78"
 			}
 		],
@@ -182,6 +174,11 @@
 				"name": "background",
 				"title": "レイアウト画像",
 				"allowedTypes": ["svg", "png"]
+			},
+			{
+				"name": "adImage",
+				"title": "宣伝画像",
+				"allowedTypes": ["png", "jpg", "jpeg", "webp", "svg"]
 			}
 		]
 	}

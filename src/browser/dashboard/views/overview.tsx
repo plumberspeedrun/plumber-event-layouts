@@ -1,5 +1,7 @@
 import {Box, Divider, Stack} from "@mui/material";
 import {renderDashboard} from "../index";
+import {AdImageControl} from "../sections/AdImageControl";
+import {CameraControl} from "../sections/CameraControl";
 import {Schedule} from "../sections/Schedule";
 import {TimerControl} from "../sections/TimerControl";
 
@@ -18,6 +20,15 @@ const Overview = () => (
 		/>
 		<Box sx={{flex: 1, minWidth: 0}}>
 			<Schedule />
+		</Box>
+		<Divider
+			orientation='vertical'
+			flexItem
+		/>
+		<Box sx={{flex: 1, minWidth: 0}}>
+			<CameraControl />
+			<Divider />
+			<AdImageControl />
 		</Box>
 	</Stack>
 );

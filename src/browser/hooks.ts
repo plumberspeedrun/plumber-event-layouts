@@ -1,5 +1,6 @@
 import {useReplicant} from "@nodecg/react-hooks";
 import type {ActiveRunId} from "../nodecg/generated/activeRunId";
+import type {AdImage} from "../nodecg/generated/adImage";
 import type {CameraVisible} from "../nodecg/generated/cameraVisible";
 import type {Nsmb} from "../nodecg/generated/nsmb";
 import type {ObsConfig} from "../nodecg/generated/obsConfig";
@@ -109,6 +110,15 @@ export const useBackgroundAsset = () => {
 export const useLogoAsset = () => {
 	const [assets] = useReplicant<Assets[]>("assets:logo");
 	return assets?.[0];
+};
+
+export const useAdImage = () => {
+	return useReplicant<AdImage>("adImage");
+};
+
+export const useAdImageAssets = () => {
+	const [assets] = useReplicant<Assets[]>("assets:adImage");
+	return assets ?? [];
 };
 
 export const useObsScenes = () => {

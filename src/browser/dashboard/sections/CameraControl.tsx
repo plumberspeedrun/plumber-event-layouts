@@ -1,18 +1,17 @@
 import {Stack, Switch, Typography} from "@mui/material";
 import {useCameraVisible} from "../../hooks";
 import {Panel} from "../components";
-import {renderDashboard} from "../index";
 
-const Camera = () => {
+export const CameraControl = () => {
 	const [visible, setVisible] = useCameraVisible();
 
 	return (
-		<Panel height={460}>
+		<Panel>
 			<Stack
 				direction='row'
 				sx={{justifyContent: "space-between", alignItems: "center"}}
 			>
-				<Typography variant='subtitle1'>カメラ</Typography>
+				<Typography variant='h6'>カメラ</Typography>
 				<Switch
 					checked={visible ?? true}
 					onChange={(e) => setVisible(e.target.checked)}
@@ -28,5 +27,3 @@ const Camera = () => {
 		</Panel>
 	);
 };
-
-renderDashboard(<Camera />);
