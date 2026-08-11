@@ -8,6 +8,7 @@ import {
 	sampleActiveRunId,
 	sampleActiveRunIdForTimer,
 	sampleAdImageAsset,
+	sampleAdImageOverlay,
 	sampleNsmb,
 	sampleRunDataArray,
 	sampleRunForTimer,
@@ -397,6 +398,34 @@ test.describe("dashboard", () => {
 				)
 				.toBe(false);
 			await expect(page.getByText("表示中: test-ad")).toBeHidden();
+		});
+
+		test("アクティブな走行を切り替えると宣伝画像が非表示になる", async ({
+			page,
+			nodecg,
+		}) => {
+			await nodecg.gotoDashboard("overview.html");
+			await nodecg.setReplicant("assets:adImage", sampleAdImageAsset);
+			await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+			await nodecg.setReplicant("activeRunId", sampleActiveRunId);
+			// 表示中の宣伝画像を設定する。
+			await nodecg.setReplicant("adImage", sampleAdImageOverlay);
+			await expect(page.getByText("表示中: test-ad")).toBeVisible();
+
+			// カーソルを run-2 へ移動し、アクティブに切り替える。
+			await page.getByRole("button", {name: "次へ"}).click();
+			await expect(page.getByText("Super Metroid")).toBeVisible();
+			await page.getByRole("button", {name: "アクティブにする"}).click();
+			await expect
+				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
+				.toBe("run-2");
+
+			// アクティブの切り替えで宣伝画像が非表示になる。
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<AdImage>("adImage"))?.visible,
+				)
+				.toBe(false);
 		});
 	});
 });

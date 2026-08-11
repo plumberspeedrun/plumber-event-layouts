@@ -2,6 +2,7 @@ import type {CSSProperties} from "react";
 import {useActiveRun, useBackgroundAsset, useCameraVisible} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
+import {AdImageOverlay} from "../components/AdImageOverlay";
 import {CameraOffIcon} from "../components/CameraOffIcon";
 import {
 	Commentator,
@@ -203,6 +204,7 @@ const App = () => {
 					/>
 				);
 			})}
+			<AdImageOverlay />
 		</BaseLayout>
 	);
 };

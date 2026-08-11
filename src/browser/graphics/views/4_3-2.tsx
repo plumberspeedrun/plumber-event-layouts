@@ -4,6 +4,7 @@ import commentatorIcon from "../../assets/icons/commentator.svg";
 import {useActiveRun, useBackgroundAsset, useCameraVisible} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
+import {AdImageOverlay} from "../components/AdImageOverlay";
 import {CameraOffIcon} from "../components/CameraOffIcon";
 import {GameInfo} from "../components/GameInfo";
 import {Logo} from "../components/Logo";
@@ -206,6 +207,7 @@ const App = () => {
 					/>
 				);
 			})}
+			<AdImageOverlay />
 		</BaseLayout>
 	);
 };

@@ -142,4 +142,41 @@ test.describe("visual regression", () => {
 
 		await expect(page).toHaveScreenshot("16_9-4-ad-overlay.png");
 	});
+
+	// 16_9-4 以外の全レイアウトにも宣伝画像オーバーレイが表示される。
+	for (const file of [
+		"4_3-1.html",
+		"4_3-2.html",
+		"4_3-4.html",
+		"SM64.html",
+		"16_9-1.html",
+		"16_9-2.html",
+		"nsmb_4_3.html",
+		"nsmb_16_9.html",
+		"nsmb_ds.html",
+		"nsmb_3ds.html",
+		"setup.html",
+	]) {
+		test(`${file} レイアウト（宣伝画像オーバーレイ表示）`, async ({
+			page,
+			nodecg,
+		}) => {
+			await nodecg.gotoGraphics(file);
+
+			// 背景・ロゴ・カメラ・run データ、アクティブ run、宣伝画像を注入して描画させる。
+			await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
+			await nodecg.setReplicant("assets:logo", sampleLogoAsset);
+			await nodecg.setReplicant("assets:adImage", sampleAdImageAsset);
+			await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
+			await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+			await nodecg.setReplicant("activeRunId", sampleActiveRunId);
+			await nodecg.setReplicant("adImage", sampleAdImageOverlay);
+
+			// 宣伝画像オーバーレイが最前面（position: fixed / z-index）で表示される。
+			const overlay = page.getByTestId("ad-image-overlay");
+			await expect(overlay).toBeVisible();
+			await expect(overlay).toHaveCSS("position", "fixed");
+			await expect(overlay).toHaveCSS("z-index", "1000");
+		});
+	}
 });

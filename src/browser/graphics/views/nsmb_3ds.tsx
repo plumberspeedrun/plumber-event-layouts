@@ -2,6 +2,7 @@ import type {CSSProperties} from "react";
 import {useBackgroundAsset, useCameraVisible, useNsmb} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
+import {AdImageOverlay} from "../components/AdImageOverlay";
 import {CameraOffIcon} from "../components/CameraOffIcon";
 import {
 	Commentator,
@@ -201,6 +202,7 @@ const App = () => {
 					style={{width: 380, justifySelf: "center"}}
 				/>
 			</div>
+			<AdImageOverlay />
 		</BaseLayout>
 	);
 };

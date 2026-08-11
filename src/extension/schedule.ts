@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import type NodeCG from "nodecg/types";
 import type {ActiveRunId} from "../nodecg/generated/activeRunId.js";
+import type {AdImage} from "../nodecg/generated/adImage.js";
 import type {Configschema} from "../nodecg/generated/configschema.js";
 import type {RunDataArray} from "../nodecg/generated/runDataArray.js";
 import type {SheetStaff} from "../nodecg/generated/sheetStaff.js";
@@ -34,6 +35,7 @@ type AddRunInput = {
 export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	const runDataArrayRep = nodecg.Replicant<RunDataArray>("runDataArray");
 	const activeRunIdRep = nodecg.Replicant<ActiveRunId>("activeRunId");
+	const adImageRep = nodecg.Replicant<AdImage>("adImage");
 	const sheetStaffRep = nodecg.Replicant<SheetStaff>("sheetStaff");
 
 	// アクティブな走行が存在しない（または削除済み）場合に、先頭の走行をアクティブに設定する。
@@ -57,6 +59,11 @@ export const schedule = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 	activeRunIdRep.on("change", (newVal) => {
 		if (newVal == null) {
 			reconcileActiveRun();
+		}
+		// アクティブな走行が切り替わったら、宣伝画像を非表示に戻す。
+		const adImage = adImageRep.value;
+		if (adImage?.visible) {
+			adImageRep.value = {...adImage, visible: false};
 		}
 	});
 	reconcileActiveRun();

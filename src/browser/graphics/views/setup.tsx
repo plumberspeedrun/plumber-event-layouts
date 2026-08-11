@@ -1,6 +1,7 @@
 import {useBackgroundAsset, useCameraVisible} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
+import {AdImageOverlay} from "../components/AdImageOverlay";
 import {CameraOffIcon} from "../components/CameraOffIcon";
 import {Logo} from "../components/Logo";
 import {ScheduleList} from "../components/ScheduleList";
@@ -49,6 +50,7 @@ const App = () => {
 			/>
 			{!cameraOn && <CameraOffIcon {...CAMERA_RECT} />}
 			<ScheduleList />
+			<AdImageOverlay />
 		</BaseLayout>
 	);
 };

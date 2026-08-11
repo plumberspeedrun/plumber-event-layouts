@@ -4,6 +4,7 @@ import gamepadIcon from "../../assets/icons/gamepad.svg";
 import {useActiveRun, useBackgroundAsset, useCameraVisible} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
+import {AdImageOverlay} from "../components/AdImageOverlay";
 import {CameraOffIcon} from "../components/CameraOffIcon";
 import {GameInfo} from "../components/GameInfo";
 import {Logo} from "../components/Logo";
@@ -141,6 +142,7 @@ const App = () => {
 					style={{width: 380, justifySelf: "center"}}
 				/>
 			</div>
+			<AdImageOverlay />
 		</BaseLayout>
 	);
 };
