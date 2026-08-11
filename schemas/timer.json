@@ -15,6 +15,10 @@
 		},
 		"timestamp": {
 			"type": "number"
+		},
+		"startedAt": {
+			"type": ["number", "null"],
+			"description": "現在の走行セグメントの開始時刻。一時停止・終了時は null。"
 		}
 	},
 	"required": ["time", "state", "milliseconds", "timestamp"],
@@ -22,6 +26,7 @@
 		"time": "00:00:00",
 		"state": "stopped",
 		"milliseconds": 0,
-		"timestamp": 0
+		"timestamp": 0,
+		"startedAt": null
 	}
 }

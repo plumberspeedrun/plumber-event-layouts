@@ -11,4 +11,8 @@ export interface Timer {
 	state: "stopped" | "running" | "paused" | "finished";
 	milliseconds: number;
 	timestamp: number;
+	/**
+	 * 現在の走行セグメントの開始時刻。一時停止・終了時は null。
+	 */
+	startedAt?: number | null;
 }

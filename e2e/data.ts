@@ -69,6 +69,7 @@ export const sampleTimer: Timer = {
 	state: "running",
 	milliseconds: 754000,
 	timestamp: 0,
+	startedAt: 0,
 };
 
 export const sampleCameraVisible: CameraVisible = true;

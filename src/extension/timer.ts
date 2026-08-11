@@ -4,6 +4,45 @@ import type {Configschema} from "../nodecg/generated/configschema.js";
 import type {RunDataArray} from "../nodecg/generated/runDataArray.js";
 import type {Timer} from "../nodecg/generated/timer.js";
 
+export type RestoredTimerState = {
+	accumulatedMs: number;
+	startedAt: number | null;
+};
+
+/**
+ * 永続化されたタイマー値から、サーバー再起動時の in-memory 状態を復元する。
+ * `running` の場合はセグメント開始時刻からの差分で経過時間を再構成するため、
+ * サーバー停止期間も経過時間に含まれる。
+ */
+export const restoreTimerState = (
+	persisted: Timer,
+	now: number,
+): RestoredTimerState => {
+	if (persisted.state === "running") {
+		const started = persisted.startedAt;
+		if (
+			started != null &&
+			Number.isFinite(started) &&
+			persisted.timestamp >= started &&
+			started <= now
+		) {
+			return {
+				accumulatedMs: persisted.milliseconds - (persisted.timestamp - started),
+				startedAt: started,
+			};
+		}
+		// startedAt を持たない旧データ等は、ダウンタイムを積算して再開する。
+		return {
+			accumulatedMs: persisted.milliseconds + (now - persisted.timestamp),
+			startedAt: now,
+		};
+	}
+	if (persisted.state === "paused" || persisted.state === "finished") {
+		return {accumulatedMs: persisted.milliseconds, startedAt: null};
+	}
+	return {accumulatedMs: 0, startedAt: null};
+};
+
 const formatTime = (ms: number): string => {
 	const totalSeconds = Math.floor(ms / 1000);
 	const hours = Math.floor(totalSeconds / 3600);
@@ -24,6 +63,7 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 			state: "stopped",
 			milliseconds: 0,
 			timestamp: 0,
+			startedAt: null,
 		},
 	});
 
@@ -59,6 +99,7 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 		timerReplicant.value.time = formatTime(ms);
 		timerReplicant.value.milliseconds = ms;
 		timerReplicant.value.timestamp = Date.now();
+		timerReplicant.value.startedAt = null;
 		timerReplicant.value.state = "finished";
 	};
 
@@ -69,6 +110,7 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 		timerReplicant.value.time = formatTime(ms);
 		timerReplicant.value.milliseconds = ms;
 		timerReplicant.value.timestamp = Date.now();
+		timerReplicant.value.startedAt = startedAt;
 		timerReplicant.value.state = "running";
 	};
 
@@ -95,13 +137,14 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 
 	nodecg.listenFor("timerPause", (_data, ack) => {
 		try {
-			if (timerReplicant.value.state === "running") {
-				accumulatedMs += Date.now() - startedAt!;
+			if (timerReplicant.value.state === "running" && startedAt != null) {
+				accumulatedMs += Date.now() - startedAt;
 				startedAt = null;
 				stopTick();
 				timerReplicant.value.time = formatTime(accumulatedMs);
 				timerReplicant.value.milliseconds = accumulatedMs;
 				timerReplicant.value.timestamp = Date.now();
+				timerReplicant.value.startedAt = null;
 				timerReplicant.value.state = "paused";
 			}
 			if (ack && !ack.handled) ack(null);
@@ -120,6 +163,7 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 				state: "stopped",
 				milliseconds: 0,
 				timestamp: 0,
+				startedAt: null,
 			};
 
 			const run = getActiveRun();
@@ -199,4 +243,13 @@ export const timer = (nodecg: NodeCG.ServerAPI<Configschema>) => {
 			if (ack && !ack.handled) ack(err as Error);
 		}
 	});
+
+	// サーバー再起動時、永続化されたタイマー状態から in-memory 状態を復元する。
+	const restored = restoreTimerState(timerReplicant.value, Date.now());
+	accumulatedMs = restored.accumulatedMs;
+	startedAt = restored.startedAt;
+	timerReplicant.value.startedAt = restored.startedAt;
+	if (timerReplicant.value.state === "running") {
+		startTick();
+	}
 };
