@@ -1,4 +1,20 @@
 services:
+  caddy:
+    image: caddy:2
+    container_name: plumber-event-layouts-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Caddyfile はホストの実ディレクトリを直接マウントし、ドメイン変更をデプロイなしで反映する
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Let's Encrypt 証明書と Caddy の設定を永続化する
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - nodecg
+
   nodecg:
     build:
       context: .
@@ -6,8 +22,9 @@ services:
     image: plumber-event-layouts:latest
     container_name: plumber-event-layouts
     restart: unless-stopped
-    ports:
-      - "9090:9090"
+    # 公開面は Caddy に任せるため、ホストへは公開しない
+    expose:
+      - "9090"
     volumes:
       # cfg はホストの実ディレクトリを直接マウントし、イメージ再ビルドなしで編集可能にする
       - ./cfg:/app/cfg
@@ -20,3 +37,5 @@ volumes:
   nodecg-db:
   nodecg-assets:
   nodecg-logs:
+  caddy-data:
+  caddy-config:

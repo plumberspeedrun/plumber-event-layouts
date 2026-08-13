@@ -1,0 +1,4 @@
+# デプロイ時に実際のドメインへ置き換えること
+your-event-domain.example.com {
+	reverse_proxy nodecg:9090
+}
