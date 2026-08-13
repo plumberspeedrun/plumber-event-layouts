@@ -91,6 +91,31 @@
 				}
 			},
 			"required": ["credentialsPath", "spreadsheetId"]
+		},
+		"spotify": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"clientId": {
+					"type": "string"
+				},
+				"clientSecret": {
+					"type": "string"
+				},
+				"redirectUri": {
+					"type": "string",
+					"default": "http://127.0.0.1:9090/spotify/callback"
+				},
+				"pollIntervalMs": {
+					"type": "number",
+					"default": 5000
+				},
+				"tokensPath": {
+					"type": "string",
+					"default": "./cfg/spotify-tokens.json"
+				}
+			},
+			"required": ["clientId", "clientSecret"]
 		}
 	}
 }

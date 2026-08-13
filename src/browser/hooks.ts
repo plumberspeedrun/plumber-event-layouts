@@ -6,6 +6,8 @@ import type {Nsmb} from "../nodecg/generated/nsmb";
 import type {ObsConfig} from "../nodecg/generated/obsConfig";
 import type {RunDataArray} from "../nodecg/generated/runDataArray";
 import type {SheetStaff} from "../nodecg/generated/sheetStaff";
+import type {SpotifyPlayback} from "../nodecg/generated/spotifyPlayback";
+import type {SpotifyStatus} from "../nodecg/generated/spotifyStatus";
 import type {SpreadsheetStatus} from "../nodecg/generated/spreadsheetStatus";
 import type {Timer} from "../nodecg/generated/timer";
 import type {Assets} from "../types/assets";
@@ -131,4 +133,16 @@ export const useObsScenes = () => {
 
 export const useObsConfig = () => {
 	return useReplicant<ObsConfig>("obsConfig");
+};
+
+export const useSpotifyPlayback = () => {
+	const [playback] = useReplicant<SpotifyPlayback>("spotifyPlayback");
+	if (playback == null) return;
+	return playback;
+};
+
+export const useSpotifyStatus = () => {
+	const [status] = useReplicant<SpotifyStatus>("spotifyStatus");
+	if (status == null) return;
+	return status;
 };

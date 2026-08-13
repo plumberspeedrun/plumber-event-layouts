@@ -5,7 +5,7 @@
 	"scripts": {
 		"start": "npx nodecg start",
 		"dev": "run-p dev:*",
-		"dev:tsc": "tsc -b src/extension -w --preserveWatchOutput",
+		"dev:tsc": "tsc -b src/extension -w --preserveWatchOutput --noEmit",
 		"dev:vite": "vite",
 		"dev:nodecg": "npx nodecg start",
 		"typecheck": "tsc -b src/extension --noEmit && tsc -p src/browser/tsconfig.json",
@@ -84,6 +84,14 @@
 				"title": "スプレッドシート",
 				"width": 4,
 				"file": "spreadsheetView.html",
+				"workspace": "外部連携",
+				"headerColor": "#525F78"
+			},
+			{
+				"name": "spotifyView",
+				"title": "Spotify",
+				"width": 4,
+				"file": "spotifyView.html",
 				"workspace": "外部連携",
 				"headerColor": "#525F78"
 			},

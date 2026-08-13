@@ -1,0 +1,32 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"authorized": {
+			"type": "boolean",
+			"default": false
+		},
+		"user": {
+			"type": ["object", "null"],
+			"additionalProperties": false,
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"displayName": {
+					"type": "string"
+				}
+			},
+			"required": ["id", "displayName"]
+		},
+		"lastSynced": {
+			"type": "string"
+		},
+		"lastError": {
+			"type": "string"
+		}
+	},
+	"required": ["authorized"],
+	"default": { "authorized": false }
+}

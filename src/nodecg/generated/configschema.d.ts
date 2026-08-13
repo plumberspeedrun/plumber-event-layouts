@@ -30,4 +30,11 @@ export interface Configschema {
 		scheduleSheetName?: string;
 		nsmbSheetName?: string;
 	};
+	spotify?: {
+		clientId: string;
+		clientSecret: string;
+		redirectUri?: string;
+		pollIntervalMs?: number;
+		tokensPath?: string;
+	};
 }
