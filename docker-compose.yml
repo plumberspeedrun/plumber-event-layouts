@@ -1,0 +1,22 @@
+services:
+  nodecg:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: plumber-event-layouts:latest
+    container_name: plumber-event-layouts
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      # cfg はホストの実ディレクトリを直接マウントし、イメージ再ビルドなしで編集可能にする
+      - ./cfg:/app/cfg
+      # db / assets / logs は named volume で永続化する
+      - nodecg-db:/app/db
+      - nodecg-assets:/app/assets
+      - nodecg-logs:/app/logs
+
+volumes:
+  nodecg-db:
+  nodecg-assets:
+  nodecg-logs:

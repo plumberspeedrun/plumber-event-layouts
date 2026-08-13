@@ -58,6 +58,42 @@ pnpm run clean
 
 生成された `dashboard/`・`graphics/`・`extension/`・`db/` ディレクトリを削除します。
 
+## 本番デプロイ（Docker Compose）
+
+Docker コンテナで本番環境を起動できます。サブモジュールを含めて clone してください。
+
+```bash
+git clone --recurse-submodules git@github.com:plumberspeedrun/plumber-event-layouts.git
+cd plumber-event-layouts
+```
+
+### 設定（cfg）
+
+`cfg/` はホストの実ディレクトリをコンテナに bind mount しています。イメージの再ビルド（再デプロイ）なしで、ホスト側の `cfg/` を編集し、コンテナを再起動するだけで設定が反映されます。
+
+```bash
+docker compose up -d --build   # 初回ビルド＆起動
+# 設定変更時
+docker compose restart
+```
+
+### 永続化
+
+| パス | 方式 | 内容 |
+|------|------|------|
+| `cfg/` | bind mount（`./cfg`） | バンドル設定・認証情報（起動時に読込） |
+| `db/` | named volume（`nodecg-db`） | NodeCG のデータベース |
+| `assets/` | named volume（`nodecg-assets`） | ダッシュボードからアップロードしたアセット |
+| `logs/` | named volume（`nodecg-logs`） | ログ |
+
+```bash
+docker compose logs -f   # ログ確認
+docker compose down      # 停止（volume は保持される）
+```
+
+- コンテナの NodeCG はポート `9090` で待ち受けます（`http://<ホスト>:9090`）。
+- `cfg/`・`db/`・`assets/` を完全に削除する場合は `docker compose down -v` を実行してください（volume ごと削除されます）。
+
 ## 開発
 
 ### スキーマ型の再生成

@@ -1,0 +1,33 @@
+node_modules
+.git
+.gitmodules
+**/.git
+
+# ビルド成果物（Docker 内で再生成）
+dashboard
+graphics
+extension
+shared/dist
+
+# 実行時データ（ボリュームで管理）
+cfg
+db
+assets
+logs
+
+# テスト・開発のみ
+test-results
+playwright-report
+blob-report
+*.tsbuildinfo
+.claude
+.agents
+.github
+e2e
+playwright.config.ts
+docs
+
+# NodeCG スキーマ生成物
+types/schemas
+
+*.local.*
