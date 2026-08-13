@@ -34,11 +34,10 @@ const rowStyle: CSSProperties = {
 	alignItems: "center",
 	gap: 16,
 	padding: "10px 16px",
-	borderRadius: 12,
-	background: "rgba(255, 255, 255, 0.75)",
+	background: "rgba(45, 85, 115, 0.65)",
 	marginBottom: 6,
 	fontSize: 26,
-	color: "#222",
+	color: "white",
 };
 
 const timeStyle: CSSProperties = {
@@ -47,7 +46,7 @@ const timeStyle: CSSProperties = {
 	fontSize: 30,
 	flexShrink: 0,
 	fontVariantNumeric: "tabular-nums",
-	color: "#333",
+	color: "white",
 };
 
 const gameStyle: CSSProperties = {
@@ -64,17 +63,17 @@ const gameTitleRowStyle: CSSProperties = {
 };
 
 const hyphenStyle: CSSProperties = {
-	color: "#333",
+	color: "white",
 };
 
 const categoryStyle: CSSProperties = {
 	fontSize: 24,
-	color: "#333",
+	color: "white",
 };
 
 const runnerStyle: CSSProperties = {
 	fontSize: 24,
-	color: "#333",
+	color: "white",
 };
 
 export const ScheduleList = () => {
