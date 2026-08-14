@@ -58,7 +58,7 @@ export const TimerControl = () => {
 			<Stack
 				direction='row'
 				spacing={1}
-				sx={{justifyContent: "center"}}
+				sx={{justifyContent: "center", flexWrap: "wrap"}}
 			>
 				<Button
 					variant='contained'
@@ -97,7 +97,7 @@ export const TimerControl = () => {
 									<Stack
 										direction='row'
 										spacing={1}
-										sx={{alignItems: "center", py: 1}}
+										sx={{alignItems: "center", py: 1, flexWrap: "wrap"}}
 									>
 										<Typography sx={{flex: 1}}>
 											{team.name ?? team.players.map((p) => p.name).join(", ")}

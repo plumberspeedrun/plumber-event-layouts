@@ -36,6 +36,7 @@ export const Row = ({
 		sx={(theme) => ({
 			display: "flex",
 			alignItems: "center",
+			flexWrap: "wrap",
 			gap: 1,
 			p: 0.75,
 			backgroundColor: active ? "#e2f0e2" : "background.paper",
