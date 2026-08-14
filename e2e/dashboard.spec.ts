@@ -72,10 +72,12 @@ test.describe("dashboard", () => {
 			// 走行中は時間が進む。
 			const msRunning = (await nodecg.readReplicant<Timer>("timer"))
 				?.milliseconds;
-			await page.waitForTimeout(300);
-			const msAfterWait = (await nodecg.readReplicant<Timer>("timer"))
-				?.milliseconds;
-			expect(msAfterWait).toBeGreaterThan(msRunning ?? 0);
+			await expect
+				.poll(
+					async () =>
+						(await nodecg.readReplicant<Timer>("timer"))?.milliseconds ?? 0,
+				)
+				.toBeGreaterThan(msRunning ?? 0);
 
 			await page.getByRole("button", {name: "一時停止"}).click();
 			await expect
@@ -205,10 +207,12 @@ test.describe("dashboard", () => {
 			expect(msAfterCancel).toBeGreaterThanOrEqual(msFinished + 400);
 
 			// 再開後も時間が進む。
-			await page.waitForTimeout(300);
-			const msResumed = (await nodecg.readReplicant<Timer>("timer"))
-				?.milliseconds;
-			expect(msResumed).toBeGreaterThan(msAfterCancel ?? 0);
+			await expect
+				.poll(
+					async () =>
+						(await nodecg.readReplicant<Timer>("timer"))?.milliseconds ?? 0,
+				)
+				.toBeGreaterThan(msAfterCancel ?? 0);
 		});
 	});
 
@@ -291,6 +295,11 @@ test.describe("dashboard", () => {
 							?.obsSceneName,
 				)
 				.toBe("SM64 N64/Switch");
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<Sm64>("sm64"))?.activeIndex,
+				)
+				.toBe(0);
 			await expect(
 				page.getByRole("button", {
 					name: "マリオ軍: N64 - ルイージ軍: N64",
@@ -331,6 +340,11 @@ test.describe("dashboard", () => {
 				),
 			};
 			await nodecg.setReplicant("sm64", sm64WithoutScene);
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<Sm64>("sm64"))?.activeIndex,
+				)
+				.toBe(0);
 			await expect(
 				page.getByRole("button", {
 					name: "マリオ軍: N64 - ルイージ軍: N64",
@@ -541,7 +555,8 @@ test.describe("dashboard", () => {
 			await nodecg.setReplicant("assets:adImage", sampleAdImageAsset);
 			await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 			await nodecg.setReplicant("activeRunId", sampleActiveRunId);
-			// 表示中の宣伝画像を設定する。
+			// 走行切替時の非表示処理が完了してから宣伝画像を設定する。
+			await expect(page.getByText("Super Mario World")).toBeVisible();
 			await nodecg.setReplicant("adImage", sampleAdImageOverlay);
 			await expect(page.getByText("表示中: test-ad")).toBeVisible();
 

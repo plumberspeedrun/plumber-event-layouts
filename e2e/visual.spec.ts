@@ -100,6 +100,33 @@ test.describe("visual regression", () => {
 		await expect(page).toHaveScreenshot("SM64-camera-off.png");
 	});
 
+	test("camera レイアウト", async ({page, nodecg}) => {
+		await nodecg.gotoGraphics("camera.html");
+
+		// 背景・カメラ・宣伝画像を注入して描画させる。
+		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
+		await nodecg.setReplicant("assets:adImage", sampleAdImageAsset);
+		await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
+		await nodecg.setReplicant("adImage", sampleAdImageOverlay);
+
+		await waitForImages(page);
+
+		await expect(page).toHaveScreenshot("camera.png");
+	});
+
+	test("camera レイアウト（カメラOFF）", async ({page, nodecg}) => {
+		await nodecg.gotoGraphics("camera.html");
+
+		// カメラを OFF にして、カメラオフアイコンが表示されることを確認する。
+		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
+		await nodecg.setReplicant("cameraVisible", false);
+		await nodecg.setReplicant("adImage", {name: null, visible: false});
+
+		await waitForImages(page);
+
+		await expect(page).toHaveScreenshot("camera-off.png");
+	});
+
 	test("ScheduleList レイアウト", async ({page, nodecg}) => {
 		await nodecg.gotoGraphics("setup.html");
 
@@ -133,10 +160,11 @@ test.describe("visual regression", () => {
 		await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
 		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
-		await nodecg.setReplicant("adImage", sampleAdImageOverlay);
 
-		// アクティブ run のゲーム名が描画されていることを確認。
+		// アクティブ run の反映後に宣伝画像を表示する。走行切替時は Extension が
+		// 宣伝画像を非表示にするため、先に表示すると更新が競合する。
 		await expect(page.getByText("Super Mario World")).toBeVisible();
+		await nodecg.setReplicant("adImage", sampleAdImageOverlay);
 
 		// 宣伝画像オーバーレイが最前面（position: fixed / z-index）で、
 		// フッターを除いた領域の上下左右から 10px ずつ内側のボックスに、
@@ -184,13 +212,12 @@ test.describe("visual regression", () => {
 		}) => {
 			await nodecg.gotoGraphics(file);
 
-			// 背景・ロゴ・カメラ・run データ、アクティブ run、宣伝画像を注入して描画させる。
+			// 宣伝画像の表示確認に不要な走行状態は変更しない。activeRunId の変更時に
+			// Extension が宣伝画像を非表示にするため、同時に注入すると競合する。
 			await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
 			await nodecg.setReplicant("assets:logo", sampleLogoAsset);
 			await nodecg.setReplicant("assets:adImage", sampleAdImageAsset);
 			await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
-			await nodecg.setReplicant("runDataArray", sampleRunDataArray);
-			await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 			await nodecg.setReplicant("adImage", sampleAdImageOverlay);
 
 			// 宣伝画像オーバーレイが最前面（position: fixed / z-index）で表示される。
