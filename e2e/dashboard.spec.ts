@@ -3,6 +3,7 @@ import type {AdImage} from "../src/nodecg/generated/adImage";
 import type {CameraVisible} from "../src/nodecg/generated/cameraVisible";
 import type {Nsmb} from "../src/nodecg/generated/nsmb";
 import type {RunDataArray} from "../src/nodecg/generated/runDataArray";
+import type {Sm64} from "../src/nodecg/generated/sm64";
 import type {Timer} from "../src/nodecg/generated/timer";
 import {
 	sampleActiveRunId,
@@ -12,6 +13,7 @@ import {
 	sampleNsmb,
 	sampleRunDataArray,
 	sampleRunForTimer,
+	sampleSm64,
 } from "./data";
 import {expect, test} from "./fixtures";
 
@@ -265,6 +267,86 @@ test.describe("dashboard", () => {
 			await expect
 				.poll(
 					async () => (await nodecg.readReplicant<Nsmb>("nsmb"))?.activeIndex,
+				)
+				.toBe(1);
+
+			// 切替メッセージが送信されないことを確認する。
+			await page.waitForTimeout(500);
+			expect(await readChangeSceneMessages(page)).toEqual([]);
+		});
+	});
+
+	test.describe("SM64シーン切り替え", () => {
+		test("トグルボタン選択で OBS シーン切替メッセージが送信される", async ({
+			page,
+			nodecg,
+		}) => {
+			await nodecg.gotoDashboard("sm64.html");
+			await nodecg.setReplicant("sm64", sampleSm64);
+			// setReplicant の値が Replicant に反映されるのを待つ。
+			await expect
+				.poll(
+					async () =>
+						(await nodecg.readReplicant<Sm64>("sm64"))?.scenes?.[1]
+							?.obsSceneName,
+				)
+				.toBe("SM64 N64/Switch");
+			await expect(
+				page.getByRole("button", {
+					name: "マリオ軍: N64 - ルイージ軍: N64",
+				}),
+			).toHaveAttribute("aria-pressed", "true");
+
+			await collectChangeSceneMessages(page);
+
+			// トグルボタンで activeIndex 1 のシーンを選択する。
+			await page
+				.getByRole("button", {
+					name: "マリオ軍: N64 - ルイージ軍: Switch",
+				})
+				.click();
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<Sm64>("sm64"))?.activeIndex,
+				)
+				.toBe(1);
+
+			// activeIndex 1 の scenes には obsSceneName "SM64 N64/Switch" が設定されている。
+			await expect
+				.poll(() => readChangeSceneMessages(page))
+				.toEqual(["SM64 N64/Switch"]);
+		});
+
+		test("OBSシーン未設定のシーンでは切替メッセージを送信しない", async ({
+			page,
+			nodecg,
+		}) => {
+			await nodecg.gotoDashboard("sm64.html");
+
+			// activeIndex 1 のシーンに obsSceneName を持たないデータを注入する。
+			const sm64WithoutScene: Sm64 = {
+				...sampleSm64,
+				scenes: (sampleSm64.scenes ?? []).map((scene) =>
+					scene.obsSceneName != null ? {label: scene.label} : scene,
+				),
+			};
+			await nodecg.setReplicant("sm64", sm64WithoutScene);
+			await expect(
+				page.getByRole("button", {
+					name: "マリオ軍: N64 - ルイージ軍: N64",
+				}),
+			).toBeVisible();
+
+			await collectChangeSceneMessages(page);
+
+			await page
+				.getByRole("button", {
+					name: "マリオ軍: N64 - ルイージ軍: Switch",
+				})
+				.click();
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<Sm64>("sm64"))?.activeIndex,
 				)
 				.toBe(1);
 

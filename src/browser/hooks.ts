@@ -6,6 +6,7 @@ import type {Nsmb} from "../nodecg/generated/nsmb";
 import type {ObsConfig} from "../nodecg/generated/obsConfig";
 import type {RunDataArray} from "../nodecg/generated/runDataArray";
 import type {SheetStaff} from "../nodecg/generated/sheetStaff";
+import type {Sm64} from "../nodecg/generated/sm64";
 import type {SpotifyPlayback} from "../nodecg/generated/spotifyPlayback";
 import type {SpotifyStatus} from "../nodecg/generated/spotifyStatus";
 import type {SpreadsheetStatus} from "../nodecg/generated/spreadsheetStatus";
@@ -98,6 +99,16 @@ export const useNsmbActiveRelay = (): NsmbActiveRelay | undefined => {
 
 export const useNsmbReplicant = () => {
 	return useReplicant<Nsmb>("nsmb");
+};
+
+export const useSm64 = () => {
+	const [sm64] = useReplicant<Sm64>("sm64");
+	if (sm64 == null) return;
+	return sm64;
+};
+
+export const useSm64Replicant = () => {
+	return useReplicant<Sm64>("sm64");
 };
 
 export const useCameraVisible = () => {

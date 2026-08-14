@@ -1,0 +1,42 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"scenes": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"label": {
+						"type": "string"
+					},
+					"obsSceneName": {
+						"type": "string"
+					}
+				},
+				"required": ["label"]
+			},
+			"default": [
+				{ "label": "マリオ軍: N64 - ルイージ軍: N64" },
+				{ "label": "マリオ軍: N64 - ルイージ軍: Switch" },
+				{ "label": "マリオ軍: Switch - ルイージ軍: N64" },
+				{ "label": "マリオ軍: Switch - ルイージ軍: Switch" }
+			]
+		},
+		"activeIndex": {
+			"type": "integer",
+			"default": 0
+		}
+	},
+	"default": {
+		"scenes": [
+			{ "label": "マリオ軍: N64 - ルイージ軍: N64" },
+			{ "label": "マリオ軍: N64 - ルイージ軍: Switch" },
+			{ "label": "マリオ軍: Switch - ルイージ軍: N64" },
+			{ "label": "マリオ軍: Switch - ルイージ軍: Switch" }
+		],
+		"activeIndex": 0
+	}
+}

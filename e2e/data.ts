@@ -3,6 +3,7 @@ import type {AdImage} from "../src/nodecg/generated/adImage";
 import type {CameraVisible} from "../src/nodecg/generated/cameraVisible";
 import type {Nsmb} from "../src/nodecg/generated/nsmb";
 import type {RunDataArray} from "../src/nodecg/generated/runDataArray";
+import type {Sm64} from "../src/nodecg/generated/sm64";
 import type {SpreadsheetStatus} from "../src/nodecg/generated/spreadsheetStatus";
 import type {Timer} from "../src/nodecg/generated/timer";
 import type {Assets} from "../src/types/assets";
@@ -199,4 +200,18 @@ export const sampleNsmb: Nsmb = {
 export const sampleSpreadsheetStatus: SpreadsheetStatus = {
 	enabled: true,
 	lastSynced: "2026-06-21T00:00:00.000Z",
+};
+
+/** SM64用OBSシーン切替テスト用。obsSceneName は一部のシーンのみ設定する。 */
+export const sampleSm64: Sm64 = {
+	activeIndex: 0,
+	scenes: [
+		{label: "マリオ軍: N64 - ルイージ軍: N64"},
+		{
+			label: "マリオ軍: N64 - ルイージ軍: Switch",
+			obsSceneName: "SM64 N64/Switch",
+		},
+		{label: "マリオ軍: Switch - ルイージ軍: N64"},
+		{label: "マリオ軍: Switch - ルイージ軍: Switch"},
+	],
 };
