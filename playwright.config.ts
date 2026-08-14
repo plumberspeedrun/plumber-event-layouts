@@ -13,6 +13,7 @@ import {defineConfig, devices} from "@playwright/test";
 
 const PORT = 9090;
 const baseURL = `http://localhost:${PORT}`;
+const {CI} = process.env;
 
 export default defineConfig({
 	testDir: "./e2e",
@@ -39,8 +40,8 @@ export default defineConfig({
 	 * 決定的に失敗する。CI と同じく常に直列で実行する。
 	 */
 	fullyParallel: false,
-	forbidOnly: !!process.env.CI,
-	retries: process.env.CI ? 2 : 0,
+	forbidOnly: !!CI,
+	retries: CI ? 2 : 0,
 	workers: 1,
 	reporter: "html",
 	projects: [
@@ -54,7 +55,7 @@ export default defineConfig({
 	webServer: {
 		command: "pnpm build && pnpm start",
 		url: baseURL,
-		reuseExistingServer: !process.env.CI,
+		reuseExistingServer: !CI,
 		timeout: 180_000,
 		stdout: "pipe",
 		stderr: "pipe",
