@@ -2,7 +2,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import {
 	Box,
 	Button,
-	Chip,
 	Dialog,
 	DialogActions,
 	DialogContent,
@@ -1091,28 +1090,20 @@ export const Schedule = () => {
 	const [obsConfig, setObsConfig] = useObsConfig();
 	const [editingRunId, setEditingRunId] = useState<string | null>(null);
 	const [addingRun, setAddingRun] = useState(false);
-	const [cursorRunId, setCursorRunId] = useState<string | null>(null);
-	useEffect(() => {
-		if (cursorRunId == null && activeRun != null) {
-			setCursorRunId(activeRun.id);
-		}
-	}, [activeRun, cursorRunId]);
-	const displayedRun =
-		runDataArray?.find((r) => r.id === cursorRunId) ?? activeRun ?? null;
-	const isActive =
-		displayedRun?.id != null && displayedRun.id === activeRun?.id;
-	const cursorIndex =
-		runDataArray?.findIndex((r) => r.id === displayedRun?.id) ?? -1;
-	const handleMoveCursor = (delta: -1 | 1) => {
+	const displayedRun = activeRun ?? null;
+	const activeIndex =
+		runDataArray?.findIndex((r) => r.id === activeRun?.id) ?? -1;
+	const handleMoveActive = (delta: -1 | 1) => {
 		if (runDataArray == null) return;
-		const targetIndex = cursorIndex + delta;
+		const targetIndex = activeIndex + delta;
 		if (targetIndex >= 0 && targetIndex < runDataArray.length) {
-			setCursorRunId(runDataArray[targetIndex]!.id);
+			nodecg.sendMessage("obsSetupScene");
+			setTimeout(() => {
+				nodecg.sendMessage("scheduleSetActiveRun", {
+					id: runDataArray[targetIndex]!.id,
+				});
+			}, 2000);
 		}
-	};
-	const handleSetActive = () => {
-		if (displayedRun == null) return;
-		nodecg.sendMessage("scheduleSetActiveRun", {id: displayedRun.id});
 	};
 	return (
 		<Box sx={{display: "flex", flexDirection: "column", gap: 1, p: 1.5}}>
@@ -1122,17 +1113,17 @@ export const Schedule = () => {
 			>
 				<Button
 					variant='outlined'
-					disabled={cursorIndex <= 0}
-					onClick={() => handleMoveCursor(-1)}
+					disabled={activeIndex <= 0}
+					onClick={() => handleMoveActive(-1)}
 				>
 					前へ
 				</Button>
 				<Button
 					variant='outlined'
 					disabled={
-						cursorIndex < 0 || cursorIndex >= (runDataArray?.length ?? 0) - 1
+						activeIndex < 0 || activeIndex >= (runDataArray?.length ?? 0) - 1
 					}
-					onClick={() => handleMoveCursor(1)}
+					onClick={() => handleMoveActive(1)}
 				>
 					次へ
 				</Button>
@@ -1231,24 +1222,10 @@ export const Schedule = () => {
 								spacing={1}
 								sx={{alignItems: "flex-end"}}
 							>
-								{isActive && (
-									<Chip
-										label='進行中'
-										size='small'
-										color='success'
-									/>
-								)}
 								<Stack
 									direction='row'
 									spacing={1}
 								>
-									<Button
-										variant='outlined'
-										disabled={isActive}
-										onClick={handleSetActive}
-									>
-										アクティブにする
-									</Button>
 									<Button
 										variant='outlined'
 										startIcon={<EditIcon />}

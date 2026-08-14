@@ -275,7 +275,7 @@ test.describe("dashboard", () => {
 	});
 
 	test.describe("スケジュール", () => {
-		test("カーソルで走行を選び、アクティブに設定できる", async ({
+		test("カーソルで走行を選ぶとアクティブ走行が切り替わる", async ({
 			page,
 			nodecg,
 		}) => {
@@ -289,25 +289,19 @@ test.describe("dashboard", () => {
 				.toBe("run-1");
 			await expect(page.getByText("Super Mario World")).toBeVisible();
 
-			// 次へ → カーソルが run-2 に移動する（アクティブは変わらない）。
+			// 次へ → カーソル移動と同時に run-2 がアクティブになる。
 			await page.getByRole("button", {name: "次へ"}).click();
 			await expect(page.getByText("Super Metroid")).toBeVisible();
 			await expect
 				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
-				.toBe("run-1");
-
-			// アクティブにする → run-2 がアクティブになる。
-			await page.getByRole("button", {name: "アクティブにする"}).click();
-			await expect
-				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
 				.toBe("run-2");
 
-			// 前へ → カーソルが run-1 に戻る（アクティブは run-2 のまま）。
+			// 前へ → カーソル移動と同時に run-1 に戻る。
 			await page.getByRole("button", {name: "前へ"}).click();
 			await expect(page.getByText("Super Mario World")).toBeVisible();
 			await expect
 				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
-				.toBe("run-2");
+				.toBe("run-1");
 		});
 
 		test("走行を編集して保存すると runDataArray に反映される", async ({
@@ -412,10 +406,9 @@ test.describe("dashboard", () => {
 			await nodecg.setReplicant("adImage", sampleAdImageOverlay);
 			await expect(page.getByText("表示中: test-ad")).toBeVisible();
 
-			// カーソルを run-2 へ移動し、アクティブに切り替える。
+			// カーソルを run-2 へ移動するとアクティブも切り替わる。
 			await page.getByRole("button", {name: "次へ"}).click();
 			await expect(page.getByText("Super Metroid")).toBeVisible();
-			await page.getByRole("button", {name: "アクティブにする"}).click();
 			await expect
 				.poll(async () => nodecg.readReplicant<ActiveRunId>("activeRunId"))
 				.toBe("run-2");
