@@ -138,6 +138,7 @@ const NsmbPanel = () => {
 						<Stack
 							direction='row'
 							spacing={1}
+							sx={{flexWrap: "wrap"}}
 						>
 							<TextField
 								fullWidth
@@ -172,6 +173,7 @@ const NsmbPanel = () => {
 						<Stack
 							direction='row'
 							spacing={1}
+							sx={{flexWrap: "wrap"}}
 						>
 							<TextField
 								fullWidth

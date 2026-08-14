@@ -376,6 +376,7 @@ const RunEditModal = ({
 									<Stack
 										direction='row'
 										spacing={1}
+										sx={{flexWrap: "wrap"}}
 									>
 										<TextField
 											select
@@ -407,6 +408,7 @@ const RunEditModal = ({
 									<Stack
 										direction='row'
 										spacing={1}
+										sx={{flexWrap: "wrap"}}
 									>
 										<TextField
 											sx={{flex: 1}}
@@ -438,6 +440,7 @@ const RunEditModal = ({
 												<Stack
 													direction='row'
 													spacing={1}
+													sx={{flexWrap: "wrap"}}
 												>
 													<TextField
 														sx={{flex: 1}}
@@ -480,6 +483,7 @@ const RunEditModal = ({
 												<Stack
 													direction='row'
 													spacing={1}
+													sx={{flexWrap: "wrap"}}
 												>
 													<TextField
 														select
@@ -522,6 +526,7 @@ const RunEditModal = ({
 												<Stack
 													direction='row'
 													spacing={1}
+													sx={{flexWrap: "wrap"}}
 												>
 													<TextField
 														sx={{flex: 1}}
@@ -595,6 +600,7 @@ const RunEditModal = ({
 							<Stack
 								direction='row'
 								spacing={1}
+								sx={{flexWrap: "wrap"}}
 							>
 								<TextField
 									select
@@ -635,6 +641,7 @@ const RunEditModal = ({
 							<Stack
 								direction='row'
 								spacing={1}
+								sx={{flexWrap: "wrap"}}
 							>
 								<TextField
 									sx={{flex: 1}}
@@ -819,6 +826,7 @@ const AddRunModal = ({onClose}: {onClose: () => void}) => {
 						<Stack
 							direction='row'
 							spacing={1}
+							sx={{flexWrap: "wrap"}}
 						>
 							<TextField
 								select
@@ -855,6 +863,7 @@ const AddRunModal = ({onClose}: {onClose: () => void}) => {
 										<Stack
 											direction='row'
 											spacing={1}
+											sx={{flexWrap: "wrap"}}
 										>
 											<TextField
 												sx={{flex: 1}}
@@ -891,6 +900,7 @@ const AddRunModal = ({onClose}: {onClose: () => void}) => {
 										<Stack
 											direction='row'
 											spacing={1}
+											sx={{flexWrap: "wrap"}}
 										>
 											<TextField
 												select
@@ -933,6 +943,7 @@ const AddRunModal = ({onClose}: {onClose: () => void}) => {
 										<Stack
 											direction='row'
 											spacing={1}
+											sx={{flexWrap: "wrap"}}
 										>
 											<TextField
 												sx={{flex: 1}}
@@ -995,6 +1006,7 @@ const AddRunModal = ({onClose}: {onClose: () => void}) => {
 					<Stack
 						direction='row'
 						spacing={1}
+						sx={{flexWrap: "wrap"}}
 					>
 						<TextField
 							select
@@ -1033,6 +1045,7 @@ const AddRunModal = ({onClose}: {onClose: () => void}) => {
 					<Stack
 						direction='row'
 						spacing={1}
+						sx={{flexWrap: "wrap"}}
 					>
 						<TextField
 							sx={{flex: 1}}
@@ -1119,6 +1132,7 @@ export const Schedule = () => {
 			<Stack
 				direction='row'
 				spacing={1}
+				sx={{flexWrap: "wrap"}}
 			>
 				<Button
 					variant='outlined'
@@ -1207,7 +1221,11 @@ export const Schedule = () => {
 						<Stack
 							direction='row'
 							spacing={1}
-							sx={{justifyContent: "space-between", alignItems: "flex-start"}}
+							sx={{
+								justifyContent: "space-between",
+								alignItems: "flex-start",
+								flexWrap: "wrap",
+							}}
 						>
 							<Stack>
 								<Typography

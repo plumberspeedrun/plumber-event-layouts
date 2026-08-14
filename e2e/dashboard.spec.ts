@@ -337,6 +337,25 @@ test.describe("dashboard", () => {
 		});
 	});
 
+	test.describe("レスポンシブ", () => {
+		test.use({viewport: {width: 390, height: 844}});
+
+		test("モバイル表示で横スクロールが発生しない", async ({page, nodecg}) => {
+			await nodecg.gotoDashboard("overview.html");
+			await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+			await nodecg.setReplicant("activeRunId", sampleActiveRunId);
+			await expect(page.getByText("Super Mario World")).toBeVisible();
+
+			// コンテンツがビューポート幅に収まり、横スクロールが発生しないことを確認する。
+			const hasHorizontalOverflow = await page.evaluate(
+				() =>
+					document.documentElement.scrollWidth >
+					document.documentElement.clientWidth,
+			);
+			expect(hasHorizontalOverflow).toBe(false);
+		});
+	});
+
 	test.describe("カメラ", () => {
 		test("スイッチでカメラ表示を切り替えられる", async ({page, nodecg}) => {
 			await nodecg.gotoDashboard("overview.html");
