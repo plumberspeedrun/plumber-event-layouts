@@ -12,4 +12,8 @@ export interface Sm64 {
 		obsSceneName?: string;
 	}[];
 	activeIndex?: number;
+	cameraVisible?: {
+		left?: boolean;
+		right?: boolean;
+	};
 }

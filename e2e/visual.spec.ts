@@ -6,6 +6,7 @@ import {
 	sampleCameraVisible,
 	sampleLogoAsset,
 	sampleRunDataArray,
+	sampleSm64,
 } from "./data";
 import {expect, test} from "./fixtures";
 
@@ -67,7 +68,7 @@ test.describe("visual regression", () => {
 		// 背景・ロゴ・カメラ・run データ、アクティブ run を注入してレイアウトを描画させる。
 		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
 		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
-		await nodecg.setReplicant("cameraVisible", sampleCameraVisible);
+		await nodecg.setReplicant("sm64", sampleSm64);
 		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
 		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
 
@@ -77,6 +78,26 @@ test.describe("visual regression", () => {
 		await waitForImages(page);
 
 		await expect(page).toHaveScreenshot("SM64.png");
+	});
+
+	test("SM64 レイアウト（左右カメラOFF）", async ({page, nodecg}) => {
+		await nodecg.gotoGraphics("SM64.html");
+
+		// 左右のカメラを個別に OFF にして、カメラオフアイコンが左右に表示されることを確認する。
+		await nodecg.setReplicant("assets:background", sampleBackgroundAsset);
+		await nodecg.setReplicant("assets:logo", sampleLogoAsset);
+		await nodecg.setReplicant("sm64", {
+			...sampleSm64,
+			cameraVisible: {left: false, right: false},
+		});
+		await nodecg.setReplicant("runDataArray", sampleRunDataArray);
+		await nodecg.setReplicant("activeRunId", sampleActiveRunId);
+
+		await expect(page.getByText("Super Mario World")).toBeVisible();
+		await expect(page.getByText("Commentator One")).toBeVisible();
+		await waitForImages(page);
+
+		await expect(page).toHaveScreenshot("SM64-camera-off.png");
 	});
 
 	test("ScheduleList レイアウト", async ({page, nodecg}) => {

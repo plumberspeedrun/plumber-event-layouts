@@ -28,6 +28,24 @@
 		"activeIndex": {
 			"type": "integer",
 			"default": 0
+		},
+		"cameraVisible": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"left": {
+					"type": "boolean",
+					"default": true
+				},
+				"right": {
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"default": {
+				"left": true,
+				"right": true
+			}
 		}
 	},
 	"default": {
@@ -37,6 +55,10 @@
 			{ "label": "マリオ軍: Switch - ルイージ軍: N64" },
 			{ "label": "マリオ軍: Switch - ルイージ軍: Switch" }
 		],
-		"activeIndex": 0
+		"activeIndex": 0,
+		"cameraVisible": {
+			"left": true,
+			"right": true
+		}
 	}
 }

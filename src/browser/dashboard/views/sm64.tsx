@@ -4,6 +4,7 @@ import {
 	MenuItem,
 	Select,
 	Stack,
+	Switch,
 	ToggleButton,
 	ToggleButtonGroup,
 	Typography,
@@ -18,11 +19,16 @@ const Sm64Panel = () => {
 
 	const scenes = sm64?.scenes ?? [];
 	const activeIndex = sm64?.activeIndex ?? 0;
+	const cameraVisible = sm64?.cameraVisible ?? {left: true, right: true};
 
 	if (sm64 == null) return null;
 
 	const handleSelect = (index: number) => {
 		setSm64({...sm64, activeIndex: index});
+	};
+
+	const handleSetCameraVisible = (key: "left" | "right", value: boolean) => {
+		setSm64({...sm64, cameraVisible: {...cameraVisible, [key]: value}});
 	};
 
 	const handleUpdateObsSceneName = (index: number, sceneName: string) => {
@@ -65,6 +71,33 @@ const Sm64Panel = () => {
 					</ToggleButton>
 				))}
 			</ToggleButtonGroup>
+
+			<Section>
+				<SectionTitle>カメラ表示</SectionTitle>
+				<Stack spacing={1}>
+					{(
+						[
+							{key: "left", label: "左カメラ"},
+							{key: "right", label: "右カメラ"},
+						] as const
+					).map(({key, label}) => (
+						<Stack
+							key={key}
+							direction='row'
+							sx={{
+								justifyContent: "space-between",
+								alignItems: "center",
+							}}
+						>
+							<Typography>{label}</Typography>
+							<Switch
+								checked={cameraVisible[key]}
+								onChange={(e) => handleSetCameraVisible(key, e.target.checked)}
+							/>
+						</Stack>
+					))}
+				</Stack>
+			</Section>
 
 			<Section>
 				<SectionTitle>OBSシーン</SectionTitle>

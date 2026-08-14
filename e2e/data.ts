@@ -205,6 +205,7 @@ export const sampleSpreadsheetStatus: SpreadsheetStatus = {
 /** SM64用OBSシーン切替テスト用。obsSceneName は一部のシーンのみ設定する。 */
 export const sampleSm64: Sm64 = {
 	activeIndex: 0,
+	cameraVisible: {left: true, right: true},
 	scenes: [
 		{label: "マリオ軍: N64 - ルイージ軍: N64"},
 		{

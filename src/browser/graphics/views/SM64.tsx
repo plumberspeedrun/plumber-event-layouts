@@ -1,5 +1,5 @@
 import type {CSSProperties} from "react";
-import {useActiveRun, useBackgroundAsset, useCameraVisible} from "../../hooks";
+import {useActiveRun, useBackgroundAsset, useSm64} from "../../hooks";
 import {render} from "../../render";
 import {BaseLayout} from "../BaseLayout";
 import {AdImageOverlay} from "../components/AdImageOverlay";
@@ -76,7 +76,7 @@ const screenPositions = [
 
 const App = () => {
 	const backgroundAsset = useBackgroundAsset();
-	const [cameraVisible] = useCameraVisible();
+	const sm64 = useSm64();
 	const activeRun = useActiveRun();
 
 	const players = activeRun?.teams.flatMap((t) => t.players) ?? [];
@@ -91,14 +91,18 @@ const App = () => {
 	const maxCommentatorSlides = Math.max(commentatorItems.length, 1);
 	const commentatorSlideIndex = useNameplateCycle(maxCommentatorSlides);
 
-	const cameraOn = cameraVisible !== false;
+	// SM64 レイアウトでは左右の会場カメラをそれぞれ独立に表示/非表示できる。
+	const cameraVisible = sm64?.cameraVisible ?? {left: true, right: true};
 	const screenHoles = screenPositions.map(({x, y}) => ({
 		x,
 		y,
 		w: SCREEN_W,
 		h: SCREEN_H,
 	}));
-	const cameraRects = cameraOn ? [LEFT_CAMERA_RECT, RIGHT_CAMERA_RECT] : [];
+	const cameraRects = [
+		...(cameraVisible.left ? [LEFT_CAMERA_RECT] : []),
+		...(cameraVisible.right ? [RIGHT_CAMERA_RECT] : []),
+	];
 	const overlayStyle: CSSProperties = {
 		position: "absolute",
 		top: 0,
@@ -119,8 +123,8 @@ const App = () => {
 				alt=''
 				style={overlayStyle}
 			/>
-			{!cameraOn && <CameraOffIcon {...LEFT_CAMERA_RECT} />}
-			{!cameraOn && <CameraOffIcon {...RIGHT_CAMERA_RECT} />}
+			{!cameraVisible.left && <CameraOffIcon {...LEFT_CAMERA_RECT} />}
+			{!cameraVisible.right && <CameraOffIcon {...RIGHT_CAMERA_RECT} />}
 			<Logo
 				height={LOGO_H}
 				x={BAR_X - LOGO_COLUMN_W}

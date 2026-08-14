@@ -356,6 +356,44 @@ test.describe("dashboard", () => {
 		});
 	});
 
+	test.describe("SM64カメラ表示", () => {
+		test("左右のカメラを独立して表示/非表示に切り替えられる", async ({
+			page,
+			nodecg,
+		}) => {
+			await nodecg.gotoDashboard("sm64.html");
+			await nodecg.setReplicant("sm64", sampleSm64);
+
+			// 初期状態: 左右とも表示。
+			await expect(page.getByRole("switch").nth(0)).toBeChecked();
+			await expect(page.getByRole("switch").nth(1)).toBeChecked();
+
+			// 左カメラを OFF にすると left のみ false になる。
+			await page.getByRole("switch").nth(0).click();
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<Sm64>("sm64"))?.cameraVisible,
+				)
+				.toEqual({left: false, right: true});
+
+			// 右カメラを OFF にしても left は false のまま。
+			await page.getByRole("switch").nth(1).click();
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<Sm64>("sm64"))?.cameraVisible,
+				)
+				.toEqual({left: false, right: false});
+
+			// 左カメラを ON に戻すと left のみ true になる。
+			await page.getByRole("switch").nth(0).click();
+			await expect
+				.poll(
+					async () => (await nodecg.readReplicant<Sm64>("sm64"))?.cameraVisible,
+				)
+				.toEqual({left: true, right: false});
+		});
+	});
+
 	test.describe("スケジュール", () => {
 		test("カーソルで走行を選ぶとアクティブ走行が切り替わる", async ({
 			page,
